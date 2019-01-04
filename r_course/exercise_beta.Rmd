@@ -1,0 +1,156 @@
+---
+title: "Exercise"
+author: "Ji-Dung Luo"
+output: html_document
+---
+
+```{r vcfMan_exercise_setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+suppressMessages(library(VariantAnnotation))
+suppressMessages(library(TxDb.Hsapiens.UCSC.hg18.knownGene))
+suppressMessages(library(BSgenome.Hsapiens.UCSC.hg18))
+suppressMessages(library(ggplot2))
+suppressMessages(library(DT))
+# file_path <- "~/Documents/01_Mission_BioinfoTraining/vcfMan/r_course/data"
+# vcf_file <- file.path(file_path,"TSI.exon.2010_03.genotypes.vcf")
+```
+
+## Variant Manipulation
+
+In this exercise, we use vcf file downloaded from **1000 Genomes Project**. This file is available in **./Data** folder. You can also download it [here](ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/release/2010_07/exon/snps/CEU.exon.2010_03.genotypes.vcf.gz). Please use this file to answer the following questions. 
+
+1. Please loading the VCF file and find out how many variations and samples in it.
+```{r vcfMan_exercise_loading}
+library(VariantAnnotation)
+vcf <- readVcf("./data/CEU.exon.2010_03.genotypes.vcf.gz")
+#vcf
+```
+
+2. Please retrieve header lines of ***Info*** section. 
+```{r vcfMan_exercise_infoExt}
+header_info <- info(header(vcf))
+#header_info
+```
+
+3. Please retrieve header lines of ***Genotype*** section. 
+```{r vcfMan_exercise_genoExt}
+header_geno <- geno(header(vcf))
+#header_geno
+```
+
+4. Please extract variants in Chromosome 1
+```{r vcfMan_exercise_rowRangeExt}
+rd <- rowRanges(vcf)
+rd_chr1 <- rd[seqnames(rd)==1]
+#rd_chr1
+```
+
+5. Please draw a histgram for the depth of the varition in chromosome 1
+```{r vcfMan_exercise_depHist}
+dp_mat <- geno(vcf)$DP
+dp_mat_chr1 <- dp_mat[rownames(dp_mat)%in%names(rd_chr1),]
+hist(dp_mat_chr1,xlab="Depth",main="",breaks=100)
+```
+
+6. Please randomly select ten variants and evaluate the distribution of their genotypes in this population.
+```{r vcfMan_exercise_gtBar}
+randNum <- sample(1:length(rd_chr1),10)
+var_id <- names(rd_chr1)[randNum]
+gt_mat <- geno(vcf)$GT
+gt_mat_chr1 <- gt_mat[rownames(gt_mat)%in%names(rd_chr1),]
+gt_mat_sel <- gt_mat_chr1[rownames(gt_mat_chr1)%in%var_id,]
+gt_type <- unique(as.vector(gt_mat_sel))
+#
+gt_count_sel <- NULL
+for(i in 1:length(var_id)){
+  var <- var_id[i]
+  yd <- data.frame(Variant=rep(var,times=length(gt_type)))
+  for(j in 1:length(gt_type)){
+    gt <- gt_type[j]
+    yd$GT[j] <- gt
+    yd$count[j] <- length(which(gt_mat_sel[rownames(gt_mat_sel)==var,]==gt))
+  }
+  gt_count_sel <- rbind(gt_count_sel,yd)
+}
+#
+library(ggplot2)
+ggplot(gt_count_sel,aes(x=Variant,y=count,fill=GT))+
+  geom_bar(stat='identity',position = position_stack(reverse = TRUE))+
+  labs(x="",y="Count",fill="Genotypes")+theme_classic()+coord_flip()
+```
+
+7. Please select variants in chromosome 1 according to the following criteria:<br>
+  **no-call(genotype==".") in less than 10 samples** <br>
+  **depth<20 in less than 10 samples** <br>
+  **PASS the filter (In this VCF, every variant is passed the filter)**
+  
+```{r vcfMan_exercise_selVar}
+var_dp <- rownames(dp_mat_chr1[!rowSums(dp_mat_chr1<=20)>=10,])
+var_gt <- rownames(gt_mat_chr1[!rowSums(gt_mat_chr1==".")>=10,])
+rd_chr1_sel <- rd_chr1[names(rd_chr1)%in%var_dp&names(rd_chr1)%in%var_gt&rd_chr1$FILTER=="PASS"]
+#rd_chr1_sel
+```
+
+8. Predict amino acid changes for the variations selected in #7<br>
+***This vcf is based onb hg18***.
+
+```{r vcfMan_exercise_aaChange,message=FALSE}
+library(BSgenome.Hsapiens.UCSC.hg18)
+library(TxDb.Hsapiens.UCSC.hg18.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene
+seqlevelsStyle(txdb) <- "NCBI"
+seqlevelsStyle(Hsapiens) <- "NCBI"
+#
+coding <- predictCoding(vcf, txdb, seqSource=Hsapiens)
+coding_sel <- coding[names(coding)%in%names(rd_chr1_sel)]
+#coding_sel
+```
+
+9. Please convert the results of #8 into a table including the following construction.
+
+```{r vcfMan_exercise_aaChTab}
+int_tab <- data.frame(VarID=names(coding_sel),
+                      chromosome=seqnames(coding_sel),
+                      start=as.vector(start(coding_sel)),
+                      end=as.vector(unlist(end(coding_sel))),
+                      strand=as.vector(strand(coding_sel)),
+                      Ref=as.vector(coding_sel$REF),
+                      Alt=as.vector(unlist(coding_sel$ALT)),
+                      Consequence=coding_sel$CONSEQUENCE,
+                      EntrezID=coding_sel$GENEID,
+                      TxID=coding_sel$TXID,
+                      Codon=paste0("c.",coding_sel$CDSLOC,as.vector(coding_sel$REF),">",as.vector(unlist(coding_sel$ALT))),
+                      aaChange=paste0("p.",as.vector(coding_sel$REFAA),coding_sel$PROTEINLOC,as.vector(unlist(coding_sel$VARAA))))
+# library(DT)
+# datatable(int_tab)
+write.table(int_tab,"selected_variations_annotated_chr1.txt",row.names = FALSE,sep="\t",quote=FALSE)
+names(int_tab)
+```
+
+10. Please demonstrate the proportion of variant types (consequence) in each sample with a bar chart.
+```{r vcfMan_exercise_consChart}
+sampleID <- samples(header(vcf))
+count_tab <- NULL
+for(k in 1:length(sampleID)){
+  samID <- sampleID[k]
+  var_dp <- rownames(dp_mat)[dp_mat[,k]>=20]
+  var_gt <- rownames(gt_mat)[!gt_mat[,k]=="."&!gt_mat[,k]=="0/0"]
+  var_sel <- names(coding)[names(coding)%in%var_dp&names(coding)%in%var_gt]
+  #
+  yd <- data.frame(sample_id=rep(samID,times=length(var_sel)),
+                   var_id=var_sel,
+                   consequence=coding$CONSEQUENCE[names(coding)%in%var_sel])
+  count_tab <- rbind(count_tab,yd)
+}
+tbl <- table(count_tab$sample_id,count_tab$consequence)
+proc_tbl <- (tbl/rowSums(tbl))*100
+melt_proc <- data.frame(sample_id=rep(rownames(proc_tbl),times=3),
+                        var_type=c(rep("nonsense",times=length(sampleID)),
+                                   rep("nonsynonymous",times=length(sampleID)),
+                                   rep("synonymous",times=length(sampleID))),
+                        count=c(proc_tbl[,1],proc_tbl[,2],proc_tbl[,3]))
+ggplot(melt_proc,aes(x=sample_id,y=count,fill=var_type))+
+  geom_bar(stat='identity',position = position_stack(reverse = FALSE))+
+  labs(x="",y="Proportion",fill="Types")+
+  coord_flip()+theme_classic()
+```
