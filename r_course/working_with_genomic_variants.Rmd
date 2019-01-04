@@ -1,7 +1,7 @@
 ---
 title: "Working with Genomic Variants <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
 author: "Rockefeller University, Bioinformatics Resource Centre"
-date: "http://rockefelleruniversity.github.io/Variants_Manipulation_In_R/"
+date: "http://rockefelleruniversity.github.io/RU_GenomicVariants/"
 output: 
   xaringan::moon_reader:
     css: ["default", "metropolisCustom.css", "metropolis-fontsCustom.css"]
