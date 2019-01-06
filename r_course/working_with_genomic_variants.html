@@ -63,7 +63,7 @@ library(VariantAnnotation)
 ## Load vcf file
 
 ```r
-vcf &lt;- readVcf("data/masterSnpCallsInDels.vcf","hg19")
+vcf &lt;- readVcf("./data/masterSnpCallsInDels.vcf","hg19")
 ```
 
 ---
@@ -139,11 +139,12 @@ length(sampleID)
 ## Metadata field
 
 ```r
-meta(header(vcf))$META
+meta(header(vcf))
 ```
 
 ```
-## NULL
+## DataFrameList of length 4
+## names(4): UnifiedGenotyper fileformat reference contig
 ```
 
 ---
@@ -151,6 +152,15 @@ meta(header(vcf))$META
 
 ```r
 ref_geno &lt;- as.matrix(meta(header(vcf))$reference)
+ref_geno
+```
+
+```
+##           Value                                                                                           
+## reference "file:///m/cphg-nextgen1/cphg-nextgen1/projects/reference/hg19/uw/Homo_sapiens_assembly19.fasta"
+```
+
+```r
 basename(ref_geno[rownames(ref_geno)=="reference"])
 ```
 
@@ -213,14 +223,11 @@ rd[1:3]
 - end position: end()
 
 ```r
-seqnames(rd)[1:2]
+as.vector(seqnames(rd))[1:2]
 ```
 
 ```
-## factor-Rle of length 2 with 1 run
-##   Lengths: 2
-##   Values : 1
-## Levels(85): 1 2 3 4 5 ... GL000194.1 GL000225.1 GL000192.1 NC_007605
+## [1] "1" "1"
 ```
 
 ```r
@@ -461,14 +468,14 @@ hist(dist_GQ,xlab="Quality",main="")
 ---
 ## Annotate variantions
 - Required resources
-- Retrive dbSNP ID
 - Predict amino acid changes
+- Retrive dbSNP ID
 
 ---
 ## Required resources
-- [dbSNP](https://bioconductor.org/packages/release/data/annotation/html/SNPlocs.Hsapiens.dbSNP144.GRCh37.html)
 - [Reference Genome](http://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg19.html)
 - [Annotation](https://bioconductor.org/packages/release/data/annotation/html/TxDb.Hsapiens.UCSC.hg19.knownGene.html)
+- [dbSNP](https://bioconductor.org/packages/release/data/annotation/html/SNPlocs.Hsapiens.dbSNP144.GRCh37.html)
 
 
 ```r
@@ -913,25 +920,6 @@ ext_dbSNP[1:5]
 ```
 
 ---
-## Generate index for Variant
-
-```r
-matV1 &lt;- data.frame(Variant=names(rd))
-matV1$posIDX &lt;- gsub("(.*)_(.*)","\\1",matV1$Variant)
-head(matV1)
-```
-
-```
-##         Variant   posIDX
-## 1   1:69270_A/G  1:69270
-## 2   1:69511_A/G  1:69511
-## 3   1:69897_T/C  1:69897
-## 4 1:874816_C/CT 1:874816
-## 5  1:876499_A/G 1:876499
-## 6  1:877831_T/C 1:877831
-```
-
----
 ## Generate index for SNP_ID
 
 ```r
@@ -949,6 +937,25 @@ head(snp_ID)
 ## 4  1:69897         rs200676709
 ## 5 1:876499           rs4372192
 ## 6 1:877831           rs6672356
+```
+
+---
+## Generate index for Variant
+
+```r
+matV1 &lt;- data.frame(Variant=names(rd))
+matV1$posIDX &lt;- gsub("(.*)_(.*)","\\1",matV1$Variant)
+head(matV1)
+```
+
+```
+##         Variant   posIDX
+## 1   1:69270_A/G  1:69270
+## 2   1:69511_A/G  1:69511
+## 3   1:69897_T/C  1:69897
+## 4 1:874816_C/CT 1:874816
+## 5  1:876499_A/G 1:876499
+## 6  1:877831_T/C 1:877831
 ```
 
 ---

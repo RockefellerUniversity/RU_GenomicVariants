@@ -13,7 +13,7 @@ suppressPackageStartupMessages(library(ggplot2))
 library(VariantAnnotation)
 
 ## ----vcfLoad_varMan------------------------------------------------------
-vcf <- readVcf("data/masterSnpCallsInDels.vcf","hg19")
+vcf <- readVcf("./data/masterSnpCallsInDels.vcf","hg19")
 
 ## ----vcf_overview_varMan-------------------------------------------------
 vcf
@@ -27,10 +27,11 @@ sampleID
 length(sampleID)
 
 ## ----meta_varMan---------------------------------------------------------
-meta(header(vcf))$META
+meta(header(vcf))
 
 ## ----meta_refG_varMan----------------------------------------------------
 ref_geno <- as.matrix(meta(header(vcf))$reference)
+ref_geno
 basename(ref_geno[rownames(ref_geno)=="reference"])
 
 ## ----meta_contig_varMan--------------------------------------------------
@@ -41,7 +42,7 @@ rd <- rowRanges(vcf)
 rd[1:3]
 
 ## ----range_varMan_posi---------------------------------------------------
-seqnames(rd)[1:2]
+as.vector(seqnames(rd))[1:2]
 start(rd)[1:2]
 end(rd)[1:2]
 
@@ -184,16 +185,16 @@ genome(my_snps) <- "hg19"
 ext_dbSNP <- my_snps[my_snps %in% rd]
 ext_dbSNP[1:5]
 
-## ----dbSNPV_varMan_tbl_1-------------------------------------------------
-matV1 <- data.frame(Variant=names(rd))
-matV1$posIDX <- gsub("(.*)_(.*)","\\1",matV1$Variant)
-head(matV1)
-
 ## ----dbSNPV_varMan_tbl_2-------------------------------------------------
 snp_ID <- data.frame(posIDX=paste0(
   seqnames(ext_dbSNP),":",pos(ext_dbSNP)),
                      ext_dbSNP$RefSNP_id)
 head(snp_ID)
+
+## ----dbSNPV_varMan_tbl_1-------------------------------------------------
+matV1 <- data.frame(Variant=names(rd))
+matV1$posIDX <- gsub("(.*)_(.*)","\\1",matV1$Variant)
+head(matV1)
 
 ## ----dbSNPV_varMan_tbl_3-------------------------------------------------
 matS <- merge(matV1,snp_ID,all.x=TRUE,
