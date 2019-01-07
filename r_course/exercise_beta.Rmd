@@ -17,7 +17,7 @@ suppressMessages(library(DT))
 
 ## Variant Manipulation
 
-In this exercise, we use vcf file downloaded from **1000 Genomes Project**. This file is available in **./Data** folder. You can also download it [here](ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/release/2010_07/exon/snps/CEU.exon.2010_03.genotypes.vcf.gz). Please use this file to answer the following questions. 
+In this exercise, we use vcf file downloaded from **1000 Genomes Project**. This file is available in **./data** folder. You can also download it [here](ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/release/2010_07/exon/snps/CEU.exon.2010_03.genotypes.vcf.gz). Please use this file to answer the following questions. 
 
 1. Please loading the VCF file and find out how many variations and samples in it.
 ```{r vcfMan_exercise_loading}
