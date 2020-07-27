@@ -1,7 +1,7 @@
 Package: genomicvariants
 Type: Package
 Title: Genomic Variants with Bioconductor
-Version: 0.1.0
+Version: 0.1.1
 Author: Ji-Dung Luo, Thomas Carroll.
 Maintainer:Ji-Dung Luo <jluo@rockefeller.edu>,  Thomas Carroll <tc.infomatics@gmail>
 Description: More about what it does (maybe more than one line)
