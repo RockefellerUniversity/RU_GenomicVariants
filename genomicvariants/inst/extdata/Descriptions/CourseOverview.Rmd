@@ -3,9 +3,9 @@
 <br>
 [<img src="https://github.com/RockefellerUniversity/RU_GenomicVariants/workflows/R-CMD-check-bioc/badge.svg">](https://github.com/RockefellerUniversity/RU_GenomicVariants/actions?query=workflow%3AR-CMD-check-bioc)
 
-This course introduces ATACseq analysis in Bioconductor.
+This course introduces Genomic Variant Analysis in Bioconductor.
 
-The course consists of 2 sections. This walk you through each step of a normal ATACseq analysis workflow. It covers alignment, QC, peak calling, testing for enrichment in groups of genes, motif enrichment and testing for differential accessibility. Exercises and answer sheets are included after all subsections to practice techniques and provide future reference examples.
+The course consists of 3 sections. This walk you through each step of a genomic variant analysis workflow. It covers manipulation VCF files, annotate variants, and more advanced analysis of large cohort. Exercises and answer sheets are included after all subsections to practice techniques and provide future reference examples.
 
 Course material and exercises are available to view as rendered HTML at https://rockefelleruniversity.github.io/RU_GenomicVariants/.
 All material is available to download under GPL v2 license.
