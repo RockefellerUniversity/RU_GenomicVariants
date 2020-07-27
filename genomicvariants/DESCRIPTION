@@ -3,12 +3,12 @@ Type: Package
 Title: Genomic Variants with Bioconductor
 Version: 0.1.0
 Author: Ji-Dung Luo, Thomas Carroll.
-Maintainer: Thomas Carroll <tc.infomatics@gmail>
+Maintainer:Ji-Dung Luo <jluo@rockefeller.edu>,  Thomas Carroll <tc.infomatics@gmail>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
 biocViews: Training
-Depends: methods, ggplot2, rmarkdown
+Depends: methods, ggplot2, rmarkdown, knitr,VariantAnnotation, BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene, SNPlocs.Hsapiens.dbSNP144.GRCh37, ggplot2, GenomicFeatures, maftools, NMF
 Suggests: knitr,
     rmarkdown,
     testthat,
