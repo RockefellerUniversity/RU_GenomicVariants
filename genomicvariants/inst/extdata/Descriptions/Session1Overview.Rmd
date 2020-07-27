@@ -1,0 +1,9 @@
+<br>
+
+#### **Genomic Variant, Session 1**
+
+This section introduces the analysis of Genomic Variant in Bioconductor
+Session sections:
+
+* Introduce VCF file structure
+* Extract variant informations from VCF file

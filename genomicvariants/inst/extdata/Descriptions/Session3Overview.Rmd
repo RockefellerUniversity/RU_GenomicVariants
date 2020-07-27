@@ -1,0 +1,10 @@
+<br>
+
+#### **Genomic Variant, Session 3**
+
+This section demonstrates how to handle Variants from multiple samples and make advanced analysis
+Session sections:
+
+* Introduce Mutation Annotatin Format (MAF)
+* Load MAF file into R and make summary report
+* Analysis of enrichment in genes, pathways, and mutational signatures

@@ -1,0 +1,10 @@
+<br>
+
+#### **Genomic Variant, Session 2**
+
+This section demonstrates how to annotate variants by using TxDb and dbSNP
+Session sections:
+
+* Annotate variants in coding region
+* Annotate SNPs by using dbSNP
+* Integrate information in a data frame
