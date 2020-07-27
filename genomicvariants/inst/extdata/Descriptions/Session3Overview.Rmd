@@ -1,10 +1,10 @@
 <br>
 
-#### **ATACAseq, Session 2**
+#### **Genomic Variant, Session 3**
 
-This section demonstrates how to assess global changes in accesibility with ATACseq data.
+This section demonstrates how to handle Variants from multiple samples and make advanced analysis
 Session sections:
 
-* Annotating ATACseq data in R
-* Plotting nucleosome free and mono-nucleosome signal
-* Plotting cut-sites around DNA binding proteins
+* Introduce Mutation Annotatin Format (MAF)
+* Load MAF file into R and make summary report
+* Analysis of enrichment in genes, pathways, and mutational signatures

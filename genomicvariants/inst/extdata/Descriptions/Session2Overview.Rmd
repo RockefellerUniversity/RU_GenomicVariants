@@ -1,10 +1,10 @@
 <br>
 
-#### **ATACAseq, Session 2**
+#### **Genomic Variant, Session 2**
 
-This section demonstrates how to assess global changes in accesibility with ATACseq data.
+This section demonstrates how to annotate variants by using TxDb and dbSNP
 Session sections:
 
-* Annotating ATACseq data in R
-* Plotting nucleosome free and mono-nucleosome signal
-* Plotting cut-sites around DNA binding proteins
+* Annotate variants in coding region
+* Annotate SNPs by using dbSNP
+* Integrate information in a data frame
