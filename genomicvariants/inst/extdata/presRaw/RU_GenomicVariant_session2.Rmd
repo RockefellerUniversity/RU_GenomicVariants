@@ -31,7 +31,7 @@ suppressPackageStartupMessages(library(BSgenome.Hsapiens.UCSC.hg19))
 suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene))
 suppressPackageStartupMessages(library(SNPlocs.Hsapiens.dbSNP144.GRCh37))
 suppressPackageStartupMessages(library(ggplot2))
-vcf <- readVcf("../data/SAMN01882168_filt.vcf.gz","hg19")
+vcf <- readVcf("data/SAMN01882168_filt.vcf.gz","hg19")
 rd <- rowRanges(vcf)
 ```
 
@@ -151,7 +151,7 @@ tar_chr <- as.vector(seqnames(rd)@values)
 my_snps <- snpsBySeqname(all_snps,c(tar_chr))
 ```
 ```{r dbSNPv_varMan_load_fail2,eval=TRUE,echo=FALSE,fig.align="center",out.width="75%"}
-knitr::include_graphics("../imgs/vcfMan_fig5r.png")
+knitr::include_graphics("imgs/vcfMan_fig5r.png")
 ```
 
 ---

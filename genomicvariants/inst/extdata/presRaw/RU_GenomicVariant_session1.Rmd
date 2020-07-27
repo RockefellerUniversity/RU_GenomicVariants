@@ -49,13 +49,13 @@ suppressPackageStartupMessages(library(GenomicFeatures))
 ---
 ## [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html)
 ```{r varLoad_intro,echo=FALSE,out.width = "75%",fig.align="center"}
-knitr::include_graphics("../imgs/vcfMan_fig2.png")
+knitr::include_graphics("imgs/vcfMan_fig2.png")
 ```
 
 ---Load VCF file
 ```{r varLoad_varMan}
 library(VariantAnnotation)
-vcf <- readVcf("../data/SAMN01882168_filt.vcf.gz","hg19")
+vcf <- readVcf("data/SAMN01882168_filt.vcf.gz","hg19")
 vcf
 ```
 
