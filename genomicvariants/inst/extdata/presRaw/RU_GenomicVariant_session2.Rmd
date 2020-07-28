@@ -56,7 +56,7 @@ library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 ---
 ## Subsetting Variants in chromosome 1
 ```{r chrSub,eval=TRUE,tidy=FALSE,echo=TRUE}
-rd_chr1 <- rd[seqnames(rd) %in% "chr1"]
+rd_chr1 <- rd[grepl(names(rd),pattern = "chr1:")]
 vcf_chr1 <- vcf[names(rd_chr1)]
 ```
 
