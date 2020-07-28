@@ -78,7 +78,7 @@ coding[1]
 
 ---
 ## Transform into data frame
-```{r aaCh_varMan_frame,eval=FALSE,tidy=FALSE,echo=TRUE}
+```{r aaCh_varMan_frame,eval=TRUE,tidy=FALSE,echo=TRUE}
 matA <- data.frame(Variant=names(coding),
                    chromosome=seqnames(coding),
                    start=start(coding),end=end(coding),
