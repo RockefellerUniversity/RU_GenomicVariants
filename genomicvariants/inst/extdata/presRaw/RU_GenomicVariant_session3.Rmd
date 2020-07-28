@@ -242,7 +242,8 @@ ggplot(yd,aes(x=num,y=count,fill=cat))+geom_bar(stat='identity')+
 library('NMF')
 laml.sign <- estimateSignatures(mat = laml.tnm,
                                 nTry = 6,
-                                pConstant = 0.1)
+                                pConstant = 0.1,
+                                parallel = 2)
 ```
 - [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation)
 - Measure of how faithfully a clustering results represent the original data
@@ -253,7 +254,8 @@ laml.sign <- estimateSignatures(mat = laml.tnm,
 library('NMF')
 laml.sign <- estimateSignatures(mat = laml.tnm,
                                 nTry = 6,
-                                pConstant = 0.1)
+                                pConstant = 0.1,
+                                parallel = 2)
 ```
 
 ```{r mult_mutSig_sigEst_advan3,eval=TRUE,echo=FALSE,include=TRUE,fig.align="center"}
@@ -265,7 +267,8 @@ plotCophenetic(laml.sign)
 ```{r mult_mutSig_sigExt_advan,tidy=FALSE}
 laml.sig.ext <- extractSignatures(mat = laml.tnm, 
                                   n = 3,
-                                  pConstant = 0.1)
+                                  pConstant = 0.1,
+                                  parallel = 2)
 laml.sig.ext$signatures[1:5,] # use for mapping to mutational signature database
 ```
 
