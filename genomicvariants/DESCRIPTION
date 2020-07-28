@@ -8,7 +8,7 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
 biocViews: Training
-Depends: methods,ggplot2, rmarkdown, knitr,VariantAnnotation, BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene, SNPlocs.Hsapiens.dbSNP144.GRCh37, ggplot2, GenomicFeatures, maftools, NMF, BiocGenerics,R.utils
+Depends: methods,ggplot2,rmarkdown,dplyr,knitr,VariantAnnotation, BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene, SNPlocs.Hsapiens.dbSNP144.GRCh37, ggplot2, GenomicFeatures, maftools, NMF, BiocGenerics,R.utils
 Suggests: knitr,
     rmarkdown,
     testthat,

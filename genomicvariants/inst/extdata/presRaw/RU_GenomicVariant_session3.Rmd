@@ -64,6 +64,7 @@ hist(tbl,breaks = 10,xlab = "Mutations")
 ```{r mult_mafT_advan}
 library(maftools)
 laml <- read.maf("data/tcga_laml.maf.gz")
+# laml <- read.maf("../data/tcga_laml.maf.gz")
 ```
 
 ---
@@ -76,9 +77,10 @@ sample_sum[1:2,]
 ---
 ## Mutation classes in each sample
 ```{r mult_samSumPlot_advan1}
-melt_dat <- reshape2::melt(sample_sum[,-c("total")],id="Tumor_Sample_Barcode")
 var_to <- sample_sum$total
 names(var_to) <- sample_sum$Tumor_Sample_Barcode
+sample_sum <- dplyr::select(sample_sum,-total)
+melt_dat <- reshape2::melt(sample_sum,id="Tumor_Sample_Barcode")
 melt_dat$totalVar <- var_to[match(melt_dat$Tumor_Sample_Barcode,names(var_to))]
 melt_dat$prop <- melt_dat$value / melt_dat$totalVar
 head(melt_dat)
