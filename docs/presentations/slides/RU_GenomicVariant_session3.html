@@ -12,7 +12,7 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# ATACseq In Bioconductor
+# Genomic Variants ~ Session 3
 <html>
 <div style="float:left">
 
@@ -20,17 +20,515 @@ class: center, middle, inverse, title-slide
 <hr color='#EB811B' size=1px width=796px>
 </html>
 ### Rockefeller University, Bioinformatics Resource Centre
-### <a href="http://rockefelleruniversity.github.io/RU_ATACseq/" class="uri">http://rockefelleruniversity.github.io/RU_ATACseq/</a>
+### <a href="http://rockefelleruniversity.github.io/RU_GenomicVariants/" class="uri">http://rockefelleruniversity.github.io/RU_GenomicVariants/</a>
 
 ---
 
 
 
+## Advaned analysis
+- How to handle multiple samples? ~ MAF and maftools
+- Any mutation hotspots? ~ lollipop plot
+- Any interactions between mutations? ~ oncoplot
+- Any enriched pathways? ~ OncogenicPathways
+- Mutational signatures?
+
+---
+## When we have multiple samples
+- [Mutation Annotation Fromat](https://docs.gdc.cancer.gov/Data/File_Formats/MAF_Format/) (MAF) would be a good choice for storing and presenting
+- [The Cancer Genome Atlas](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga) (TCGA) data as example 
+
+```r
+laml_tab &lt;- read.delim("data/tcga_laml.maf",sep="\t")
+# laml_tab &lt;- read.delim("../data/tcga_laml.maf",sep="\t")
+laml_tab[1:2,]
+```
+
+```
+##   Hugo_Symbol Entrez_Gene_Id           Center NCBI_Build Chromosome
+## 1      ABCA10          10349 genome.wustl.edu         37         17
+## 2       ABCA4             24 genome.wustl.edu         37          1
+##   Start_Position End_position Strand Variant_Classification Variant_Type
+## 1       67170917     67170917      +            Splice_Site          SNP
+## 2       94490594     94490594      +      Missense_Mutation          SNP
+##   Reference_Allele Tumor_Seq_Allele1 Tumor_Seq_Allele2 Tumor_Sample_Barcode
+## 1                T                 T                 C         TCGA-AB-2988
+## 2                C                 C                 T         TCGA-AB-2869
+##   Protein_Change i_TumorVAF_WU i_transcript_name
+## 1        p.K960R         45.66       NM_080282.3
+## 2       p.R1517H         38.12       NM_000350.2
+```
+
+---
+## How many mutations per sample
+
+```r
+tbl &lt;- table(laml_tab$Tumor_Sample_Barcode)
+hist(tbl,breaks = 10,xlab = "Mutations")
+```
+
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_samInfo_advan-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## [maftools](https://www.bioconductor.org/packages/release/bioc/html/maftools.html)
+
+```r
+library(maftools)
+laml &lt;- read.maf("data/tcga_laml.maf.gz")
+```
+
+```
+## -Reading
+## -Validating
+## -Silent variants: 475 
+## -Summarizing
+## -Processing clinical data
+## --Missing clinical data
+## -Finished in 0.562s elapsed (0.457s cpu)
+```
+
+```r
+# laml &lt;- read.maf("../data/tcga_laml.maf.gz")
+```
+
+---
+## Mutation classes in each sample
+
+```r
+sample_sum &lt;- getSampleSummary(laml)
+sample_sum[1:2,]
+```
+
+```
+##    Tumor_Sample_Barcode Frame_Shift_Del Frame_Shift_Ins In_Frame_Del
+## 1:         TCGA-AB-3009               0               5            0
+## 2:         TCGA-AB-2807               1               0            1
+##    In_Frame_Ins Missense_Mutation Nonsense_Mutation Splice_Site total
+## 1:            1                25                 2           1    34
+## 2:            0                16                 3           4    25
+```
+
+---
+## Mutation classes in each sample
+
+```r
+var_to &lt;- sample_sum$total
+names(var_to) &lt;- sample_sum$Tumor_Sample_Barcode
+sample_sum &lt;- dplyr::select(sample_sum,-total)
+melt_dat &lt;- reshape2::melt(sample_sum,id="Tumor_Sample_Barcode")
+melt_dat$totalVar &lt;- var_to[match(melt_dat$Tumor_Sample_Barcode,names(var_to))]
+melt_dat$prop &lt;- melt_dat$value / melt_dat$totalVar
+head(melt_dat)
+```
+
+```
+##   Tumor_Sample_Barcode        variable value totalVar prop
+## 1         TCGA-AB-3009 Frame_Shift_Del     0       34 0.00
+## 2         TCGA-AB-2807 Frame_Shift_Del     1       25 0.04
+## 3         TCGA-AB-2959 Frame_Shift_Del     0       23 0.00
+## 4         TCGA-AB-3002 Frame_Shift_Del     0       21 0.00
+## 5         TCGA-AB-2849 Frame_Shift_Del     0       20 0.00
+## 6         TCGA-AB-2923 Frame_Shift_Del     1       20 0.05
+```
+
+---
+## Mutation classes in each sample
+
+```r
+ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=value,fill=variable))+
+  geom_bar(stat='identity',position = 'stack')+
+  labs(x="",y="Mutations",fill="")+
+  theme(axis.text.x=element_blank())
+```
+
+---
+## Mutation classes in each sample
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_samSumPlot_advan3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Mutation classes in each sample
+
+```r
+ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=prop,fill=variable))+
+  geom_bar(stat='identity',position = 'stack')+
+  labs(x="",y="Proportion",fill="")+
+  theme(axis.text.x=element_blank())
+```
+
+---
+## Mutation classes in each sample
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_samSumPlotPres_advan5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Most frequently mutated genes
+
+```r
+gene_sum &lt;- getGeneSummary(laml)
+gene_sum[1:5]
+```
+
+```
+##       Hugo_Symbol Frame_Shift_Del Frame_Shift_Ins In_Frame_Del In_Frame_Ins
+##    1:        FLT3               0               0            1           33
+##    2:      DNMT3A               4               0            0            0
+##    3:        NPM1               0              33            0            0
+##    4:        IDH2               0               0            0            0
+##    5:        IDH1               0               0            0            0
+##   ---                                                                      
+## 1237:      ZNF689               0               0            0            0
+## 1238:      ZNF75D               0               0            0            0
+## 1239:      ZNF827               1               0            0            0
+## 1240:       ZNF99               0               0            0            0
+## 1241:        ZPBP               0               0            0            0
+```
+
+---
+## Mutation hotspots? 
+
+```r
+lollipopPlot(maf = laml, 
+             gene = 'NRAS', 
+             AACol = 'Protein_Change', 
+             showMutationRate = TRUE,
+             labelPos = "all")
+```
+
+---
+## Mutation hotspots? 
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_lolli_advan_eval2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Interactions between mutations?
+
+```r
+oncoplot(maf=laml,top = 5)
+```
+
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_oncoplot_advan-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Any enriched in pathways?
+
+```r
+OncogenicPathways(maf = laml)
+```
+
+```
+##    Pathway  N n_affected_genes fraction_affected Mutated_samples
+## 1:    PI3K 29                1        0.03448276               1
+## 2:    NRF2  3                1        0.33333333               1
+## 3:    TP53  6                2        0.33333333              15
+## 4:     WNT 68                3        0.04411765               4
+## 5:     MYC 13                3        0.23076923               3
+## 6:   NOTCH 71                6        0.08450704               8
+## 7:   Hippo 38                7        0.18421053               7
+## 8: RTK-RAS 85               18        0.21176471              97
+##    Fraction_mutated_samples
+## 1:              0.005181347
+## 2:              0.005181347
+## 3:              0.077720207
+## 4:              0.020725389
+## 5:              0.015544041
+## 6:              0.041450777
+## 7:              0.036269430
+## 8:              0.502590674
+```
+
+---
+## Any enriched in pathways?
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_pathPlotWF_advan2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Mutations enriched in pathways?
+
+```r
+PlotOncogenicPathways(maf = laml, pathways = "RTK-RAS")
+```
+
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_pathPlotWF_advan3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## [Mutational signatures](https://cancer.sanger.ac.uk/cosmic/signatures)
+- Pattern of nucleotide substituions 
+- Evaluate nucleotide substitutions
+- Calculate trinucleotide matrix
+- Estimate Signatures
+- Compare to databases
+
+---
+## Ti/Tv plot
+
+```r
+laml.titv = titv(maf = laml, plot = FALSE, useSyn = TRUE)
+plotTiTv(res = laml.titv)
+```
+
+---
+## Ti/Tv plot
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_TiTv_advan2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Trinucleotide matrix
+
+```r
+library(BSgenome.Hsapiens.UCSC.hg19, quietly = TRUE)
+laml.tnm = trinucleotideMatrix(maf = laml,
+                               prefix = 'chr', 
+                               add = TRUE, 
+                               ref_genome = "BSgenome.Hsapiens.UCSC.hg19")
+```
+
+```
+## -Extracting 5' and 3' adjacent bases
+## -Extracting +/- 20bp around mutated bases for background C&gt;T estimation
+## -Estimating APOBEC enrichment scores
+## --Performing one-way Fisher's test for APOBEC enrichment
+## ---APOBEC related mutations are enriched in  3.315 % of samples (APOBEC enrichment score &gt; 2 ;  6  of  181  samples)
+## -Creating mutation matrix
+## --matrix of dimension 188x96
+```
+
+---
+## Trinucleotide matrix
+
+```r
+dim(laml.tnm$nmf_matrix)
+```
+
+```
+## [1] 188  96
+```
+
+```r
+laml.tnm$nmf_matrix[1,]
+```
+
+```
+## A[C&gt;A]A A[C&gt;A]C A[C&gt;A]G A[C&gt;A]T C[C&gt;A]A C[C&gt;A]C C[C&gt;A]G C[C&gt;A]T G[C&gt;A]A G[C&gt;A]C 
+##       0       0       0       0       0       0       0       0       0       0 
+## G[C&gt;A]G G[C&gt;A]T T[C&gt;A]A T[C&gt;A]C T[C&gt;A]G T[C&gt;A]T A[C&gt;G]A A[C&gt;G]C A[C&gt;G]G A[C&gt;G]T 
+##       0       0       0       0       0       0       0       0       0       0 
+## C[C&gt;G]A C[C&gt;G]C C[C&gt;G]G C[C&gt;G]T G[C&gt;G]A G[C&gt;G]C G[C&gt;G]G G[C&gt;G]T T[C&gt;G]A T[C&gt;G]C 
+##       0       0       0       0       0       0       0       0       0       0 
+## T[C&gt;G]G T[C&gt;G]T A[C&gt;T]A A[C&gt;T]C A[C&gt;T]G A[C&gt;T]T C[C&gt;T]A C[C&gt;T]C C[C&gt;T]G C[C&gt;T]T 
+##       0       0       0       0       1       0       1       0       1       1 
+## G[C&gt;T]A G[C&gt;T]C G[C&gt;T]G G[C&gt;T]T T[C&gt;T]A T[C&gt;T]C T[C&gt;T]G T[C&gt;T]T A[T&gt;A]A A[T&gt;A]C 
+##       0       0       1       1       1       0       0       0       0       0 
+## A[T&gt;A]G A[T&gt;A]T C[T&gt;A]A C[T&gt;A]C C[T&gt;A]G C[T&gt;A]T G[T&gt;A]A G[T&gt;A]C G[T&gt;A]G G[T&gt;A]T 
+##       1       0       0       0       1       0       0       0       0       0 
+## T[T&gt;A]A T[T&gt;A]C T[T&gt;A]G T[T&gt;A]T A[T&gt;C]A A[T&gt;C]C A[T&gt;C]G A[T&gt;C]T C[T&gt;C]A C[T&gt;C]C 
+##       0       0       0       0       0       0       0       0       0       0 
+## C[T&gt;C]G C[T&gt;C]T G[T&gt;C]A G[T&gt;C]C G[T&gt;C]G G[T&gt;C]T T[T&gt;C]A T[T&gt;C]C T[T&gt;C]G T[T&gt;C]T 
+##       1       0       0       0       0       0       0       0       0       0 
+## A[T&gt;G]A A[T&gt;G]C A[T&gt;G]G A[T&gt;G]T C[T&gt;G]A C[T&gt;G]C C[T&gt;G]G C[T&gt;G]T G[T&gt;G]A G[T&gt;G]C 
+##       0       0       0       0       0       0       0       0       0       0 
+## G[T&gt;G]G G[T&gt;G]T T[T&gt;G]A T[T&gt;G]C T[T&gt;G]G T[T&gt;G]T 
+##       0       0       0       0       0       0
+```
+
+---
+## Trinucleotide pattern in TCGA-AB-3009
+
+```r
+yd &lt;- data.frame(triNuc=colnames(laml.tnm$nmf_matrix),
+                 count=laml.tnm$nmf_matrix['TCGA-AB-3009',],
+                 stringsAsFactors = FALSE)
+yd$cat &lt;- gsub("(.*)\\[(.*)\\](.*)","\\2",yd$triNuc)
+yd$num &lt;- seq(1,length(yd$triNuc))
+```
+
+---
+## Trinucleotide pattern in TCGA-AB-3009
+
+```r
+ggplot(yd,aes(x=num,y=count,fill=cat))+
+  geom_bar(stat='identity')+
+  labs(x="",y="Counts",fill="")+
+  theme(axis.text.x=element_blank())
+```
+
+---
+## Trinucleotide pattern in TCGA-AB-3009
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_triMutPat_advan3-1.png" style="display: block; margin: auto;" /&gt;
+
+**What does this pattern stand for?**
+
+---
+## Estimate number of signautres
+
+```r
+library('NMF')
+laml.sign &lt;- estimateSignatures(mat = laml.tnm,
+                                nTry = 6,
+                                pConstant = 0.1,
+                                parallel = 2)
+```
+- [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation)
+- Measure of how faithfully a clustering results represent the original data
+
+---
+## Estimate number of signautres
 
 
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_sigEst_advan3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Extract signautres
+
+```r
+laml.sig.ext &lt;- extractSignatures(mat = laml.tnm, 
+                                  n = 3,
+                                  pConstant = 0.1,
+                                  parallel = 1)
+laml.sig.ext$signatures[1:5,] # use for mapping to mutational signature database
+```
+
+```
+##         Signature_1 Signature_2 Signature_3
+## A[C&gt;A]A 0.009675202 0.004069562 0.011908054
+## A[C&gt;A]C 0.025910582 0.005584385 0.008636836
+## A[C&gt;A]G 0.010011263 0.002505450 0.005986448
+## A[C&gt;A]T 0.007482971 0.007651267 0.006813378
+## C[C&gt;A]A 0.012005658 0.007071996 0.010397992
+```
+
+---
+## What do the signtures stand for?
+- Map to mutational signatures databases eg. COSMIC
+
+```r
+laml.og30.cosm = compareSignatures(nmfRes = laml.sig.ext,
+                                   sig_db = "legacy")
+laml.og30.cosm$cosine_similarities[,1:5]
+```
+
+```
+##             COSMIC_1 COSMIC_2 COSMIC_3 COSMIC_4 COSMIC_5
+## Signature_1    0.840    0.099    0.231    0.198    0.375
+## Signature_2    0.577    0.153    0.313    0.253    0.405
+## Signature_3    0.328    0.229    0.803    0.586    0.851
+```
+
+---
+## Map the signatures to COSMIC database
+
+```r
+pheatmap::pheatmap(mat = laml.og30.cosm$cosine_similarities, cluster_rows = FALSE)
+```
+
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_mapSigPres_advan-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Map the signatures to SBS database
+
+```r
+laml.sign.sbs = compareSignatures(nmfRes = laml.sig.ext, sig_db = "SBS")
+laml.sign.sbs$cosine_similarities[,1:5]
+```
+
+```
+##              SBS1  SBS2  SBS3  SBS4  SBS5
+## Signature_1 0.858 0.084 0.215 0.155 0.298
+## Signature_2 0.482 0.124 0.314 0.203 0.440
+## Signature_3 0.075 0.186 0.836 0.487 0.823
+```
+
+---
+## Map the signatures to SBS database
+
+```r
+pheatmap::pheatmap(mat = laml.sign.sbs$cosine_similarities, cluster_rows = FALSE)
+```
+
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_mapSigSBS_advan2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## plot signatures ~ COSMIC
+
+```r
+plotSignatures(nmfRes = laml.sig.ext, 
+               title_size = 1.2,
+               contributions = FALSE,
+               show_title = TRUE,
+               sig_db = 'legacy')
+```
+
+---
+## plot signatures ~ COSMIC
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_plotSigCOS_advan2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## plot signatures ~ SBS
+
+```r
+plotSignatures(nmfRes = laml.sig.ext, 
+               title_size = 1.2,
+               contributions = FALSE,
+               show_title = TRUE,
+               sig_db = 'SBS')
+```
+
+---
+## plot signatures ~ SBS
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_plotSigSBS_advan2-1.png" style="display: block; margin: auto;" /&gt;
 
 
-## This is a placeholder
+---
+## Mutational signautes in each sample
+
+```r
+plotSignatures(nmfRes = laml.sig.ext,
+               title_size = 0.8,
+               contributions = TRUE,
+               show_title = TRUE)
+```
+
+---
+## Mutational signautes in each sample
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_plotSigSAM_advan2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Enrichment analysis
+- k-mean clustering based on the exposure of mutational signatures
+- Assign dominate signatures based on k-mean clustering
+
+```r
+laml.se = signatureEnrichment(maf = laml, 
+                              sig_res = laml.sig.ext)
+```
+
+---
+## Enrichment analysis
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_enrich_advan2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Genes associated with signatures
+- Genes mutated in samples with particular mutational signature
+
+```r
+laml.se$groupwise_comparision[1:2,]
+```
+
+```
+##    Hugo_Symbol      Group1 Group2 n_mutated_group1 n_mutated_group2
+## 1:        IDH2 Signature_2   Rest         14 of 65         6 of 123
+## 2:        NPM1 Signature_3   Rest         18 of 63        14 of 125
+##         p_value OR_low   OR_high        fdr
+## 1: 0.0007078259      0 0.4811362 0.04246955
+## 2: 0.0032158292      0 0.6539739 0.09647487
+```
+
+---
+## Genes associated with signatures
+
+```r
+plotEnrichmentResults(enrich_res = laml.se, pVal = 0.05)
+```
+
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_enrichGenePlot_advan1-1.png" height="70%" style="display: block; margin: auto;" /&gt;
+
+---
+## Exercises
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

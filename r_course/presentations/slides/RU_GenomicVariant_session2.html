@@ -12,7 +12,7 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# ATACseq In Bioconductor
+# Genomic Variants ~ Session 2
 <html>
 <div style="float:left">
 
@@ -20,17 +20,457 @@ class: center, middle, inverse, title-slide
 <hr color='#EB811B' size=1px width=796px>
 </html>
 ### Rockefeller University, Bioinformatics Resource Centre
-### <a href="http://rockefelleruniversity.github.io/RU_ATACseq/" class="uri">http://rockefelleruniversity.github.io/RU_ATACseq/</a>
+### <a href="http://rockefelleruniversity.github.io/RU_GenomicVariants/" class="uri">http://rockefelleruniversity.github.io/RU_GenomicVariants/</a>
 
 ---
 
 
 
 
+## Annotate variantions
+- Required resources
+- Retrive dbSNP ID
+- Predict amino acid changes
+
+---
+## Required resources
+- [dbSNP](https://bioconductor.org/packages/release/data/annotation/html/SNPlocs.Hsapiens.dbSNP144.GRCh37.html)
+- [Reference Genome](http://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg19.html)
+- [Annotation](https://bioconductor.org/packages/release/data/annotation/html/TxDb.Hsapiens.UCSC.hg19.knownGene.html)
 
 
+```r
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
+```
 
-## This is a placeholder
+---
+## Subsetting Variants in chromosome 1
+
+```r
+# rd_chr1 &lt;- rd[grepl(names(rd),pattern = "chr1:")]
+# vcf_chr1 &lt;- vcf[names(rd_chr1)]
+vcf_chr1 &lt;- vcf[grepl(names(vcf),pattern = "chr1:")]
+rd_chr1 &lt;- rowRanges(vcf_chr1)
+```
+
+---
+## Predict amino acid changes with TxDb
+
+```r
+txdb &lt;- TxDb.Hsapiens.UCSC.hg19.knownGene
+```
+
+---
+## TxDb
+
+```r
+txdb
+```
+
+```
+## TxDb object:
+## # Db type: TxDb
+## # Supporting package: GenomicFeatures
+## # Data source: UCSC
+## # Genome: hg19
+## # Organism: Homo sapiens
+## # Taxonomy ID: 9606
+## # UCSC Table: knownGene
+## # Resource URL: http://genome.ucsc.edu/
+## # Type of Gene ID: Entrez Gene ID
+## # Full dataset: yes
+## # miRBase build ID: GRCh37
+## # transcript_nrow: 82960
+## # exon_nrow: 289969
+## # cds_nrow: 237533
+## # Db created by: GenomicFeatures package from Bioconductor
+## # Creation time: 2015-10-07 18:11:28 +0000 (Wed, 07 Oct 2015)
+## # GenomicFeatures version at creation time: 1.21.30
+## # RSQLite version at creation time: 1.0.0
+## # DBSCHEMAVERSION: 1.1
+```
+
+---
+## Predict amino acid changes ~ Failed
+
+```r
+coding &lt;- predictCoding(vcf_chr1, txdb, seqSource=Hsapiens)
+```
+
+```
+## Warning in valid.GenomicRanges.seqinfo(x, suggest.trim = TRUE): GRanges object contains 56 out-of-bound ranges located on sequences
+##   2149, 2159, 6098, 6103, 2198, 2199, 2200, 2201, and 2204. Note that
+##   ranges located on a sequence whose length is unknown (NA) or on a
+##   circular sequence are not considered out-of-bound (use seqlengths() and
+##   isCircular() to get the lengths and circularity flags of the underlying
+##   sequences). You can use trim() to trim these ranges. See
+##   ?`trim,GenomicRanges-method` for more information.
+```
+
+---
+## Predict amino acid changes ~ present
+
+```r
+coding[1]
+```
+
+```
+## GRanges object with 1 range and 17 metadata columns:
+##                     seqnames    ranges strand | paramRangeID            REF
+##                        &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;
+##   chr1:12907379_T/C     chr1  12907379      - |           NA              T
+##                                    ALT      QUAL      FILTER      varAllele
+##                     &lt;DNAStringSetList&gt; &lt;numeric&gt; &lt;character&gt; &lt;DNAStringSet&gt;
+##   chr1:12907379_T/C                  C     76.77           .              G
+##                        CDSLOC    PROTEINLOC   QUERYID        TXID         CDSID
+##                     &lt;IRanges&gt; &lt;IntegerList&gt; &lt;integer&gt; &lt;character&gt; &lt;IntegerList&gt;
+##   chr1:12907379_T/C       764           255       544        4428         13139
+##                          GENEID   CONSEQUENCE       REFCODON       VARCODON
+##                     &lt;character&gt;      &lt;factor&gt; &lt;DNAStringSet&gt; &lt;DNAStringSet&gt;
+##   chr1:12907379_T/C      649330 nonsynonymous            GAT            GGT
+##                             REFAA         VARAA
+##                     &lt;AAStringSet&gt; &lt;AAStringSet&gt;
+##   chr1:12907379_T/C             D             G
+##   -------
+##   seqinfo: 25 sequences from hg19 genome
+```
+
+---
+## Transform into data frame
+
+```r
+matA &lt;- data.frame(Variant=names(coding),
+                   chromosome=seqnames(coding),
+                   start=start(coding),end=end(coding),
+                   ref_allele=as.character(coding$REF),
+                   alt_allele=unlist(lapply(lapply(
+                     coding$ALT,`[[`,1),as.character)),
+                   GeneID=coding$GENEID,
+                   TxID=coding$TXID,
+                   Protein_posi=unlist(lapply(lapply(
+                     coding$PROTEINLOC,`[[`,1),as.integer)),
+                   ref_AA=as.character(coding$REFAA),
+                   alt_AA=as.character(coding$VARAA),
+                   Type=coding$CONSEQUENCE,
+                   stringsAsFactors = FALSE)
+matA$aaChange &lt;- paste0("p.",matA$ref_AA,matA$Protein_posi,matA$alt_AA)
+matA &lt;- dplyr::select(matA,-Protein_posi,-ref_AA,-alt_AA)
+```
+
+---
+## Annotation table ~ Amino Acid Changes
+
+```r
+matA[1:2,]
+```
+
+```
+##             Variant chromosome    start      end ref_allele alt_allele GeneID
+## 1 chr1:12907379_T/C       chr1 12907379 12907379          T          C 649330
+## 2 chr1:12907379_T/C       chr1 12907379 12907379          T          C 343069
+##   TxID          Type aaChange
+## 1 4428 nonsynonymous  p.D255G
+## 2 4429 nonsynonymous  p.D255G
+```
+
+---
+## How many variations in coding region
+
+```r
+var_in_coding &lt;- data.frame(varName=names(vcf_chr1),
+                            in_coding=names(vcf_chr1) %in% matA$Variant,
+                            stringsAsFactors = FALSE)
+table(var_in_coding$in_coding)
+```
+
+```
+## 
+## FALSE  TRUE 
+##  5097    30
+```
+
+---
+## How many types of variations in coding region
+
+```r
+taC &lt;- table(matA$Type)
+taC_dat &lt;- as.data.frame(taC)
+taC
+```
+
+```
+## 
+##      nonsense nonsynonymous    synonymous 
+##             1            49            20
+```
+
+---
+## Variant types in coding region
+
+```r
+ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat='Identity')+
+  labs(x="",y="Counts",fill="")+
+  theme(legend.position = "none")
+```
+
+---
+## Variant types in coding region
+&lt;img src="RU_GenomicVariant_session2_files/figure-html/aaCh_varMan_muType_disp2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Retrive dbSNP data
+
+```r
+all_snps &lt;- SNPlocs.Hsapiens.dbSNP144.GRCh37
+all_snps
+```
+
+```
+## # SNPlocs object for Homo sapiens (dbSNP Human BUILD 144)
+## # reference genome: GRCh37.p13
+## # nb of SNPs: 135276726
+```
+
+---
+## Generate SNPs by chromosome
+
+```r
+tar_chr &lt;- as.vector(seqnames(rd_chr1)@values)
+my_snps &lt;- snpsBySeqname(all_snps,c(tar_chr))
+```
+&lt;img src="imgs/vcfMan_fig5r.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+## What's wrong?
+- **seqlevels** in the two objects dosn't match
+- **seqlevelStyle** in the two objects dosn't match
+- **genome** in the tow objects dosen't match
+
+---
+## check seqlevels
+
+```r
+# seqlevels ~ rd
+seqlevels(rd_chr1)
+```
+
+```
+##  [1] "chr1"  "chr2"  "chr3"  "chr4"  "chr5"  "chr6"  "chr7"  "chr8"  "chr9" 
+## [10] "chr10" "chr11" "chr12" "chr13" "chr14" "chr15" "chr16" "chr17" "chr18"
+## [19] "chr19" "chr20" "chr21" "chr22" "chrX"  "chrY"  "chrM"
+```
+
+```r
+# seqlevels ~ dbSNP
+seqlevels(all_snps)
+```
+
+```
+##  [1] "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "10" "11" "12" "13" "14" "15"
+## [16] "16" "17" "18" "19" "20" "21" "22" "X"  "Y"  "MT"
+```
+
+---
+## check seqlevelStyle
+
+```r
+seqlevelsStyle(rd_chr1)
+```
+
+```
+## [1] "UCSC"
+```
+
+```r
+seqlevelsStyle(all_snps)
+```
+
+```
+## [1] "NCBI"    "Ensembl"
+```
+
+---
+## check genome
+
+```r
+genome(rd_chr1)
+```
+
+```
+##   chr1   chr2   chr3   chr4   chr5   chr6   chr7   chr8   chr9  chr10  chr11 
+## "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" 
+##  chr12  chr13  chr14  chr15  chr16  chr17  chr18  chr19  chr20  chr21  chr22 
+## "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" "hg19" 
+##   chrX   chrY   chrM 
+## "hg19" "hg19" "hg19"
+```
+
+```r
+genome(all_snps)
+```
+
+```
+##            1            2            3            4            5            6 
+## "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" 
+##            7            8            9           10           11           12 
+## "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" 
+##           13           14           15           16           17           18 
+## "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" 
+##           19           20           21           22            X            Y 
+## "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" "GRCh37.p13" 
+##           MT 
+## "GRCh37.p13"
+```
+
+---
+## Generate SNPs by chromosome
+
+```r
+tar_chr &lt;- as.vector(seqnames(rd_chr1)@values)
+tar_chr &lt;- gsub("chr","",tar_chr)
+tar_chr[grepl(tar_chr,pattern = "M")] &lt;- "MT"
+my_snps &lt;- snpsBySeqname(all_snps,c(tar_chr))
+my_snps[1:2]
+```
+
+```
+## UnstitchedGPos object with 2 positions and 2 metadata columns:
+##       seqnames       pos strand |   RefSNP_id alleles_as_ambig
+##          &lt;Rle&gt; &lt;integer&gt;  &lt;Rle&gt; | &lt;character&gt;      &lt;character&gt;
+##   [1]        1     10108      * |  rs62651026                Y
+##   [2]        1     10109      * | rs376007522                W
+##   -------
+##   seqinfo: 25 sequences (1 circular) from GRCh37.p13 genome
+```
+
+---
+## Replace seq Info of my_snps
+
+```r
+# change seqlevels
+seqlevels(my_snps) &lt;- paste0("chr",seqlevels(my_snps))
+seqlevels(my_snps) &lt;- gsub("MT","M",seqlevels(my_snps))
+# change seqlevelsStyle
+seqlevelsStyle(my_snps) &lt;- "UCSC"
+# change genome
+genome(my_snps) &lt;- "hg19"
+```
+
+---
+## Make rsID table
+
+```r
+snp_ID &lt;- data.frame(
+  posIDX=paste0(seqnames(my_snps),":",pos(my_snps)),
+  rsID=my_snps$RefSNP_id,stringsAsFactors = FALSE)
+head(snp_ID)
+```
+
+```
+##       posIDX        rsID
+## 1 chr1:10108  rs62651026
+## 2 chr1:10109 rs376007522
+## 3 chr1:10139 rs368469931
+## 4 chr1:10150 rs371194064
+## 5 chr1:10177 rs201752861
+## 6 chr1:10180 rs201694901
+```
+
+---
+## Generate Variant table
+
+```r
+matV1 &lt;- data.frame(Variant=names(rd_chr1),stringsAsFactors = FALSE)
+matV1$chromosome &lt;- gsub("(.*):(.*)_(.*)/(.*)","\\1",matV1$Variant)
+matV1$start &lt;- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
+matV1$end &lt;- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
+matV1$ref_allele &lt;- gsub("(.*):(.*)_(.*)/(.*)","\\3",matV1$Variant)
+matV1$alt_allele &lt;- gsub("(.*):(.*)_(.*)/(.*)","\\4",matV1$Variant)
+matV1$posIDX &lt;- gsub("(.*)_(.*)","\\1",matV1$Variant)
+matV1[1:2,]
+```
+
+```
+##           Variant chromosome  start    end ref_allele alt_allele      posIDX
+## 1 chr1:815337_G/T       chr1 815337 815337          G          T chr1:815337
+## 2 chr1:815341_G/A       chr1 815341 815341          G          A chr1:815341
+```
+
+---
+## Annotation table ~ SNP_ID
+
+```r
+matS &lt;- merge(matV1,snp_ID,all.x=TRUE,by="posIDX")
+matS &lt;- dplyr::select(matS,-posIDX)
+matS[1:2,]
+```
+
+```
+##              Variant chromosome     start       end ref_allele alt_allele
+## 1 chr1:100309252_T/C       chr1 100309252 100309252          T          C
+## 2 chr1:100523688_G/A       chr1 100523688 100523688          G          A
+##       rsID
+## 1 rs520644
+## 2     &lt;NA&gt;
+```
+
+---
+## How many variations in dbSNP
+
+```r
+taC2 &lt;- table(!is.na(matS$rsID))
+taC2_dat &lt;- as.data.frame(taC2)
+taC2
+```
+
+```
+## 
+## FALSE  TRUE 
+##   730  4627
+```
+
+---
+## Variations in dbSNP ~ Plotting
+
+```r
+ggplot(taC2_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat='Identity')+
+  labs(x="",y="Counts",fill="in_dbSNP")+
+  theme(legend.position = "none")
+```
+
+---
+## Variations in dbSNP ~ Plotting
+&lt;img src="RU_GenomicVariant_session2_files/figure-html/dbSNPv_varMan_muCt_disp2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Add Gene and AAChange
+
+```r
+matS$GeneID &lt;- matA$GeneID[match(matS$Variant,matA$Variant)]
+matS$AAChange &lt;- matA$GeneID[match(matS$Variant,matA$Variant)]
+matS[1:2,]
+```
+
+```
+##              Variant chromosome     start       end ref_allele alt_allele
+## 1 chr1:100309252_T/C       chr1 100309252 100309252          T          C
+## 2 chr1:100523688_G/A       chr1 100523688 100523688          G          A
+##       rsID GeneID AAChange
+## 1 rs520644   &lt;NA&gt;     &lt;NA&gt;
+## 2     &lt;NA&gt;   &lt;NA&gt;     &lt;NA&gt;
+```
+
+---
+## Other annotation softwares
+- [ANNOVAR](https://doc-openbio.readthedocs.io/projects/annovar/en/latest/)
+- [SnpEff](http://snpeff.sourceforge.net/)
+
+---
+## Excercises
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
