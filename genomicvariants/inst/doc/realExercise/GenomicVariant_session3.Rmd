@@ -1,0 +1,123 @@
+---
+title: "Genomic Variants in Bioconductor exercises (session 3)"
+author: "Rockefeller University, Bioinformatics Resource Centre"
+date: "https://rockefelleruniversity.github.io/RU_ATACseq/"
+output: 
+  html_document:
+    number_sections: false  ## if you want number sections at each table header
+    theme: united  # many options for theme, this one is my favorite.
+    highlight: tango  # specifies the syntax highlighting style
+params:
+  toMessage: false    
+---
+
+```{r, setup,include=FALSE}
+toMessage <- ifelse(!is.null(params$toMessage),params$toMessage,FALSE)
+message(toMessage)
+```
+
+```{r, include=FALSE}
+library(VariantAnnotation)
+library(DT)
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
+library(ggplot2)
+library(GenomicFeatures)
+library(VariantAnnotation)
+library(maftools)
+library(NMF)
+```
+
+In this exercise, we will practice how to handle variants from multiple samples. An MAF file of breast carcinoma (BRCA) was fetched from TCGA. Please find this MAF file "../extdata/data/TCGA_BRCA_maf.txt" and answer the following questions.
+
+```{r makeSubset,eval=TRUE, echo=toMessage}
+library(maftools)
+maf_file <- "../extdata/data/TCGA_BRCA_maf.txt"
+brca <- read.maf(maf_file)
+```
+
+## Advanced analysis
+
+1. Make a sample summary of this dataset and make a plot to demonstrate the composition of mutations in each sample
+
+```{r samSum,eval=TRUE, echo=toMessage}
+sample_sum <- getSampleSummary(brca)
+dim(sample_sum)
+#
+melt_dat <- reshape2::melt(sample_sum[,-c("total")],id="Tumor_Sample_Barcode")
+var_to <- sample_sum$total
+names(var_to) <- sample_sum$Tumor_Sample_Barcode
+melt_dat$totalVar <- var_to[match(melt_dat$Tumor_Sample_Barcode,names(var_to))]
+melt_dat$prop <- melt_dat$value / melt_dat$totalVar
+#
+ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=log10(value),fill=variable))+
+  geom_bar(stat='identity',position = 'stack')+
+  labs(x="",y="Mutations",fill="")+
+  theme(axis.text.x=element_blank())
+```
+
+2. Please list top five mutated genes and evalutate the interactions between them
+- TTN is a huge gene. Usually with more mutations than others
+- The interactions of gene mutations can be shown in oncoplot
+
+```{r oncoPlot,eval=TRUE, echo=toMessage}
+gene_sum <- getGeneSummary(brca)
+gene_sum[1:5]
+#
+oncoplot(brca,top=5,genesToIgnore = "TTN")
+```
+
+3. Mutations in PIK3CA is the most common in BRCA dataset. Please plot mutations in a lollipop plot to demonstrate any hotspots
+
+```{r lollipopPlot,eval=TRUE, echo=toMessage}
+lollipopPlot(brca,gene="PIK3CA",AACol="Protein_Change",labelPos = c(542,545,1047))
+```
+
+4. Is there any enriched pathways in BRCA dataset and evaluate the top 3 enriched pathways
+- Select enriched pathways: OncogenicPathways()
+- Display mutations in enriched pathway: PlotOncogenicPathways()
+
+```{r enrichPath, eval=TRUE, echo=toMessage}
+OncogenicPathways(maf = brca)
+#
+PlotOncogenicPathways(maf = brca, pathways = "RTK-RAS")
+#
+PlotOncogenicPathways(maf = brca, pathways = "NOTCH")
+#
+PlotOncogenicPathways(maf = brca, pathways = "WNT")
+```
+
+5. Please identify mutational signatures in BRCA dataset
+- Make trinucleotide matrix: ***trinucleotideMatrix()***
+- Estimate number of signaturez: ***estimateSignatures()***
+- Extract signature: ***extractSignatues()***
+- Map to COSMIC database and display: ***compareSignature()***
+- Enrichment analysis: ***signatureEnrichment()***
+
+```{r mutSig, eval=TRUE, echo=toMessage}
+library(BSgenome.Hsapiens.UCSC.hg19, quietly = TRUE)
+brca.tnm = trinucleotideMatrix(maf = brca,
+                               prefix = 'chr', 
+                               add = TRUE, 
+                               ref_genome = "BSgenome.Hsapiens.UCSC.hg19")
+#
+library('NMF')
+brca.sign <- estimateSignatures(mat = brca.tnm,
+                                nTry = 6,
+                                pConstant = 0.1)
+
+#
+brca.sig.ext <- extractSignatures(mat = brca.tnm, 
+                                  n = 4,
+                                  pConstant = 0.1)
+#
+plotSignatures(nmfRes = brca.sig.ext, 
+               title_size = 1.2,
+               contributions = FALSE,
+               show_title = TRUE,
+               sig_db = 'legacy')
+#
+brca.se = signatureEnrichment(maf = brca, 
+                              sig_res = brca.sig.ext)
+```

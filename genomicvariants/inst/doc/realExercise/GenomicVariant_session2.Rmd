@@ -1,0 +1,142 @@
+---
+title: "Genomic Variants in Bioconductor exercises (session 2)"
+author: "Rockefeller University, Bioinformatics Resource Centre"
+date: "https://rockefelleruniversity.github.io/RU_ATACseq/"
+output: 
+  html_document:
+    number_sections: false  ## if you want number sections at each table header
+    theme: united  # many options for theme, this one is my favorite.
+    highlight: tango  # specifies the syntax highlighting style
+params:
+  toMessage: false    
+---
+
+```{r, setup,include=FALSE}
+toMessage <- ifelse(!is.null(params$toMessage),params$toMessage,FALSE)
+message(toMessage)
+```
+
+```{r, include=FALSE}
+library(VariantAnnotation)
+library(DT)
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
+library(ggplot2)
+library(GenomicFeatures)
+library(VariantAnnotation)
+```
+
+In this exercise, we will practice how to annotate variants. Please find this VCF file "../data/SAMN01882168_filt.vcf.gz" and subset variants in chromosome 21. 
+
+```{r makeSubset,eval=TRUE, echo=toMessage}
+library(VariantAnnotation)
+vcf_file <- "../extData/data/SAMN01882168_filt.vcf.gz"
+vcf <- readVcf(vcf_file,"hg19")
+rd <- rowRanges(vcf)
+rd_sub <- rd[seqnames(rd) == "chr21"]
+vcf_sub <- vcf[names(rd_sub)]
+```
+
+## Variant annotation
+
+1. Please predict amino acid changes by using TxDb
+- loaingTxDb.Hsapiens.UCSC.hg19.knownGene
+- predict amino acid changes: predictCoding
+- make a data frame
+
+```{r readVCF,eval=TRUE, echo=toMessage}
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+coding <- predictCoding(vcf_sub, txdb, seqSource=Hsapiens)
+#
+matA <- data.frame(Variant=names(coding),
+                   chromosome=seqnames(coding),
+                   start=start(coding),end=end(coding),
+                   ref_allele=as.character(coding$REF),
+                   alt_allele=unlist(lapply(lapply(
+                     coding$ALT,`[[`,1),as.character)),
+                   GeneID=coding$GENEID,
+                   TxID=coding$TXID,
+                   Protein_posi=unlist(lapply(lapply(
+                     coding$PROTEINLOC,`[[`,1),as.integer)),
+                   ref_AA=as.character(coding$REFAA),
+                   alt_AA=as.character(coding$VARAA),
+                   Type=coding$CONSEQUENCE,
+                   stringsAsFactors = FALSE)
+matA$aaChange <- paste0("p.",matA$ref_AA,matA$Protein_posi,matA$alt_AA)
+matA <- dplyr::select(matA,-Protein_posi,-ref_AA,-alt_AA)
+#
+coding
+head(matA)
+```
+
+2. How many variants in coding region
+
+```{r codingVar,eval=TRUE, echo=toMessage}
+var_in_coding <- data.frame(varName=names(vcf_sub),
+                            in_coding=names(vcf_sub) %in% matA$Variant,
+                            stringsAsFactors = FALSE)
+table(var_in_coding$in_coding)
+#
+taC <- table(matA$Type)
+taC_dat <- as.data.frame(taC)
+taC
+#
+ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat='Identity')+
+  labs(x="",y="Counts",fill="")+
+  theme(legend.position = "none")
+```
+
+3. Please annotate variants by using dbSNP
+- dbSNP used: SNPlocs.Hsapiens.dbSNP144.GRCh37
+- make sure seqevels, seqengths, seqlevelsStyle, and refgenome are comparable
+
+```{r dbSNPVar,eval=TRUE, echo=toMessage}
+library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
+all_snps <- SNPlocs.Hsapiens.dbSNP144.GRCh37
+#
+# Extract SNPs of chr21
+tar_chr <- as.vector(seqnames(rd_sub)@values)
+my_snps <- snpsBySeqname(all_snps,gsub("chr","",tar_chr))
+#
+seqlevels(my_snps)
+seqlengths(my_snps)
+seqlevelsStyle(my_snps)
+genome(my_snps)
+#
+seqlevels(my_snps) <- paste0("chr",seqlevels(my_snps))
+seqlevels(my_snps) <- gsub("MT","M",seqlevels(my_snps))
+# change seqlevelsStyle
+seqlevelsStyle(my_snps) <- "UCSC"
+# change genome
+genome(my_snps) <- "hg19"
+#
+snp_ID <- data.frame(
+  posIDX=paste0(seqnames(my_snps),":",pos(my_snps)),
+  rsID=my_snps$RefSNP_id,stringsAsFactors = FALSE)
+#
+matV1 <- data.frame(Variant=names(rd_sub),stringsAsFactors = FALSE)
+matV1$chromosome <- gsub("(.*):(.*)_(.*)/(.*)","\\1",matV1$Variant)
+matV1$start <- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
+matV1$end <- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
+matV1$ref_allele <- gsub("(.*):(.*)_(.*)/(.*)","\\3",matV1$Variant)
+matV1$alt_allele <- gsub("(.*):(.*)_(.*)/(.*)","\\4",matV1$Variant)
+matV1$posIDX <- gsub("(.*)_(.*)","\\1",matV1$Variant)
+#
+matV1$rsID <- snp_ID$rsID[match(matV1$posIDX,snp_ID$posIDX)]
+```
+
+4. How many variants in dbSNP
+
+```{r incPlot, eval=TRUE, echo=toMessage}
+taC2 <- table(!is.na(matV1$rsID))
+taC2_dat <- as.data.frame(taC2)
+taC2
+#
+ggplot(taC2_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat='Identity')+
+  labs(x="",y="Counts",fill="in_dbSNP")+
+  theme(legend.position = "none")
+```

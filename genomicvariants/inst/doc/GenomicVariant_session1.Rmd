@@ -1,0 +1,218 @@
+---
+title: "Genomic Variants in Bioconductor exercises (session 1)"
+author: "Rockefeller University, Bioinformatics Resource Centre"
+date: "https://rockefelleruniversity.github.io/RU_ATACseq/"
+output: 
+  html_document:
+    number_sections: false  ## if you want number sections at each table header
+    theme: united  # many options for theme, this one is my favorite.
+    highlight: tango  # specifies the syntax highlighting style
+params:
+  toMessage: false    
+---
+
+```{r, setup,include=FALSE}
+toMessage <- ifelse(!is.null(params$toMessage),params$toMessage,FALSE)
+message(toMessage)
+```
+
+```{r, include=FALSE}
+library(VariantAnnotation)
+library(DT)
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
+library(ggplot2)
+library(GenomicFeatures)
+```
+
+In this exercise, we will practice how to manipulate VCF files. Please find this VCF file "../data/SAMN01882168_filt.vcf.gz" and use it to answer the following questions.
+
+
+## Genomic Variant manipulation
+
+1. Read in the VCF file and make a VRange object
+
+```{r readVCF, eval=TRUE, echo=toMessage}
+library(VariantAnnotation)
+vcf_file <- "../data/SAMN01882168_filt.vcf.gz"
+# vcf_file <- "../extData/data/SAMN01882168_filt.vcf.gz"
+vcf <- readVcf(vcf_file,"hg19")
+rd <- rowRanges(vcf)
+```
+
+2. Please extract the genotype field  and explain the abbreviations
+
+```{r genoInfo, eval=TRUE, echo=toMessage}
+geno(header(vcf))
+```
+
+3. Please calculate the incidance of mutation occurce in each chromosome.
+- Incidence: variant per kilobase
+- Chromosome length in reference genome: seqlengths(rd)
+- Variants per chromosome: table(seqnames(rd))
+
+```{r incPlot, eval=TRUE, echo=toMessage}
+contig_leng <- seqlengths(rd)
+tbl <- table(seqnames(rd))
+variant_count <- as.vector(tbl)
+names(variant_count) <- names(tbl)
+
+var_leng_dat <- data.frame(chr=names(variant_count),
+                           stringsAsFactors = FALSE)
+var_leng_dat$chrLeng <- contig_leng[match(var_leng_dat$chr,names(contig_leng))]
+var_leng_dat$varCount <- variant_count[match(var_leng_dat$chr,names(variant_count))]
+var_leng_dat$incidence <- (var_leng_dat$varCount / var_leng_dat$chrLeng) * 1000
+
+ggplot(var_leng_dat,aes(x=reorder(chr,-incidence),y=incidence,label=chr))+
+  geom_point()+geom_text(size=2,hjust=0.5, vjust=-1)+
+  scale_y_continuous(trans='log10')+
+  labs(x="",y="Log10_Incidence")+
+  theme(axis.text.x=element_blank())
+```
+
+4. Substract variants in Chr21
+
+```{r subVCF, eval=TRUE, echo=toMessage}
+rd_sub <- rd[seqnames(rd) == "chr21"]
+vcf_sub <- vcf[names(rd_sub)]
+```
+
+5. Extract GT information from vcf subset and make barchart to describe variant number in each genotype
+
+```{r extGT, eval=TRUE, echo=toMessage}
+tbl <- table(geno(vcf_sub)$GT)
+tbl_dat <- as.data.frame(tbl)
+
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat='Identity')+
+  labs(x="",y="Counts",fill="")+theme_classic()
+```
+
+6. Extract DP information from vcf subset and make histogram
+- use ggplot to make histogram
+- scale x axis as log10
+
+```{r extDP, eval=TRUE, echo=toMessage}
+matDP <- geno(vcf_sub)$DP
+summary(as.vector(matDP))
+#
+ggplot(as.data.frame(matDP),aes(x=SAMN01882168))+geom_histogram()+
+  labs(x="",y="Counts")+
+  scale_x_log10()+
+  theme_classic()
+```
+
+7. Extract GQ information from vcf subset and make histogram
+- use ggplot to make histogram
+- scale x axis as log10
+
+```{r extGQ, eval=TRUE, echo=toMessage}
+matGQ <- geno(vcf_sub)$GQ
+summary(as.vector(matGQ))
+#
+ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
+  labs(x="",y="Counts")+
+  scale_x_log10()+
+  theme_classic()
+```
+
+8. Please make a data frame including the following information demonstrated below.
+
+```{r gatherInfo, eval=TRUE, echo=toMessage}
+# Genotype 1/2
+var_2 <- rownames(geno(vcf_sub)$GT)[geno(vcf_sub)$GT=="1/2"]
+varTab2 <- data.frame(variant=names(rd_sub)[names(rd_sub) %in% var_2],
+                      chr=as.vector(seqnames(rd_sub)[names(rd_sub) %in% var_2]),
+                      start=start(rd_sub)[names(rd_sub) %in% var_2],
+                      end=end(rd_sub)[names(rd_sub) %in% var_2],
+                      refBase=unlist(lapply(lapply(
+                        alt(vcf_sub)[rownames(vcf_sub) %in% var_2],`[[`,1),as.character)),
+                      altBase=unlist(lapply(lapply(
+                        alt(vcf_sub)[rownames(vcf_sub) %in% var_2],`[[`,2),as.character)),
+                      refCount=unlist(lapply(
+                        geno(vcf_sub)$AD[rownames(geno(vcf_sub)$AD) %in% var_2],`[[`,2)),
+                      altCount=unlist(
+                        lapply(geno(vcf_sub)$AD[rownames(geno(vcf_sub)$AD) %in% var_2],`[[`,3)),
+                      genoType=geno(vcf_sub)$GT[rownames(geno(vcf_sub)$GT) %in% var_2],
+                      gtQuality=geno(vcf_sub)$GQ[rownames(geno(vcf_sub)$GQ) %in% var_2],
+                      stringsAsFactors = FALSE)
+#
+# Genotype: 0/1, 1/1
+varTab1 <- data.frame(variant=names(rd_sub)[!names(rd_sub) %in% var_2],
+                      chr=as.vector(seqnames(rd_sub)[!names(rd_sub) %in% var_2]),
+                      start=start(rd_sub)[!names(rd_sub) %in% var_2],
+                      end=end(rd_sub)[!names(rd_sub) %in% var_2],
+                      refBase=as.character(ref(vcf_sub)[!rownames(vcf_sub) %in% var_2]),
+                      altBase=unlist(lapply(lapply(
+                        alt(vcf_sub)[!rownames(vcf_sub) %in% var_2],`[[`,1),as.character)),
+                      refCount=unlist(lapply(
+                        geno(vcf_sub)$AD[!rownames(geno(vcf_sub)$AD) %in% var_2],`[[`,1)),
+                      altCount=unlist(lapply(
+                        geno(vcf_sub)$AD[!rownames(geno(vcf_sub)$AD) %in% var_2],`[[`,2)),
+                      genoType=geno(vcf_sub)$GT[!rownames(geno(vcf_sub)$GT) %in% var_2],
+                      gtQuality=geno(vcf_sub)$GQ[!rownames(geno(vcf_sub)$GQ) %in% var_2],
+                      stringsAsFactors = FALSE)
+#
+# merge into table
+varTab <- rbind(varTab1,varTab2)
+varTab[1:2,]
+```
+
+9. Please differnentiate variants by types (SNP/INS/DEL/Others) and count variants by each type 
+- SNP: single nucleotide substitution, length(refBase) = length(altBase) = 1
+- INS: insertion, length(refBase) < length(altBase)
+- DEL: deletion, length(refBase) > length(altBase)
+- Others: might be conplicated substitutions, eg. insdel, length(refBase) = length(altBase) <> 1
+
+```{r varClass, eval=TRUE, echo=toMessage}
+for(k in 1:length(varTab$variant)){
+  if(width(varTab$refBase[k]) < width(varTab$altBase[k])){
+    varTab$mutType[k] <- "INS"
+  }else if(width(varTab$refBase[k]) > width(varTab$altBase[k])){
+    varTab$mutType[k] <- "DEL"
+  }else if(width(varTab$refBase[k])==1&width(varTab$altBase[k])==1){
+    varTab$mutType[k] <- "SNP"
+  }else{
+    varTab$mutType[k] <- "Others"}}
+#
+tbl <- table(varTab$mutType)
+tbl_dat <- as.data.frame(tbl)
+tbl
+#
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat = 'identity')+
+  labs(x="",y="Mutations",fill="")+
+  theme_classic()
+```
+
+10. Evaluate nucleotide substitutions
+- only focus on SNPs
+- Nucleotide substitutions: 
+  + Transition: A>G, G>A, C>T, T>C
+  + Transversion: A>T, A>C, G>T, G>C, C>A, C>G, T>A, T>G
+  
+```{r nuclSub, eval=TRUE, echo=toMessage}
+ti <- c("A>G","G>A","C>T","T>C")
+# Transveersion (Tv)
+tv <- c("A>T","A>C","G>T","G>C","C>A","C>G","T>A","T>G")
+varTab$nuSub <- paste0(varTab$refBase,">",varTab$altBase)
+varTab$TiTv[varTab$nuSub %in% ti] <- "Ti"
+varTab$TiTv[varTab$nuSub %in% tv] <- "Tv"
+varTab[1:2,]
+#
+varX <- varTab[varTab$mutType=="SNP",]
+tbl <- table(varX$nuSub)
+tbl_dat <- as.data.frame(tbl)
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat = 'identity')+
+  labs(x="",y="Mutations",fill="")+
+  theme(legend.position = "none")
+#
+tbl <- table(varX$TiTv)
+tbl_dat <- as.data.frame(tbl)
+ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat = 'identity')+
+  labs(x="",y="Mutations",fill="")+
+  theme(legend.position = "none")
+```
