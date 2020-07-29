@@ -244,7 +244,7 @@ library('NMF')
 laml.sign <- estimateSignatures(mat = laml.tnm,
                                 nTry = 6,
                                 pConstant = 0.1,
-                                parallel = 2)
+                                parallel = 1)
 ```
 - [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation)
 - Measure of how faithfully a clustering results represent the original data

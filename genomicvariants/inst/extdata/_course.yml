@@ -5,4 +5,4 @@ Presentations:
     titles: Session1 Session2 Session3
     PresRmd: RU_GenomicVariant_session1.Rmd RU_GenomicVariant_session2.Rmd RU_GenomicVariant_session3.Rmd
     PresOverviewRmd: Session1Overview.Rmd Session2Overview.Rmd Session3Overview.Rmd
-    Exercises: placeholder_ex.Rmd
+    Exercises: GenomicVariant_session1.Rmd GenomicVariant_session2.Rmd GenomicVariant_session3.Rmd
