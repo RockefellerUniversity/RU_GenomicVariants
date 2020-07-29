@@ -49,6 +49,7 @@ suppressPackageStartupMessages(library(NMF))
 - [The Cancer Genome Atlas](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga) (TCGA) data as example 
 ```{r mult_mafIntro_advan}
 laml_tab <- read.delim("data/tcga_laml.maf",sep="\t")
+# laml_tab <- read.delim("../data/tcga_laml.maf",sep="\t")
 laml_tab[1:2,]
 ```
 
@@ -255,7 +256,7 @@ library('NMF')
 laml.sign <- estimateSignatures(mat = laml.tnm,
                                 nTry = 6,
                                 pConstant = 0.1,
-                                parallel = 2)
+                                parallel = 1)
 ```
 
 ```{r mult_mutSig_sigEst_advan3,eval=TRUE,echo=FALSE,include=TRUE,fig.align="center"}
@@ -268,7 +269,7 @@ plotCophenetic(laml.sign)
 laml.sig.ext <- extractSignatures(mat = laml.tnm, 
                                   n = 3,
                                   pConstant = 0.1,
-                                  parallel = 2)
+                                  parallel = 1)
 laml.sig.ext$signatures[1:5,] # use for mapping to mutational signature database
 ```
 
