@@ -1,19 +1,329 @@
 params <-
 list(isSlides = "no")
 
-## ----include=FALSE------------------------------------------------------------
-suppressPackageStartupMessages(require(knitr))
-knitr::opts_chunk$set(echo = TRUE, tidy = T)
+## ----setup_varMan, include=FALSE----------------------------------------------
+knitr::opts_chunk$set(echo = TRUE,cache = TRUE,cache.lazy = FALSE)
+# AsSlides <- TRUE
+#
+suppressPackageStartupMessages(library(VariantAnnotation))
+suppressPackageStartupMessages(library(DT))
+suppressPackageStartupMessages(library(BSgenome.Hsapiens.UCSC.hg19))
+suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene))
+suppressPackageStartupMessages(library(SNPlocs.Hsapiens.dbSNP144.GRCh37))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(GenomicFeatures))
 
 
-## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
-if(params$isSlides != "yes"){
-  cat("# ATACseq (part 2)
+## ----varLoad_intro,echo=FALSE,out.width = "75%",fig.align="center"------------
+knitr::include_graphics("imgs/vcfMan_fig2.png")
 
----
-"    
-  )
-  
-}
 
+## ----varLoad_varMan-----------------------------------------------------------
+library(VariantAnnotation)
+vcf <- readVcf("data/SAMN01882168_filt.vcf.gz","hg19")
+vcf
+
+
+## ----gInfo_varMan-------------------------------------------------------------
+header(vcf)
+
+
+## ----sample_varMan------------------------------------------------------------
+sampleID <- samples(header(vcf))
+sampleID
+
+
+## ----metaOV_META_varMan-------------------------------------------------------
+# Contents in Meta field
+meta(header(vcf))
+
+
+## ----meta_META_varMan---------------------------------------------------------
+# File format
+meta(header(vcf))$fileformat
+# Source used for variant calling
+meta(header(vcf))$source
+
+
+## ----meta_contig_varMan-------------------------------------------------------
+meta(header(vcf))$contig
+
+
+## ----range_varMan-------------------------------------------------------------
+rd <- rowRanges(vcf)
+rd[1:2]
+
+
+## ----range_varMan_posi--------------------------------------------------------
+as.vector(seqnames(rd)[1:2]) # Chromosome
+start(rd)[1:2] # Start position
+end(rd)[1:2] # End position
+
+
+## ----range_varMan_baseInfo_Ref------------------------------------------------
+refBase <- ref(vcf)
+# is a DNAStringSet
+refBase[1:2]
+refBase <- as.character(refBase)
+# Convert into character
+refBase[1:2]
+
+
+## ----range_varMan_baseInfo_Alt------------------------------------------------
+altBase <- alt(vcf)
+# Is a list
+alt(vcf)[1:2] 
+# get the 1st vector of the list
+altBase <- lapply(altBase,`[[`,1) 
+altBase[1:2]
+
+
+## ----range_varMan_baseInfo_Alt2-----------------------------------------------
+# convert DNAString to character
+altBase <- unlist(lapply(altBase,as.character)) 
+altBase[1:2]
+
+
+## ----info_varMan--------------------------------------------------------------
+info(header(vcf))[1:2,]
+
+
+## ----info_varMan_disp---------------------------------------------------------
+info(vcf)[1:2,]
+
+
+## ----geno_varMan--------------------------------------------------------------
+geno(header(vcf))[1:2,]
+
+
+## ----genoGT_varMan------------------------------------------------------------
+paste0("GT: ",geno(header(vcf))[1,3])
+matGT <- geno(vcf)$GT
+matGT[1:2,]
+
+
+## ----genoGT_varMan_tbl--------------------------------------------------------
+tbl <- table(geno(vcf)$GT)
+tbl_dat <- as.data.frame(tbl)
+tbl
+
+
+## ----genoGT_varMan_disp1,echo=TRUE,tidy=FALSE,eval=FALSE----------------------
+## ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+##   geom_bar(stat='Identity')+
+##   labs(x="",y="Counts",fill="")+
+##   theme_classic()
+
+
+## ----genoGT_varMan_disp2,echo=FALSE,tidy=FALSE,eval=TRUE,fig.align="center"----
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat='Identity')+
+  labs(x="",y="Counts",fill="")+theme_classic()
+
+
+## ----genoDP_varMan------------------------------------------------------------
+paste0("DP: ",geno(header(vcf))[3,3])
+matDP <- geno(vcf)$DP
+matDP[1:2,]
+
+
+## ----genoDP_varMan_dist-------------------------------------------------------
+summary(as.vector(matDP))
+#
+dist_DP <- as.vector(as.matrix(matDP))
+dist_DP <- dist_DP[!is.na(dist_DP)]
+
+
+## ----genoDP_varMan_distPres,fig.align="center"--------------------------------
+hist(dist_DP,xlab="Depth",main="")
+
+
+## ----genoGQ_varMan------------------------------------------------------------
+paste0("GQ: ",geno(header(vcf))[4,3])
+matGQ <- geno(vcf)$GQ
+matGQ[1:2,]
+
+
+## ----genoGQ_varMan_dist-------------------------------------------------------
+summary(as.vector(matGQ))
+#
+dist_GQ <- as.vector(as.matrix(matGQ))
+dist_GQ <- dist_GQ[!is.na(dist_GQ)]
+
+
+
+## ----genoGQ_varMan_dist2,fig.align="center"-----------------------------------
+hist(dist_GQ,xlab="Quality",ylab = "Variations",main="")
+
+
+## ----gatGT_info2,echo=TRUE,tidy=FALSE-----------------------------------------
+var_2 <- rownames(geno(vcf)$GT)[geno(vcf)$GT=="1/2"]
+varTab2 <- data.frame(variant=names(rd)[names(rd) %in% var_2],
+                      chr=as.vector(seqnames(rd)[names(rd) %in% var_2]),
+                      start=start(rd)[names(rd) %in% var_2],
+                      end=end(rd)[names(rd) %in% var_2],
+                      refBase=unlist(lapply(lapply(
+                        alt(vcf)[rownames(vcf) %in% var_2],`[[`,1),as.character)),
+                      altBase=unlist(lapply(lapply(
+                        alt(vcf)[rownames(vcf) %in% var_2],`[[`,2),as.character)),
+                      refCount=unlist(lapply(
+                        geno(vcf)$AD[rownames(geno(vcf)$AD) %in% var_2],`[[`,2)),
+                      altCount=unlist(
+                        lapply(geno(vcf)$AD[rownames(geno(vcf)$AD) %in% var_2],`[[`,3)),
+                      genoType=geno(vcf)$GT[rownames(geno(vcf)$GT) %in% var_2],
+                      gtQuality=geno(vcf)$GQ[rownames(geno(vcf)$GQ) %in% var_2],
+                      stringsAsFactors = FALSE)
+
+
+## ----gatGT_info1,echo=TRUE,tidy=FALSE-----------------------------------------
+varTab1 <- data.frame(variant=names(rd)[!names(rd) %in% var_2],
+                      chr=as.vector(seqnames(rd)[!names(rd) %in% var_2]),
+                      start=start(rd)[!names(rd) %in% var_2],
+                      end=end(rd)[!names(rd) %in% var_2],
+                      refBase=as.character(ref(vcf)[!rownames(vcf) %in% var_2]),
+                      altBase=unlist(lapply(lapply(
+                        alt(vcf)[!rownames(vcf) %in% var_2],`[[`,1),as.character)),
+                      refCount=unlist(lapply(
+                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,1)),
+                      altCount=unlist(lapply(
+                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,2)),
+                      genoType=geno(vcf)$GT[!rownames(geno(vcf)$GT) %in% var_2],
+                      gtQuality=geno(vcf)$GQ[!rownames(geno(vcf)$GQ) %in% var_2],
+                      stringsAsFactors = FALSE)
+
+
+## ----gatGT_merge--------------------------------------------------------------
+varTab <- rbind(varTab1,varTab2)
+varTab[1:2,]
+
+
+## ----mutType_gen--------------------------------------------------------------
+# differentiate SNP/INS/DEL/Others
+for(k in 1:length(varTab$variant)){
+  if(width(varTab$refBase[k]) < width(varTab$altBase[k])){
+    varTab$mutType[k] <- "INS"
+  }else if(width(varTab$refBase[k]) > width(varTab$altBase[k])){
+    varTab$mutType[k] <- "DEL"
+  }else if(width(varTab$refBase[k])==1&width(varTab$altBase[k])==1){
+    varTab$mutType[k] <- "SNP"
+  }else{
+    varTab$mutType[k] <- "Others"}}
+#
+tbl <- table(varTab$mutType)
+tbl_dat <- as.data.frame(tbl)
+tbl
+
+
+## ----mutType_pres1,echo=TRUE,eval=FALSE,tidy=FALSE,fig.align="center"---------
+## ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+##   geom_bar(stat = 'identity')+
+##   labs(x="",y="Mutations",fill="")+
+##   theme_classic()
+
+
+## ----mutType_pres2,echo=FALSE,eval=TRUE,fig.align="center"--------------------
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+geom_bar(stat = 'identity')+
+  labs(x="",y="Mutations",fill="")+theme_classic()
+
+
+## ----TiTb_gen,tidy=FALSE------------------------------------------------------
+# Transition (Ti)
+ti <- c("A>G","G>A","C>T","T>C")
+# Transveersion (Tv)
+tv <- c("A>T","A>C","G>T","G>C","C>A","C>G","T>A","T>G")
+varTab$nuSub <- paste0(varTab$refBase,">",varTab$altBase)
+varTab$TiTv[varTab$nuSub %in% ti] <- "Ti"
+varTab$TiTv[varTab$nuSub %in% tv] <- "Tv"
+varTab[1:2,]
+
+
+## ----TiTv_pres_nuSub----------------------------------------------------------
+varX <- varTab[varTab$mutType=="SNP",]
+tbl <- table(varX$nuSub)
+tbl_dat <- as.data.frame(tbl)
+tbl
+
+
+## ----TiTv_pres_nuSubPres1,eval=FALSE,tidy=FALSE,echo=TRUE,fig.align="center"----
+## ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+##   geom_bar(stat = 'identity')+
+##   labs(x="",y="Mutations",fill="")+
+##   theme(legend.position = "none")
+
+
+## ----TiTv_pres_nuSubPres2,eval=TRUE,echo=FALSE,tidy=FALSE,fig.align="center"----
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+geom_bar(stat = 'identity')+
+  labs(x="",y="Mutations",fill="")+theme(legend.position = "none")
+
+
+## ----TiTv_pres_TiTv1----------------------------------------------------------
+tbl <- table(varX$TiTv)
+tbl_dat <- as.data.frame(tbl)
+tbl
+
+
+## ----TiTv_pres_TiTv2,echo=TRUE,eval=FALSE,tidy=FALSE--------------------------
+## ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+
+##   geom_bar(stat = 'identity')+labs(x="",y="Mutations",fill="")+
+##   theme(legend.position = "none")
+
+
+## ----TiTv_pres_TiTv=3,echo=FALSE,eval=TRUE,tidy=FALSE,fig.align="center"------
+ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+geom_bar(stat = 'identity')+labs(x="",y="Mutations",fill="")+theme(legend.position = "none")
+
+
+## ----motif_load_advAn---------------------------------------------------------
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(GenomicFeatures)
+#
+rd_sub <- rd[gsub("(.*):(.*)_(.*)","\\3",names(rd))=="C/T"]
+
+
+## ----motif_seqExt_advAn,tidy=FALSE--------------------------------------------
+rd_sub$triNu <- getSeq(Hsapiens,
+                 seqnames(rd_sub),
+                 start=start(rd_sub)-1,
+                 end=end(rd_sub)+1)
+rd_sub[1:2]
+
+
+## ----motif_seqPat_advan-------------------------------------------------------
+tbl <- table(rd_sub$triNu)
+tbl_dat <- as.data.frame(tbl)
+tbl
+
+
+## ----motif_seqPat_advan2,eval=FALSE,echo=TRUE,tidy=FALSE----------------------
+## ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+##   geom_bar(stat='identity')+
+##   labs(x="",y="Variants",fill="")+
+##   theme(legend.position = "none")
+
+
+## ----motif_seqPat_advan3,eval=TRUE,echo=FALSE,tidy=FALSE,fig.align="center"----
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat='identity')+
+  labs(x="",y="Variants",fill="")+
+  theme(legend.position = "none")
+
+
+## ----motif_ApoTar_advan1------------------------------------------------------
+# TCW: TCA/TCT
+tbl_dat$APOBEC_target <- tbl_dat$Var1 %in% c("TCA","TCT")
+apobec_dat <- aggregate(Freq ~ APOBEC_target,tbl_dat,FUN=sum,na.rm=TRUE)
+apobec_dat
+
+
+## ----motif_ApoTar_advan2,eval=FALSE,echo=TRUE,tidy=FALSE,fig.align="center"----
+## ggplot(apobec_dat,aes(x=APOBEC_target,y=Freq,fill=APOBEC_target))+
+##   geom_bar(stat='identity')+
+##   labs(x="",y="Variants",fill="")+
+##   theme(legend.position = "none")
+
+
+## ----motif_ApoTar_advan3,eval=TRUE,echo=FALSE,tidy=FALSE,fig.align="center"----
+ggplot(apobec_dat,aes(x=APOBEC_target,y=Freq,fill=APOBEC_target))+
+  geom_bar(stat='identity')+
+  labs(x="",y="Variants",fill="")+
+  theme(legend.position = "none")
 

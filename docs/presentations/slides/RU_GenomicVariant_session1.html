@@ -12,7 +12,7 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# ATACseq In Bioconductor
+# Genomic Variants ~ Session 1
 <html>
 <div style="float:left">
 
@@ -20,17 +20,812 @@ class: center, middle, inverse, title-slide
 <hr color='#EB811B' size=1px width=796px>
 </html>
 ### Rockefeller University, Bioinformatics Resource Centre
-### <a href="http://rockefelleruniversity.github.io/RU_ATACseq/" class="uri">http://rockefelleruniversity.github.io/RU_ATACseq/</a>
+### <a href="http://rockefelleruniversity.github.io/RU_GenomicVariants/" class="uri">http://rockefelleruniversity.github.io/RU_GenomicVariants/</a>
 
 ---
 
 
 
+## Manipulate VCF files
+- Load VCF file
+- Structure of VCF file
+- General inforamtion in the vcf
+- Variants in VRange format
+- Information field
+- Genotype field
+
+---
+## Dataset
+- Row data from SRA: [PRJNA185252](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA185252)
+- References: Ge H et al, Plos ONE (2013), 8(6):e67464 [LINK](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3696090/)
+
+---
+## [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html)
+&lt;img src="imgs/vcfMan_fig2.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---Load VCF file
+
+```r
+library(VariantAnnotation)
+vcf &lt;- readVcf("data/SAMN01882168_filt.vcf.gz","hg19")
+vcf
+```
+
+```
+## class: CollapsedVCF 
+## dim: 72244 1 
+## rowRanges(vcf):
+##   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER
+## info(vcf):
+##   DataFrame with 19 columns: AC, AF, AN, BaseQRankSum, ClippingRankSum, DP, ...
+## info(header(vcf)):
+##                    Number Type    Description                                  
+##    AC              A      Integer Allele count in genotypes, for each ALT al...
+##    AF              A      Float   Allele Frequency, for each ALT allele, in ...
+##    AN              1      Integer Total number of alleles in called genotypes  
+##    BaseQRankSum    1      Float   Z-score from Wilcoxon rank sum test of Alt...
+##    ClippingRankSum 1      Float   Z-score From Wilcoxon rank sum test of Alt...
+##    DP              1      Integer Approximate read depth; some reads may hav...
+##    DS              0      Flag    Were any of the samples downsampled?         
+##    END             1      Integer Stop position of the interval                
+##    ExcessHet       1      Float   Phred-scaled p-value for exact test of exc...
+##    FS              1      Float   Phred-scaled p-value using Fisher's exact ...
+##    InbreedingCoeff 1      Float   Inbreeding coefficient as estimated from t...
+##    MLEAC           A      Integer Maximum likelihood expectation (MLE) for t...
+##    MLEAF           A      Float   Maximum likelihood expectation (MLE) for t...
+##    MQ              1      Float   RMS Mapping Quality                          
+##    MQRankSum       1      Float   Z-score From Wilcoxon rank sum test of Alt...
+##    QD              1      Float   Variant Confidence/Quality by Depth          
+##    RAW_MQ          1      Float   Raw data for RMS Mapping Quality             
+##    ReadPosRankSum  1      Float   Z-score from Wilcoxon rank sum test of Alt...
+##    SOR             1      Float   Symmetric Odds Ratio of 2x2 contingency ta...
+## geno(vcf):
+##   List of length 10: GT, AD, DP, GQ, MIN_DP, PGT, PID, PL, RGQ, SB
+## geno(header(vcf)):
+##           Number Type    Description                                           
+##    GT     1      String  Genotype                                              
+##    AD     R      Integer Allelic depths for the ref and alt alleles in the o...
+##    DP     1      Integer Approximate read depth (reads with MQ=255 or with b...
+##    GQ     1      Integer Genotype Quality                                      
+##    MIN_DP 1      Integer Minimum DP observed within the GVCF block             
+##    PGT    1      String  Physical phasing haplotype information, describing ...
+##    PID    1      String  Physical phasing ID information, where each unique ...
+##    PL     G      Integer Normalized, Phred-scaled likelihoods for genotypes ...
+##    RGQ    1      Integer Unconditional reference genotype confidence, encode...
+##    SB     4      Integer Per-sample component statistics which comprise the ...
+```
+
+---
+## General information
+
+```r
+header(vcf)
+```
+
+```
+## class: VCFHeader 
+## samples(1): SAMN01882168
+## meta(5): fileformat reference source GATKCommandLine contig
+## fixed(2): FILTER ALT
+## info(19): AC AF ... ReadPosRankSum SOR
+## geno(10): GT AD ... RGQ SB
+```
+
+---
+## How many samples in this vcf?
+
+```r
+sampleID &lt;- samples(header(vcf))
+sampleID
+```
+
+```
+## [1] "SAMN01882168"
+```
+
+---
+## Meta information
+
+```r
+# Contents in Meta field
+meta(header(vcf))
+```
+
+```
+## DataFrameList of length 5
+## names(5): fileformat reference source GATKCommandLine contig
+```
+
+---
+## Meta information
+
+```r
+# File format
+meta(header(vcf))$fileformat
+```
+
+```
+## DataFrame with 1 row and 1 column
+##                  Value
+##            &lt;character&gt;
+## fileformat     VCFv4.2
+```
+
+```r
+# Source used for variant calling
+meta(header(vcf))$source
+```
+
+```
+## DataFrame with 1 row and 1 column
+##                Value
+##          &lt;character&gt;
+## source GenotypeGVCFs
+```
+
+---
+## Reference contigs used
+
+```r
+meta(header(vcf))$contig
+```
+
+```
+## DataFrame with 25 rows and 2 columns
+##            length                       assembly
+##       &lt;character&gt;                    &lt;character&gt;
+## chr1    249250621 BSgenome.Hsapiens.UCSC.hg19.fa
+## chr2    243199373 BSgenome.Hsapiens.UCSC.hg19.fa
+## chr3    198022430 BSgenome.Hsapiens.UCSC.hg19.fa
+## chr4    191154276 BSgenome.Hsapiens.UCSC.hg19.fa
+## chr5    180915260 BSgenome.Hsapiens.UCSC.hg19.fa
+## ...           ...                            ...
+## chr21    48129895 BSgenome.Hsapiens.UCSC.hg19.fa
+## chr22    51304566 BSgenome.Hsapiens.UCSC.hg19.fa
+## chrX    155270560 BSgenome.Hsapiens.UCSC.hg19.fa
+## chrY     59373566 BSgenome.Hsapiens.UCSC.hg19.fa
+## chrM        16571 BSgenome.Hsapiens.UCSC.hg19.fa
+```
+
+---
+## Variants information (VRange format)
+
+```r
+rd &lt;- rowRanges(vcf)
+rd[1:2]
+```
+
+```
+## GRanges object with 2 ranges and 5 metadata columns:
+##                   seqnames    ranges strand | paramRangeID            REF
+##                      &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;
+##   chr1:815337_G/T     chr1    815337      * |           NA              G
+##   chr1:815341_G/A     chr1    815341      * |           NA              G
+##                                  ALT      QUAL      FILTER
+##                   &lt;DNAStringSetList&gt; &lt;numeric&gt; &lt;character&gt;
+##   chr1:815337_G/T                  T     32.77           .
+##   chr1:815341_G/A                  A     32.77           .
+##   -------
+##   seqinfo: 25 sequences from hg19 genome
+```
+
+---
+## Position of the variations
+- chromosome: seqnames()
+- start position: start()
+- end position: end()
+
+---
+## Position of the variations
+
+```r
+as.vector(seqnames(rd)[1:2]) # Chromosome
+```
+
+```
+## [1] "chr1" "chr1"
+```
+
+```r
+start(rd)[1:2] # Start position
+```
+
+```
+## [1] 815337 815341
+```
+
+```r
+end(rd)[1:2] # End position
+```
+
+```
+## [1] 815337 815341
+```
+
+---
+## Extract Reference Allele
+
+```r
+refBase &lt;- ref(vcf)
+# is a DNAStringSet
+refBase[1:2]
+```
+
+```
+## DNAStringSet object of length 2:
+##     width seq
+## [1]     1 G
+## [2]     1 G
+```
+
+```r
+refBase &lt;- as.character(refBase)
+# Convert into character
+refBase[1:2]
+```
+
+```
+## [1] "G" "G"
+```
+
+---
+## Extract Alternative Allele
+
+```r
+altBase &lt;- alt(vcf)
+# Is a list
+alt(vcf)[1:2] 
+```
+
+```
+## DNAStringSetList of length 2
+## [[1]] T
+## [[2]] A
+```
+
+```r
+# get the 1st vector of the list
+altBase &lt;- lapply(altBase,`[[`,1) 
+altBase[1:2]
+```
+
+```
+## [[1]]
+## 1-letter DNAString object
+## seq: T
+## 
+## [[2]]
+## 1-letter DNAString object
+## seq: A
+```
+
+---
+## Extract Alternative Allele
+
+```r
+# convert DNAString to character
+altBase &lt;- unlist(lapply(altBase,as.character)) 
+altBase[1:2]
+```
+
+```
+## [1] "T" "A"
+```
+
+---
+## Information field ~ Description
+- Integrated information from all the samples
+- Annotation information would be recored in this section
+
+```r
+info(header(vcf))[1:2,]
+```
+
+```
+## DataFrame with 2 rows and 3 columns
+##         Number        Type
+##    &lt;character&gt; &lt;character&gt;
+## AC           A     Integer
+## AF           A       Float
+##                                                                    Description
+##                                                                    &lt;character&gt;
+## AC Allele count in genotypes, for each ALT allele, in the same order as listed
+## AF          Allele Frequency, for each ALT allele, in the same order as listed
+```
+
+---
+## Information field (in a dataframe)
+
+```r
+info(vcf)[1:2,]
+```
+
+```
+## DataFrame with 2 rows and 19 columns
+##                            AC            AF        AN BaseQRankSum
+##                 &lt;IntegerList&gt; &lt;NumericList&gt; &lt;integer&gt;    &lt;numeric&gt;
+## chr1:815337_G/T             1           0.5         2        0.084
+## chr1:815341_G/A             1           0.5         2        2.740
+##                 ClippingRankSum        DP        DS       END ExcessHet
+##                       &lt;numeric&gt; &lt;integer&gt; &lt;logical&gt; &lt;integer&gt; &lt;numeric&gt;
+## chr1:815337_G/T               0        11     FALSE        NA    3.0103
+## chr1:815341_G/A               0        11     FALSE        NA    3.0103
+##                        FS InbreedingCoeff         MLEAC         MLEAF        MQ
+##                 &lt;numeric&gt;       &lt;numeric&gt; &lt;IntegerList&gt; &lt;NumericList&gt; &lt;numeric&gt;
+## chr1:815337_G/T      3.09              NA             1           0.5     48.39
+## chr1:815341_G/A      3.09              NA             1           0.5     48.39
+##                 MQRankSum        QD    RAW_MQ ReadPosRankSum       SOR
+##                 &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;
+## chr1:815337_G/T    -2.744      2.98        NA         -1.083     2.093
+## chr1:815341_G/A    -2.744      2.98        NA         -1.200     2.093
+```
+
+---
+## Genotype information ~ Description
+- Separatd by indivisual samples
+
+```r
+geno(header(vcf))[1:2,]
+```
+
+```
+## DataFrame with 2 rows and 3 columns
+##         Number        Type
+##    &lt;character&gt; &lt;character&gt;
+## GT           1      String
+## AD           R     Integer
+##                                                       Description
+##                                                       &lt;character&gt;
+## GT                                                       Genotype
+## AD Allelic depths for the ref and alt alleles in the order listed
+```
+
+---
+## Genotype information ~ GT
+
+```r
+paste0("GT: ",geno(header(vcf))[1,3])
+```
+
+```
+## [1] "GT: Genotype"
+```
+
+```r
+matGT &lt;- geno(vcf)$GT
+matGT[1:2,]
+```
+
+```
+## chr1:815337_G/T chr1:815341_G/A 
+##           "0/1"           "0/1"
+```
+
+---
+## GT Types
+
+```r
+tbl &lt;- table(geno(vcf)$GT)
+tbl_dat &lt;- as.data.frame(tbl)
+tbl
+```
+
+```
+## 
+##   0/1   1/1   1/2 
+## 70215  1853   176
+```
+- 0/1: heterozygous mutations, one allele is the same as reference sequence
+- 1/1: homozygous mutations, both alleles are different from reference sequence
+- 1/2: heterozygous mutations, both alleles are different from reference sequence
+
+---
+## GT Types ~ plot
+
+```r
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat='Identity')+
+  labs(x="",y="Counts",fill="")+
+  theme_classic()
+```
+
+---
+## GT Types ~ plot
+&lt;img src="RU_GenomicVariant_session1_files/figure-html/genoGT_varMan_disp2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Genotype information ~ DP
+
+```r
+paste0("DP: ",geno(header(vcf))[3,3])
+```
+
+```
+## [1] "DP: Approximate read depth (reads with MQ=255 or with bad mates are filtered)"
+```
+
+```r
+matDP &lt;- geno(vcf)$DP
+matDP[1:2,]
+```
+
+```
+## chr1:815337_G/T chr1:815341_G/A 
+##              11              11
+```
+
+---
+## DP Distribution
+
+```r
+summary(as.vector(matDP))
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    2.00   10.00   14.00   24.41   21.00 4136.00
+```
+
+```r
+#
+dist_DP &lt;- as.vector(as.matrix(matDP))
+dist_DP &lt;- dist_DP[!is.na(dist_DP)]
+```
+
+---
+## DP Distribution
+
+```r
+hist(dist_DP,xlab="Depth",main="")
+```
+
+&lt;img src="RU_GenomicVariant_session1_files/figure-html/genoDP_varMan_distPres-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Genotype information ~ GQ
+- The confidance in gentype calling
+- [Phred quality score](https://gatk.broadinstitute.org/hc/en-us/articles/360035531872-Phred-scaled-quality-scores)
+
+```r
+paste0("GQ: ",geno(header(vcf))[4,3])
+```
+
+```
+## [1] "GQ: Genotype Quality"
+```
+
+```r
+matGQ &lt;- geno(vcf)$GQ
+matGQ[1:2,]
+```
+
+```
+## chr1:815337_G/T chr1:815341_G/A 
+##              61              61
+```
+
+---
+## GQ Distribution
+
+```r
+summary(as.vector(matGQ))
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00   90.00   99.00   88.41   99.00   99.00
+```
+
+```r
+#
+dist_GQ &lt;- as.vector(as.matrix(matGQ))
+dist_GQ &lt;- dist_GQ[!is.na(dist_GQ)]
+```
+
+---
+## GQ Distribution
+
+```r
+hist(dist_GQ,xlab="Quality",ylab = "Variations",main="")
+```
+
+&lt;img src="RU_GenomicVariant_session1_files/figure-html/genoGQ_varMan_dist2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Gathering information ~ 1/2
+
+```r
+var_2 &lt;- rownames(geno(vcf)$GT)[geno(vcf)$GT=="1/2"]
+varTab2 &lt;- data.frame(variant=names(rd)[names(rd) %in% var_2],
+                      chr=as.vector(seqnames(rd)[names(rd) %in% var_2]),
+                      start=start(rd)[names(rd) %in% var_2],
+                      end=end(rd)[names(rd) %in% var_2],
+                      refBase=unlist(lapply(lapply(
+                        alt(vcf)[rownames(vcf) %in% var_2],`[[`,1),as.character)),
+                      altBase=unlist(lapply(lapply(
+                        alt(vcf)[rownames(vcf) %in% var_2],`[[`,2),as.character)),
+                      refCount=unlist(lapply(
+                        geno(vcf)$AD[rownames(geno(vcf)$AD) %in% var_2],`[[`,2)),
+                      altCount=unlist(
+                        lapply(geno(vcf)$AD[rownames(geno(vcf)$AD) %in% var_2],`[[`,3)),
+                      genoType=geno(vcf)$GT[rownames(geno(vcf)$GT) %in% var_2],
+                      gtQuality=geno(vcf)$GQ[rownames(geno(vcf)$GQ) %in% var_2],
+                      stringsAsFactors = FALSE)
+```
+
+---
+## Gathering information ~ 0/1 and 1/1
+
+```r
+varTab1 &lt;- data.frame(variant=names(rd)[!names(rd) %in% var_2],
+                      chr=as.vector(seqnames(rd)[!names(rd) %in% var_2]),
+                      start=start(rd)[!names(rd) %in% var_2],
+                      end=end(rd)[!names(rd) %in% var_2],
+                      refBase=as.character(ref(vcf)[!rownames(vcf) %in% var_2]),
+                      altBase=unlist(lapply(lapply(
+                        alt(vcf)[!rownames(vcf) %in% var_2],`[[`,1),as.character)),
+                      refCount=unlist(lapply(
+                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,1)),
+                      altCount=unlist(lapply(
+                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,2)),
+                      genoType=geno(vcf)$GT[!rownames(geno(vcf)$GT) %in% var_2],
+                      gtQuality=geno(vcf)$GQ[!rownames(geno(vcf)$GQ) %in% var_2],
+                      stringsAsFactors = FALSE)
+```
+
+---
+## Merged datatable
+
+```r
+varTab &lt;- rbind(varTab1,varTab2)
+varTab[1:2,]
+```
+
+```
+##           variant  chr  start    end refBase altBase refCount altCount genoType
+## 1 chr1:815337_G/T chr1 815337 815337       G       T        8        3      0/1
+## 2 chr1:815341_G/A chr1 815341 815341       G       A        8        3      0/1
+##   gtQuality
+## 1        61
+## 2        61
+```
+
+---
+## Mutation types
+- SNP: single-nucleotide substitutions
+- DEL: deletions
+- INS: insertions
+- Others: complicated variations, such as Ins/Del or Inversion
+
+---
+## Mutation types
+
+```r
+# differentiate SNP/INS/DEL/Others
+for(k in 1:length(varTab$variant)){
+  if(width(varTab$refBase[k]) &lt; width(varTab$altBase[k])){
+    varTab$mutType[k] &lt;- "INS"
+  }else if(width(varTab$refBase[k]) &gt; width(varTab$altBase[k])){
+    varTab$mutType[k] &lt;- "DEL"
+  }else if(width(varTab$refBase[k])==1&amp;width(varTab$altBase[k])==1){
+    varTab$mutType[k] &lt;- "SNP"
+  }else{
+    varTab$mutType[k] &lt;- "Others"}}
+#
+tbl &lt;- table(varTab$mutType)
+tbl_dat &lt;- as.data.frame(tbl)
+tbl
+```
+
+```
+## 
+##    DEL    INS Others    SNP 
+##   4351   3174      5  64714
+```
+
+---
+## Mutation types ~ plot
+
+```r
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat = 'identity')+
+  labs(x="",y="Mutations",fill="")+
+  theme_classic()
+```
+
+---
+## Mutation types ~ Plot
+&lt;img src="RU_GenomicVariant_session1_files/figure-html/mutType_pres2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Nucleotide substitution
+- only SNPs
+- Transition (Ti): purine-to-purine, pyrimidine-to-pyrimidine
+- Transversion (Tv): purine-to-pyrimidine, pyrimidine-to-purine
+
+---
+## Nucleotide substitution
+
+```r
+# Transition (Ti)
+ti &lt;- c("A&gt;G","G&gt;A","C&gt;T","T&gt;C")
+# Transveersion (Tv)
+tv &lt;- c("A&gt;T","A&gt;C","G&gt;T","G&gt;C","C&gt;A","C&gt;G","T&gt;A","T&gt;G")
+varTab$nuSub &lt;- paste0(varTab$refBase,"&gt;",varTab$altBase)
+varTab$TiTv[varTab$nuSub %in% ti] &lt;- "Ti"
+varTab$TiTv[varTab$nuSub %in% tv] &lt;- "Tv"
+varTab[1:2,]
+```
+
+```
+##           variant  chr  start    end refBase altBase refCount altCount genoType
+## 1 chr1:815337_G/T chr1 815337 815337       G       T        8        3      0/1
+## 2 chr1:815341_G/A chr1 815341 815341       G       A        8        3      0/1
+##   gtQuality mutType nuSub TiTv
+## 1        61     SNP   G&gt;T   Tv
+## 2        61     SNP   G&gt;A   Ti
+```
+
+---
+## Nucleotide substitution
+
+```r
+varX &lt;- varTab[varTab$mutType=="SNP",]
+tbl &lt;- table(varX$nuSub)
+tbl_dat &lt;- as.data.frame(tbl)
+tbl
+```
+
+```
+## 
+##   A&gt;C   A&gt;G   A&gt;T   C&gt;A   C&gt;G   C&gt;T   G&gt;A   G&gt;C   G&gt;T   T&gt;A   T&gt;C   T&gt;G 
+##  3062  9380  3083  3448  2830 10393 10579  2793  3515  3143  9424  3064
+```
+
+---
+## Nucleotide substitution ~ Plot
+
+```r
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat = 'identity')+
+  labs(x="",y="Mutations",fill="")+
+  theme(legend.position = "none")
+```
+
+---
+## Nucleotide substitution ~ Plot
+&lt;img src="RU_GenomicVariant_session1_files/figure-html/TiTv_pres_nuSubPres2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Ti/Tv
+
+```r
+tbl &lt;- table(varX$TiTv)
+tbl_dat &lt;- as.data.frame(tbl)
+tbl
+```
+
+```
+## 
+##    Ti    Tv 
+## 39776 24938
+```
+
+---
+## Ti/Tv ~ Plot
+
+```r
+ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat = 'identity')+labs(x="",y="Mutations",fill="")+
+  theme(legend.position = "none")
+```
+
+---
+## Ti/Tv ~ Plot
+&lt;img src="RU_GenomicVariant_session1_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Motif analysis
+- Specific patterns beneath the mutation sites
+- eg. APOBEC target: T[C&gt;T]W
 
 
+```r
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(GenomicFeatures)
+#
+rd_sub &lt;- rd[gsub("(.*):(.*)_(.*)","\\3",names(rd))=="C/T"]
+```
 
+---
+## Extract sequences beneath the mutation
 
-## This is a placeholder
+```r
+rd_sub$triNu &lt;- getSeq(Hsapiens,
+                 seqnames(rd_sub),
+                 start=start(rd_sub)-1,
+                 end=end(rd_sub)+1)
+rd_sub[1:2]
+```
+
+```
+## GRanges object with 2 ranges and 6 metadata columns:
+##                   seqnames    ranges strand | paramRangeID            REF
+##                      &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;
+##   chr1:815520_C/T     chr1    815520      * |           NA              C
+##   chr1:815573_C/T     chr1    815573      * |           NA              C
+##                                  ALT      QUAL      FILTER          triNu
+##                   &lt;DNAStringSetList&gt; &lt;numeric&gt; &lt;character&gt; &lt;DNAStringSet&gt;
+##   chr1:815520_C/T                  T    916.77           .            CCT
+##   chr1:815573_C/T                  T     70.77           .            ACA
+##   -------
+##   seqinfo: 25 sequences from hg19 genome
+```
+
+---
+## Trinucleotide pattern
+
+```r
+tbl &lt;- table(rd_sub$triNu)
+tbl_dat &lt;- as.data.frame(tbl)
+tbl
+```
+
+```
+## 
+##  ACA  ACC  ACG  ACT  CCA  CCC  CCG  CCT  GCA  GCC  GCG  GCT  TCA  TCC  TCG  TCT 
+## 1176  535 1096  879  619  429  544  641  554  387  511  556  633  535  584  706
+```
+
+---
+## Trinucleotide pattern ~ code
+
+```r
+ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat='identity')+
+  labs(x="",y="Variants",fill="")+
+  theme(legend.position = "none")
+```
+
+---
+## Trinucleotide pattern ~ plot
+&lt;img src="RU_GenomicVariant_session1_files/figure-html/motif_seqPat_advan3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## APOBEC targets? ~ Count
+
+```r
+# TCW: TCA/TCT
+tbl_dat$APOBEC_target &lt;- tbl_dat$Var1 %in% c("TCA","TCT")
+apobec_dat &lt;- aggregate(Freq ~ APOBEC_target,tbl_dat,FUN=sum,na.rm=TRUE)
+apobec_dat
+```
+
+```
+##   APOBEC_target Freq
+## 1         FALSE 9046
+## 2          TRUE 1339
+```
+
+---
+## APOBEC targets? ~ Plot
+
+```r
+ggplot(apobec_dat,aes(x=APOBEC_target,y=Freq,fill=APOBEC_target))+
+  geom_bar(stat='identity')+
+  labs(x="",y="Variants",fill="")+
+  theme(legend.position = "none")
+```
+
+---
+## APOBEC targets? ~ Plot
+&lt;img src="RU_GenomicVariant_session1_files/figure-html/motif_ApoTar_advan3-1.png" style="display: block; margin: auto;" /&gt;
+**Probably not an APOBEC-enriched**
+
+---
+## Exercises
+- [Exercise](./exercise_beta.html)
+- [Answer](./answer_beta.html)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
