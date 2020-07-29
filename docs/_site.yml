@@ -32,12 +32,24 @@ navbar:
         href: presentations/r_code/RU_GenomicVariant_session3.R
   - text: Exercises
     menu:
-    - text: placeholder_ex
+    - text: GenomicVariant_session1
       menu:
       - text: Exercise
-        href: exercises/exercises/placeholder_ex_exercise.html
+        href: exercises/exercises/GenomicVariant_session1_exercise.html
       - text: Solution
-        href: exercises/answers/placeholder_ex_answers.html
+        href: exercises/answers/GenomicVariant_session1_answers.html
+    - text: GenomicVariant_session2
+      menu:
+      - text: Exercise
+        href: exercises/exercises/GenomicVariant_session2_exercise.html
+      - text: Solution
+        href: exercises/answers/GenomicVariant_session2_answers.html
+    - text: GenomicVariant_session3
+      menu:
+      - text: Exercise
+        href: exercises/exercises/GenomicVariant_session3_exercise.html
+      - text: Solution
+        href: exercises/answers/GenomicVariant_session3_answers.html
   right:
   - text: Getting help!
     href: https://github.com//RockefellerUniversity/RU_GenomicVariants/issues

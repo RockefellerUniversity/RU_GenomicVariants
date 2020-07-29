@@ -84,7 +84,7 @@ laml &lt;- read.maf("data/tcga_laml.maf.gz")
 ## -Summarizing
 ## -Processing clinical data
 ## --Missing clinical data
-## -Finished in 0.507s elapsed (0.363s cpu)
+## -Finished in 0.396s elapsed (0.305s cpu)
 ```
 
 ```r
@@ -361,7 +361,7 @@ library('NMF')
 laml.sign &lt;- estimateSignatures(mat = laml.tnm,
                                 nTry = 6,
                                 pConstant = 0.1,
-                                parallel = 2)
+                                parallel = 1)
 ```
 - [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation)
 - Measure of how faithfully a clustering results represent the original data

@@ -158,7 +158,7 @@ ggplot(yd,aes(x=num,y=count,fill=cat))+geom_bar(stat='identity')+
 ## laml.sign <- estimateSignatures(mat = laml.tnm,
 ##                                 nTry = 6,
 ##                                 pConstant = 0.1,
-##                                 parallel = 2)
+##                                 parallel = 1)
 
 
 ## ----mult_mutSig_sigEst_advan2,eval=TRUE,echo=FALSE,include=FALSE-------------
