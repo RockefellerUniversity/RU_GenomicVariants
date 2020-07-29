@@ -48,11 +48,13 @@ brca <- read.maf(maf_file)
 sample_sum <- getSampleSummary(brca)
 dim(sample_sum)
 #
-melt_dat <- reshape2::melt(sample_sum[,-c("total")],id="Tumor_Sample_Barcode")
 var_to <- sample_sum$total
 names(var_to) <- sample_sum$Tumor_Sample_Barcode
+sample_sum <- dplyr::select(sample_sum,-total)
+melt_dat <- reshape2::melt(sample_sum,id="Tumor_Sample_Barcode")
 melt_dat$totalVar <- var_to[match(melt_dat$Tumor_Sample_Barcode,names(var_to))]
 melt_dat$prop <- melt_dat$value / melt_dat$totalVar
+head(melt_dat)
 #
 ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=log10(value),fill=variable))+
   geom_bar(stat='identity',position = 'stack')+
