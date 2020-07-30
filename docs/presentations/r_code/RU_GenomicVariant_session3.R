@@ -12,7 +12,6 @@ suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene))
 suppressPackageStartupMessages(library(SNPlocs.Hsapiens.dbSNP144.GRCh37))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(GenomicFeatures))
-# suppressPackageStartupMessages(library(seqLogo))
 suppressPackageStartupMessages(library(maftools))
 suppressPackageStartupMessages(library(NMF))
 
