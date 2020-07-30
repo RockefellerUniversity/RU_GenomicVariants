@@ -483,6 +483,6 @@ ggplot(apobec_dat,aes(x=APOBEC_target,y=Freq,fill=APOBEC_target))+
 **Probably not an APOBEC-enriched**
 
 ---
-## Exercises
-- [Exercise](./exercise_beta.html)
-- [Answer](./answer_beta.html)
+## Exercise Time
+- [Exercise](../../exercises/exercises/GenomicVariant_session1_exercise.html)
+- [Answer](../../exercises/answers/GenomicVariant_session1_answers.html)

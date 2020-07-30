@@ -1,7 +1,7 @@
 ---
-title: "Genomic Variants in Bioconductor exercises (session 1)"
+title: "Genomic Variants Exercises ~ Session 1"
 author: "Rockefeller University, Bioinformatics Resource Centre"
-date: "https://rockefelleruniversity.github.io/RU_ATACseq/"
+date: "https://rockefelleruniversity.github.io/RU_GenomicVariants/"
 output: 
   html_document:
     number_sections: false  ## if you want number sections at each table header
@@ -26,10 +26,9 @@ library(ggplot2)
 library(GenomicFeatures)
 ```
 
-In this exercise, we will practice how to manipulate VCF files. Please find this VCF file "../data/SAMN01882168_filt.vcf.gz" and use it to answer the following questions.
-
-
 ## Genomic Variant manipulation
+
+In this exercise, we will practice how to manipulate VCF files. Please find this VCF file "data/SAMN01882168_filt.vcf.gz" and use it to answer the following questions.
 
 1. Read in the VCF file and make a VRange object
 
@@ -48,9 +47,9 @@ geno(header(vcf))
 ```
 
 3. Please calculate the incidance of mutation occurce in each chromosome.
-- Incidence: variant per kilobase
-- Chromosome length in reference genome: seqlengths(rd)
-- Variants per chromosome: table(seqnames(rd))
+  - Incidence: variant per kilobase
+  - Chromosome length in reference genome: ***seqlengths()***
+  - Variants per chromosome: ***table(seqnames())***
 
 ```{r incPlot, eval=TRUE, echo=toMessage}
 contig_leng <- seqlengths(rd)
@@ -90,8 +89,8 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 6. Extract DP information from vcf subset and make histogram
-- use ggplot to make histogram
-- scale x axis as log10
+  - use ggplot to make histogram
+  - scale x axis as log10: ***scale_x_log10()***
 
 ```{r extDP, eval=TRUE, echo=toMessage}
 matDP <- geno(vcf_sub)$DP
@@ -104,8 +103,8 @@ ggplot(as.data.frame(matDP),aes(x=SAMN01882168))+geom_histogram()+
 ```
 
 7. Extract GQ information from vcf subset and make histogram
-- use ggplot to make histogram
-- scale x axis as log10
+  - use ggplot to make histogram
+  - scale x axis as log10
 
 ```{r extGQ, eval=TRUE, echo=toMessage}
 matGQ <- geno(vcf_sub)$GQ
@@ -160,10 +159,10 @@ varTab[1:2,]
 ```
 
 9. Please differnentiate variants by types (SNP/INS/DEL/Others) and count variants by each type 
-- SNP: single nucleotide substitution, length(refBase) = length(altBase) = 1
-- INS: insertion, length(refBase) < length(altBase)
-- DEL: deletion, length(refBase) > length(altBase)
-- Others: might be conplicated substitutions, eg. insdel, length(refBase) = length(altBase) <> 1
+  - SNP: single nucleotide substitution, length(refBase) = length(altBase) = 1
+  - INS: insertion, length(refBase) < length(altBase)
+  - DEL: deletion, length(refBase) > length(altBase)
+  - Others: might be conplicated substitutions, eg. insdel, length(refBase) = length(altBase) <> 1
 
 ```{r varClass, eval=TRUE, echo=toMessage}
 for(k in 1:length(varTab$variant)){
@@ -187,10 +186,10 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 10. Evaluate nucleotide substitutions
-- only focus on SNPs
-- Nucleotide substitutions: 
-  + Transition: A>G, G>A, C>T, T>C
-  + Transversion: A>T, A>C, G>T, G>C, C>A, C>G, T>A, T>G
+  - only focus on SNPs
+  - Nucleotide substitutions: 
+    + Transition: A>G, G>A, C>T, T>C
+    + Transversion: A>T, A>C, G>T, G>C, C>A, C>G, T>A, T>G
   
 ```{r nuclSub, eval=TRUE, echo=toMessage}
 ti <- c("A>G","G>A","C>T","T>C")

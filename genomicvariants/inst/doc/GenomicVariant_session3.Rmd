@@ -1,7 +1,7 @@
 ---
-title: "Genomic Variants in Bioconductor exercises (session 3)"
+title: "Genomic Variants Exercises ~ Session 3"
 author: "Rockefeller University, Bioinformatics Resource Centre"
-date: "https://rockefelleruniversity.github.io/RU_ATACseq/"
+date: "https://rockefelleruniversity.github.io/RU_GenomicVariants/"
 output: 
   html_document:
     number_sections: false  ## if you want number sections at each table header
@@ -31,7 +31,11 @@ library(NMF)
 # write.table(abc,"../extdata/data/tcga_brca.maf",sep="\t",quote = FALSE,row.names = FALSE)
 ```
 
+## Advanced analysis
+
 In this exercise, we will practice how to handle variants from multiple samples. An MAF file of breast carcinoma (BRCA) was fetched from TCGA. Please find this MAF file "data/tcga_brca.maf" and answer the following questions.
+
+1. Make a sample summary of this dataset and make a plot to demonstrate the composition of mutations in each sample
 
 ```{r makeSubset,eval=TRUE, echo=toMessage}
 library(maftools)
@@ -39,10 +43,6 @@ maf_file <- "data/tcga_brca.maf"
 # maf_file <- "../extdata/data/tcga_brca.maf"
 brca <- read.maf(maf_file)
 ```
-
-## Advanced analysis
-
-1. Make a sample summary of this dataset and make a plot to demonstrate the composition of mutations in each sample
 
 ```{r samSum,eval=TRUE, echo=toMessage}
 sample_sum <- getSampleSummary(brca)
@@ -63,8 +63,8 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=log10(value),fill=variable))+
 ```
 
 2. Please list top five mutated genes and evalutate the interactions between them
-- TTN is a huge gene. Usually with more mutations than others
-- The interactions of gene mutations can be shown in oncoplot
+  - TTN is a huge gene usually with more mutations than others.
+  - The interactions of gene mutations can be shown in oncoplot.
 
 ```{r oncoPlot,eval=TRUE, echo=toMessage}
 gene_sum <- getGeneSummary(brca)
@@ -73,15 +73,15 @@ gene_sum[1:5]
 oncoplot(brca,top=5,genesToIgnore = "TTN")
 ```
 
-3. Mutations in PIK3CA is the most common in BRCA dataset. Please plot mutations in a lollipop plot to demonstrate any hotspots.
-- PIK3CA has hotspots in E542, E545, and H1047
+3. Mutations in PIK3CA is the most common in BRCA dataset. Please plot mutations in a lollipop plot to demonstrate any hotspots. ***(PIK3CA may have hotspots at E542, E545, and H1047.)***
+
 ```{r lollipopPlot,eval=TRUE, echo=toMessage}
 lollipopPlot(brca,gene="PIK3CA",AACol="Protein_Change",labelPos = c(542,545,1047))
 ```
 
 4. Is there any enriched pathways in BRCA dataset and evaluate the top 3 enriched pathways
-- Select enriched pathways: OncogenicPathways()
-- Display mutations in enriched pathway: PlotOncogenicPathways()
+  - Select enriched pathways: ***OncogenicPathways()***
+  - Display mutations in enriched pathway: ***PlotOncogenicPathways()***
 
 ```{r enrichPath, eval=TRUE, echo=toMessage}
 OncogenicPathways(maf = brca)
@@ -94,11 +94,11 @@ PlotOncogenicPathways(maf = brca, pathways = "WNT")
 ```
 
 5. Please identify mutational signatures in BRCA dataset
-- Make trinucleotide matrix: ***trinucleotideMatrix()***
-- Estimate number of signaturez: ***estimateSignatures()***
-- Extract signature: ***extractSignatues()***
-- Map to COSMIC database and display: ***compareSignature()***
-- Enrichment analysis: ***signatureEnrichment()***
+  - Make trinucleotide matrix: ***trinucleotideMatrix()***
+  - Estimate number of signaturez: ***estimateSignatures()***
+  - Extract signature: ***extractSignatues()***
+  - Map to COSMIC database and display: ***compareSignature()***
+  - Enrichment analysis: ***signatureEnrichment()***
 
 ```{r mutSig, eval=TRUE, echo=toMessage}
 library(BSgenome.Hsapiens.UCSC.hg19, quietly = TRUE)

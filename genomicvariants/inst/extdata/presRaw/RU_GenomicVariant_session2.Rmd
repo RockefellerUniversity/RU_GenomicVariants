@@ -286,4 +286,6 @@ matS[1:2,]
 - [SnpEff](http://snpeff.sourceforge.net/)
 
 ---
-## Excercises
+## Exercise Time
+- [Exercise](../../exercises/exercises/GenomicVariant_session2_exercise.html)
+- [Answer](../../exercises/answers/GenomicVariant_session2_answers.html)
