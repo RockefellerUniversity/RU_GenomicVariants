@@ -16,6 +16,18 @@ vcf <- readVcf("data/SAMN01882168_filt.vcf.gz","hg19")
 rd <- rowRanges(vcf)
 
 
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides != "yes"){
+  cat("# Genomic Variants (part 2)
+
+---
+"    
+  )
+  
+}
+
+
+
 ## ----annoRS_varMan------------------------------------------------------------
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
@@ -23,8 +35,32 @@ library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 
 
 ## ----chrSub,eval=TRUE,tidy=FALSE,echo=TRUE------------------------------------
+names(vcf)[1:2]
+grepl(names(vcf),pattern = "chr1:")[1:2]
 vcf_chr1 <- vcf[grepl(names(vcf),pattern = "chr1:")]
 rd_chr1 <- rowRanges(vcf_chr1)
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Annotating Variants
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Annotating Variants
+
+---
+"    
+  )
+  
+}
+
 
 
 ## ----dbSNPv_varMan------------------------------------------------------------
@@ -66,9 +102,6 @@ my_snps[1:2]
 
 
 ## ----change_seqlvl------------------------------------------------------------
-# change seqlevels
-seqlevels(my_snps) <- paste0("chr",seqlevels(my_snps))
-seqlevels(my_snps) <- gsub("MT","M",seqlevels(my_snps))
 # change seqlevelsStyle
 seqlevelsStyle(my_snps) <- "UCSC"
 # change genome
@@ -119,6 +152,28 @@ ggplot(taC2_dat,aes(x=Var1,y=Freq,fill=Var1))+
   theme(legend.position = "none")
 
 
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Variants and Amino Acid Changes
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Variants and Amino Acid Changes
+
+---
+"    
+  )
+  
+}
+
+
+
 ## ----aaCh_varMan--------------------------------------------------------------
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
@@ -148,8 +203,7 @@ matA <- data.frame(Variant=names(coding),
                      coding$PROTEINLOC,`[[`,1),as.integer)),
                    ref_AA=as.character(coding$REFAA),
                    alt_AA=as.character(coding$VARAA),
-                   Type=coding$CONSEQUENCE,
-                   stringsAsFactors = FALSE)
+                   Type=coding$CONSEQUENCE)
 matA$aaChange <- paste0("p.",matA$ref_AA,matA$Protein_posi,matA$alt_AA)
 matA <- dplyr::select(matA,-Protein_posi,-ref_AA,-alt_AA)
 

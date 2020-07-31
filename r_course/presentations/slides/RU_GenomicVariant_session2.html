@@ -27,12 +27,16 @@ class: center, middle, inverse, title-slide
 
 
 
-# Abou this session
-In this session, we are focus on **variant annotation**. You will learn how to annotate variants with rsID of dbSNP and consequences of amino acid changes by [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html). The VCF file is the same as session 1. You can find it in this file path "data/SAMN01882168_filt.vcf.gz". Besides, the annotation process is highly memory intensive. So, we just focus on the variants in Chromosome 1. 
+
+
+## About this session
+In this session, we are focus on **variant annotation**. You will learn how to annotate variants with rsID of dbSNP and consequences of amino acid changes using the Bioconductor package [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html). The VCF file is the same as session 1. You can find it in this file path "data/SAMN01882168_filt.vcf.gz". 
+
+*NOTE: The annotation process is highly memory intensive. We will just focus on the variants in Chromosome 1.* 
 
 Required resources
 - dbSNP: [SNPlocs.Hsapiens.dbSNP144.GRCh37](https://bioconductor.org/packages/release/data/annotation/html/SNPlocs.Hsapiens.dbSNP144.GRCh37.html)
-- Annotation databse: [TxDb.Hsapiens.UCSC.hg19.knownGene](https://bioconductor.org/packages/release/data/annotation/html/TxDb.Hsapiens.UCSC.hg19.knownGene.html)
+- Annotation database: [TxDb.Hsapiens.UCSC.hg19.knownGene](https://bioconductor.org/packages/release/data/annotation/html/TxDb.Hsapiens.UCSC.hg19.knownGene.html)
 
 
 ```r
@@ -42,14 +46,31 @@ library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 ```
 
 ---
-# Outline of this session
+## Outline of this session
 - Subset variants in chromosome 1
 - Annotate rsID from dbSNP
 - Predict amino acid changes
 - Integrate information into single table
 
 ---
-# Subsetting Variants in chromosome 1
+## Subsetting Variants in chromosome 1
+Unlike other Bioconductor objects the VCF object is not easily subset by chromosome. We can use grepl to get a logical vector of all the vcf names that contain the pattern "chr1:". This logical vecotr can then subset our VCF.  
+
+```r
+names(vcf)[1:2]
+```
+
+```
+## [1] "chr1:815337_G/T" "chr1:815341_G/A"
+```
+
+```r
+grepl(names(vcf),pattern = "chr1:")[1:2]
+```
+
+```
+## [1] TRUE TRUE
+```
 
 ```r
 vcf_chr1 &lt;- vcf[grepl(names(vcf),pattern = "chr1:")]
@@ -57,7 +78,16 @@ rd_chr1 &lt;- rowRanges(vcf_chr1)
 ```
 
 ---
-# Annotate rsID from dbSNP
+class: inverse, center, middle
+
+# Annotating Variants
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+
+## Annotate rsID from dbSNP
 - Retrieve dbSNP
 - Extract SNPs by Chromosome ***memory intensive***
 - Merge SNPs and variant information by positions
@@ -137,7 +167,7 @@ seqlevelsStyle(all_snps)
 ```
 ## [1] "NCBI"    "Ensembl"
 ```
-seqlevelsSytle in rd_chr1 is *UCSC* but in all_snps is *NCBI Ensembl*
+seqlevelsSytle in rd_chr1 is *UCSC*, but in all_snps is *NCBI Ensembl*
 
 ---
 ## check genome
@@ -171,10 +201,11 @@ genome(all_snps)
 ##           MT 
 ## "GRCh37.p13"
 ```
-genome in rd_chr1 is *hg19* but in all_snps is *GRCh37.p13*
+genome in rd_chr1 is *hg19*, but in all_snps is *GRCh37.p13*
 
 ---
 ## Unify seqnames and Process
+Lets first grab all SNPs that are on Chr1. Though there are simpler ways to do this, this code will all still work if you are looking at all chromosomes. 
 
 ```r
 tar_chr &lt;- as.vector(seqnames(rd_chr1)@values)
@@ -195,15 +226,10 @@ my_snps[1:2]
 ```
 
 ---
-## Replace seq Info of my_snps
-- set seqlevels to "chr" and change MT to M
-- set seqlevelsStyle  to "UCSC"
-- set genome to "hg19"
+## Convert seqInfo to UCSC style
+We can update the seqlevelsStyle to "UCSC". This automatically updates all the chromosome names to be UCSC style.We will then just have to update the genome to "hg19".
 
 ```r
-# change seqlevels
-seqlevels(my_snps) &lt;- paste0("chr",seqlevels(my_snps))
-seqlevels(my_snps) &lt;- gsub("MT","M",seqlevels(my_snps))
 # change seqlevelsStyle
 seqlevelsStyle(my_snps) &lt;- "UCSC"
 # change genome
@@ -212,6 +238,7 @@ genome(my_snps) &lt;- "hg19"
 
 ---
 ## Make rsID table
+We can extract out information about the SNPs to generate a reference data.frame that contains their position and ID. 
 - posIDX: [chromosome]:[position] ~ the index column for merging data
 - rsID: rsID from dbSNP 
 
@@ -234,6 +261,7 @@ head(snp_ID)
 
 ---
 ## Generate Variant table
+Next we will reformat our variant information into a data.frame with our fields of interest. To do this we will have to break up the Variant strings. 
 
 ```r
 matV1 &lt;- data.frame(Variant=names(rd_chr1),stringsAsFactors = FALSE)
@@ -254,6 +282,7 @@ matV1[1:2,]
 
 ---
 ## Annotation table ~ SNP_ID
+Now that we have the variant and rsID data.frames we can merge them together to tie together our observed variants with their reference IDs. We can drop the posIDX after this as we do not need it. 
 
 ```r
 matS &lt;- merge(matV1,snp_ID,all.x=TRUE,by="posIDX")
@@ -299,8 +328,18 @@ ggplot(taC2_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ## Variations in dbSNP ~ Plotting
 &lt;img src="RU_GenomicVariant_session2_files/figure-html/dbSNPv_varMan_muCt_disp2-1.png" style="display: block; margin: auto;" /&gt;
 
+
 ---
-# Predict amino acid changes
+class: inverse, center, middle
+
+# Variants and Amino Acid Changes
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+## Predict amino acid changes
+
 - load annotation database: TxDb
 - predict amino acid changes: ***predictCoding***
 
@@ -343,6 +382,7 @@ txdb
 
 ---
 ## Predict amino acid changes
+We can run the **predictcoding()** function by providing our VCF object. It will use the Ranges contained within it, to look within a TxDb object. 
 
 ```r
 coding &lt;- predictCoding(vcf_chr1, txdb, seqSource=Hsapiens)
@@ -387,7 +427,7 @@ coding[1]
 ```
 
 ---
-## Transform into data frame
+## Transform into data.frame
 
 ```r
 matA &lt;- data.frame(Variant=names(coding),
@@ -402,8 +442,7 @@ matA &lt;- data.frame(Variant=names(coding),
                      coding$PROTEINLOC,`[[`,1),as.integer)),
                    ref_AA=as.character(coding$REFAA),
                    alt_AA=as.character(coding$VARAA),
-                   Type=coding$CONSEQUENCE,
-                   stringsAsFactors = FALSE)
+                   Type=coding$CONSEQUENCE)
 matA$aaChange &lt;- paste0("p.",matA$ref_AA,matA$Protein_posi,matA$alt_AA)
 matA &lt;- dplyr::select(matA,-Protein_posi,-ref_AA,-alt_AA)
 ```
@@ -473,7 +512,7 @@ ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
 &lt;img src="RU_GenomicVariant_session2_files/figure-html/aaCh_varMan_muType_disp2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-# Integrate SNP and amino acid change into single table
+## Integrate SNP and amino acid change into single table
 
 ```r
 matS$GeneID &lt;- matA$GeneID[match(matS$Variant,matA$Variant)]
@@ -491,7 +530,7 @@ matS[1:2,]
 ```
 
 ---
-# Other annotation softwares
+## Other annotation softwares
 - [ANNOVAR](https://doc-openbio.readthedocs.io/projects/annovar/en/latest/)
   + Wang et al, NAR, 2010(38):e164 [link](https://academic.oup.com/nar/article/38/16/e164/1749458)
   + Detailed databases available for human genome
@@ -503,7 +542,7 @@ matS[1:2,]
   + Java-based
 
 ---
-# Exercise Time
+## Exercise Time
 - [Exercise](../../exercises/exercises/GenomicVariant_session2_exercise.html)
 - [Answer](../../exercises/answers/GenomicVariant_session2_answers.html)
     </textarea>
