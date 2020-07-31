@@ -63,7 +63,7 @@ hist(tbl,breaks = 10,xlab = "Mutations")
 
 ---
 ## [maftools](https://www.bioconductor.org/packages/release/bioc/html/maftools.html)
-```{r mafTools_intro,echo=FALSE,out.width = "75%",fig.align="center"}
+```{r mafTools_intro,echo=FALSE,out.width = "50%",fig.align="center"}
 knitr::include_graphics("imgs/vcfMan_fig7r.png")
 ```
 
@@ -145,7 +145,7 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=prop,fill=variable))+
 - A matrix, counts of each mutation classes in each gene
 ```{r mult_geneSum_advan}
 gene_sum <- getGeneSummary(laml)
-gene_sum[1:5]
+gene_sum[1:2,]
 ```
 
 ---

@@ -314,7 +314,7 @@ matS[1:2,]
   + Perl-based
 
 - [SnpEff](http://snpeff.sourceforge.net/)
-  + Cingolani et al, Landes Biosciense, 2012(6):1
+  + Cingolani et al, Landes Biosciense, 2012(6):1 [link](http://snpeff.sourceforge.net/SnpEff_paper.pdf)
   + Support over 38,000 genomes
   + Java-based
 
