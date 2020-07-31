@@ -33,6 +33,18 @@ suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(GenomicFeatures))
 ```
 
+```{r, results='asis',include=TRUE,echo=FALSE}
+if(params$isSlides != "yes"){
+  cat("# Genomic Variants (part 1)
+
+---
+"    
+  )
+  
+}
+
+```
+
 ## About this session
 Variant Call Format (VCF) is widely used file format to record genomic variants. We introduced the VCF file format in [previous section](rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#35). In this session, we want to demonstrate how to manipulate VCF file with [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html).
 
@@ -54,6 +66,29 @@ We will be using a study on $\alpha$-Thalassemia from Wei Wangs group at BGI-She
 - Differentiate variant types
 - Retrieve nucleotide substitution pattern
 - Trinucleotide motif analysis
+
+---
+```{r, results='asis',include=TRUE,echo=FALSE}
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# VCF files
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# VCF files
+
+---
+"    
+  )
+  
+}
+
+```
 
 ---
 ## [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html)
@@ -306,6 +341,29 @@ ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
 ```
 
 ---
+```{r, results='asis',include=TRUE,echo=FALSE}
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Gathering variant information
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Gathering variant information
+
+---
+"    
+  )
+  
+}
+
+```
+
+---
 ## Gathering information ~ genotype 0/1 and 1/1
 - Ref alleles are retrieved from ref(vcf)
 - Alt alleles are retrieved from alt(vcf)
@@ -462,6 +520,29 @@ ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+
 ## Ti/Tv
 ```{r TiTv_pres_TiTv=3,echo=FALSE,eval=TRUE,tidy=FALSE,fig.align="center"}
 ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+geom_bar(stat = 'identity')+labs(x="",y="Mutations",fill="")+theme(legend.position = "none")
+```
+
+---
+```{r, results='asis',include=TRUE,echo=FALSE}
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Trinucleotide motif analysis
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Trinucleotide motif analysis
+
+---
+"    
+  )
+  
+}
+
 ```
 
 ---
