@@ -90,7 +90,7 @@ if(params$isSlides == "yes"){
 
 ```
 
----
+
 ## [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html)
 ```{r varLoad_intro,echo=FALSE,out.width = "75%",fig.align="center"}
 knitr::include_graphics("imgs/vcfMan_fig2.png")
@@ -363,7 +363,7 @@ if(params$isSlides == "yes"){
 
 ```
 
----
+
 ## Gathering information ~ genotype 0/1 and 1/1
 - Ref alleles are retrieved from ref(vcf)
 - Alt alleles are retrieved from alt(vcf)
@@ -546,7 +546,7 @@ if(params$isSlides == "yes"){
 
 ```
 
----
+
 ## Trinucleotide motif analysis
 Other constraints may bias nucleotide transitions. One of these is the trinucleotide motif around the variant (from -1 to +1). This pattern could reflect different causes for the mutations.  
 
