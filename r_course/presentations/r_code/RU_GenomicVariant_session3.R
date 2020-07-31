@@ -26,7 +26,7 @@ tbl <- table(laml_tab$Tumor_Sample_Barcode)
 hist(tbl,breaks = 10,xlab = "Mutations")
 
 
-## ----mafTools_intro,echo=FALSE,out.width = "75%",fig.align="center"-----------
+## ----mafTools_intro,echo=FALSE,out.width = "50%",fig.align="center"-----------
 knitr::include_graphics("imgs/vcfMan_fig7r.png")
 
 
@@ -80,7 +80,7 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=prop,fill=variable))+
 
 ## ----mult_geneSum_advan-------------------------------------------------------
 gene_sum <- getGeneSummary(laml)
-gene_sum[1:5]
+gene_sum[1:2,]
 
 
 ## ----mult_lolli_advan_eval1,echo=TRUE,eval=FALSE,tidy=FALSE-------------------

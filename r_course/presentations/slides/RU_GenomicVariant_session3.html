@@ -73,7 +73,7 @@ hist(tbl,breaks = 10,xlab = "Mutations")
 
 ---
 ## [maftools](https://www.bioconductor.org/packages/release/bioc/html/maftools.html)
-&lt;img src="imgs/vcfMan_fig7r.png" width="75%" style="display: block; margin: auto;" /&gt;
+&lt;img src="imgs/vcfMan_fig7r.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
 ## Load MAF file
@@ -90,7 +90,7 @@ laml &lt;- read.maf("data/tcga_laml.maf.gz")
 ## -Summarizing
 ## -Processing clinical data
 ## --Missing clinical data
-## -Finished in 0.534s elapsed (0.393s cpu)
+## -Finished in 0.518s elapsed (0.361s cpu)
 ```
 
 ---
@@ -178,22 +178,19 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=prop,fill=variable))+
 
 ```r
 gene_sum &lt;- getGeneSummary(laml)
-gene_sum[1:5]
+gene_sum[1:2,]
 ```
 
 ```
-##       Hugo_Symbol Frame_Shift_Del Frame_Shift_Ins In_Frame_Del In_Frame_Ins
-##    1:        FLT3               0               0            1           33
-##    2:      DNMT3A               4               0            0            0
-##    3:        NPM1               0              33            0            0
-##    4:        IDH2               0               0            0            0
-##    5:        IDH1               0               0            0            0
-##   ---                                                                      
-## 1237:      ZNF689               0               0            0            0
-## 1238:      ZNF75D               0               0            0            0
-## 1239:      ZNF827               1               0            0            0
-## 1240:       ZNF99               0               0            0            0
-## 1241:        ZPBP               0               0            0            0
+##    Hugo_Symbol Frame_Shift_Del Frame_Shift_Ins In_Frame_Del In_Frame_Ins
+## 1:        FLT3               0               0            1           33
+## 2:      DNMT3A               4               0            0            0
+##    Missense_Mutation Nonsense_Mutation Splice_Site total MutatedSamples
+## 1:                15                 0           3    52             52
+## 2:                39                 5           6    54             48
+##    AlteredSamples
+## 1:             52
+## 2:             48
 ```
 
 ---
