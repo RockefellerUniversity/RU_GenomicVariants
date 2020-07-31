@@ -39,7 +39,7 @@ In this session, we will demonstrte how to use several advanced analysis to deci
 - Any Mutational signatures?
 
 ---
-## MAF format
+# MAF format
 
 ```r
 laml_tab &lt;- read.delim("data/tcga_laml.maf",sep="\t")
@@ -62,7 +62,7 @@ laml_tab[1:2,]
 ```
 
 ---
-### How many mutations per sample
+## How many mutations per sample
 
 ```r
 tbl &lt;- table(laml_tab$Tumor_Sample_Barcode)
@@ -72,11 +72,11 @@ hist(tbl,breaks = 10,xlab = "Mutations")
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_samInfo_advan-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### [maftools](https://www.bioconductor.org/packages/release/bioc/html/maftools.html)
+## [maftools](https://www.bioconductor.org/packages/release/bioc/html/maftools.html)
 &lt;img src="imgs/vcfMan_fig7r.png" width="75%" style="display: block; margin: auto;" /&gt;
 
 ---
-### Load MAF file
+## Load MAF file
 
 ```r
 library(maftools)
@@ -90,20 +90,19 @@ laml &lt;- read.maf("data/tcga_laml.maf.gz")
 ## -Summarizing
 ## -Processing clinical data
 ## --Missing clinical data
-## -Finished in 0.481s elapsed (0.336s cpu)
+## -Finished in 0.534s elapsed (0.393s cpu)
 ```
 
 ---
-## Summary by samples or genes
+# Summary by samples or genes
 maftools provides two functions to generate summary table for by samples or by genes
 - getSampleSummary: a matrix, count of mutation classes in each sample
 - getGeneSummary: a matrix, count of mutation classes in each gene
 
 ---
-### How many mutations in each sample
+## How many mutations in each sample
 - ***getSampleSummary()***
 - a matrix of mutation classes in each sample
-
 
 ```r
 sample_sum &lt;- getSampleSummary(laml)
@@ -120,10 +119,9 @@ sample_sum[1:2,]
 ```
 
 ---
-### Mutation classes in each sample
+## Mutation classes in each sample
 - convert into table for ggplot
 - proportion: count of mutation / total mutations for each sample
-
 
 ```r
 var_to &lt;- sample_sum$total
@@ -146,8 +144,7 @@ head(melt_dat)
 ```
 
 ---
-### Mutation classes in each sample
-
+## Mutation classes in each sample
 
 ```r
 ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=value,fill=variable))+
@@ -157,13 +154,11 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=value,fill=variable))+
 ```
 
 ---
-### Mutation classes in each sample
-
+## Mutation classes in each sample
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_samSumPlot_advan3-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### Mutation classes in each sample
-
+## Mutation classes in each sample
 
 ```r
 ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=prop,fill=variable))+
@@ -173,15 +168,13 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=prop,fill=variable))+
 ```
 
 ---
-### Mutation classes in each sample
-
+## Mutation classes in each sample
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_samSumPlotPres_advan5-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### How many mutations in each gene
+## How many mutations in each gene
 - ***getGeneSummary()***
 - A matrix, counts of each mutation classes in each gene
-
 
 ```r
 gene_sum &lt;- getGeneSummary(laml)
@@ -204,12 +197,11 @@ gene_sum[1:5]
 ```
 
 ---
-## Any mutation hotspot?
+# Any mutation hotspot?
 Mutation hotspot means mutation in a given position detected in more samples than in other positions. Most activation mutations have mutaion hotspot, like G12, G13, or H61 mutation in KRAS. In contrast, loss of function mutations are usually with no mutation hotspot. The ***lollipop plot*** is a fansy plot of mutations in each position of a given gene. It's very intuitional to demonstrate any mutation hotspot.  
 ---
-### Mutation hotspots? 
+## Mutation hotspots? 
 - ***lollipopPlot()***
-
 
 ```r
 lollipopPlot(maf = laml, 
@@ -220,15 +212,15 @@ lollipopPlot(maf = laml,
 ```
 
 ---
-### Mutation hotspots? 
+## Mutation hotspots? 
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_lolli_advan_eval2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-## Interaction between mutations
+# Interaction between mutations
 This means any concordnce or exclusivity of given two gene mutations. If two gene mutations concordantly identified in the same patient, it indicates the two mutations could be with synergistic effect in cancer or they are in causality. If two gene mutations are exclusive, not present in the same patient, could suggest they may lead to similar consequence. So, no need to mutate both of them. The ***oncoplot*** is an intuitional plot to show any interaction between genes. 
 
 ---
-### Oncoplot for top 5 mutated genes
+## Oncoplot for top 5 mutated genes
 
 ```r
 oncoplot(maf=laml,top = 5)
@@ -238,13 +230,13 @@ oncoplot(maf=laml,top = 5)
 **IDH1 and IDH2 mutations could be exlusive.**
 
 ---
-## Pathway analysis
+# Pathway analysis
 maftools provides two functions for pathway analysis.
 - OncogenicPathways(): calculate mutations detected in each pathway and the fraction of samples affected
 - PlotOncogenicPathways(): make a waterfall plot for a given pathway
 
 ---
-### Any enriched in pathways?
+## Any enriched pathways?
 
 ```r
 OncogenicPathways(maf = laml)
@@ -272,7 +264,7 @@ OncogenicPathways(maf = laml)
 ```
 
 ---
-## Any enriched in pathways?
+## Any enriched pathways?
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_pathPlotWF_advan2-1.png" style="display: block; margin: auto;" /&gt;
 **Mutations in RTK-RAS pathway is much higher than others**
 
@@ -286,11 +278,11 @@ PlotOncogenicPathways(maf = laml, pathways = "RTK-RAS")
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_pathPlotWF_advan3-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-## [Mutational signatures](https://cancer.sanger.ac.uk/cosmic/signatures)
+# [Mutational signatures](https://cancer.sanger.ac.uk/cosmic/signatures)
 Mutational signature means a patterrn of trinucleotide substitution. As mentioned in [session 1](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session1.html#44), the pattern may reflect to exposure of spontanious/enzymatic deamination and defect of DNA repair, etc. This information provides a different aspect for cancer research.
 
 ---
-### Steps for mutational signature analysis
+## Steps for mutational signature analysis
 - Evaluate nucleotide substitutions
 - Calculate trinucleotide matrix
 - Estimate Signatures
@@ -298,10 +290,9 @@ Mutational signature means a patterrn of trinucleotide substitution. As mentione
 - Compare signature and gene mutations
 
 ---
-### Ti/Tv plot
+## Ti/Tv plot
 - Evaluate single-nucleotide substitution
 - ***titv()***
-
 
 ```r
 laml.titv = titv(maf = laml, plot = FALSE, useSyn = TRUE)
@@ -309,15 +300,14 @@ plotTiTv(res = laml.titv)
 ```
 
 ---
-### Ti/Tv plot
+## Ti/Tv plot
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_TiTv_advan2-1.png" style="display: block; margin: auto;" /&gt;
 **C&gt;T mutations is in majority.**
 
 ---
-### Trinucleotide matrix
+## Trinucleotide matrix
 - calcualte trinucleotide substituion pattern
 - ***trinucleotideMatrix()***
-
 
 ```r
 library(BSgenome.Hsapiens.UCSC.hg19, quietly = TRUE)
@@ -338,7 +328,7 @@ laml.tnm = trinucleotideMatrix(maf = laml,
 ```
 
 ---
-### Trinucleotide matrix
+## Trinucleotide matrix
 
 ```r
 dim(laml.tnm$nmf_matrix)
@@ -376,7 +366,7 @@ laml.tnm$nmf_matrix[1,]
 ```
 
 ---
-### Trinucleotide pattern in TCGA-AB-3009
+## Trinucleotide pattern in TCGA-AB-3009
 
 ```r
 yd &lt;- data.frame(triNuc=colnames(laml.tnm$nmf_matrix),
@@ -387,7 +377,7 @@ yd$num &lt;- seq(1,length(yd$triNuc))
 ```
 
 ---
-### Trinucleotide pattern in TCGA-AB-3009
+## Trinucleotide pattern in TCGA-AB-3009
 
 ```r
 ggplot(yd,aes(x=num,y=count,fill=cat))+
@@ -399,11 +389,10 @@ ggplot(yd,aes(x=num,y=count,fill=cat))+
 ---
 ## Trinucleotide pattern in TCGA-AB-3009
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_triMutPat_advan3-1.png" style="display: block; margin: auto;" /&gt;
-
 **What does this pattern stand for?**
 
 ---
-### Estimate number of signautres
+## Estimate number of signautres
 
 ```r
 library('NMF')
@@ -416,13 +405,13 @@ laml.sign &lt;- estimateSignatures(mat = laml.tnm,
 - Measure of how faithfully a clustering results represent the original data
 
 ---
-### Estimate number of signautres
+## Estimate number of signautres
 
 
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_sigEst_advan3-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### Extract signautres
+## Extract signautres
 - Based on cophenetic plot
 - In this case, number of signatures = 3
 
@@ -444,7 +433,7 @@ laml.sig.ext$signatures[1:5,] # use for mapping to mutational signature database
 ```
 
 ---
-### What do the signtures stand for?
+## What do the signtures stand for?
 - Map to mutational signatures databases eg. COSMIC
 
 ```r
@@ -461,7 +450,7 @@ laml.og30.cosm$cosine_similarities[,1:5]
 ```
 
 ---
-### Map the signatures to COSMIC database
+## Map the signatures to COSMIC database
 
 ```r
 pheatmap::pheatmap(mat = laml.og30.cosm$cosine_similarities, cluster_rows = FALSE)
@@ -470,7 +459,7 @@ pheatmap::pheatmap(mat = laml.og30.cosm$cosine_similarities, cluster_rows = FALS
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_mapSigPres_advan-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### Map the signatures to SBS database
+## Map the signatures to SBS database
 
 ```r
 laml.sign.sbs = compareSignatures(nmfRes = laml.sig.ext, sig_db = "SBS")
@@ -485,7 +474,7 @@ laml.sign.sbs$cosine_similarities[,1:5]
 ```
 
 ---
-### Map the signatures to SBS database
+## Map the signatures to SBS database
 
 ```r
 pheatmap::pheatmap(mat = laml.sign.sbs$cosine_similarities, cluster_rows = FALSE)
@@ -494,7 +483,7 @@ pheatmap::pheatmap(mat = laml.sign.sbs$cosine_similarities, cluster_rows = FALSE
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_mapSigSBS_advan2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### plot signatures ~ COSMIC
+## plot signatures ~ COSMIC
 - plots signature pattern and annotate basing on COSMIC database
 
 ```r
@@ -506,11 +495,11 @@ plotSignatures(nmfRes = laml.sig.ext,
 ```
 
 ---
-### plot signatures ~ COSMIC
+## plot signatures ~ COSMIC
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_plotSigCOS_advan2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### plot signatures ~ SBS
+## plot signatures ~ SBS
 - plots signature pattern and annotate basing on SBS database
 
 ```r
@@ -522,12 +511,12 @@ plotSignatures(nmfRes = laml.sig.ext,
 ```
 
 ---
-### plot signatures ~ SBS
+## plot signatures ~ SBS
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_plotSigSBS_advan2-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
-### Mutational signautes in each sample
+## Mutational signautes in each sample
 - Display mutational signatures in each sample
 
 ```r
@@ -538,11 +527,11 @@ plotSignatures(nmfRes = laml.sig.ext,
 ```
 
 ---
-### Mutational signautes in each sample
+## Mutational signautes in each sample
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_plotSigSAM_advan2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### Enrichment analysis
+## Enrichment analysis
 - k-mean clustering based on the exposure of mutational signatures
 - Assign dominate signatures based on k-mean clustering
 - Mutations in samples with different signatures
@@ -553,11 +542,11 @@ laml.se = signatureEnrichment(maf = laml,
 ```
 
 ---
-### Enrichment analysis
+## Enrichment analysis
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_enrich_advan2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### Genes associated with signatures
+## Genes associated with signatures
 - Genes mutated in samples with particular mutational signature
 
 ```r
@@ -574,7 +563,7 @@ laml.se$groupwise_comparision[1:2,]
 ```
 
 ---
-### Genes associated with signatures
+## Genes associated with signatures
 
 ```r
 plotEnrichmentResults(enrich_res = laml.se, pVal = 0.05)

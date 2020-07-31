@@ -177,11 +177,9 @@ summary(as.vector(matGQ))
 ##   theme_classic()
 
 
-## ----genoGQ_varMan_distPres2,fig.align="center",eval=TRUE,echo=TRUE-----------
+## ----genoGQ_varMan_distPres2,fig.align="center",eval=TRUE,echo=FALSE----------
 ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
-  labs(x="",y="Counts")+
-  scale_x_log10()+
-  theme_classic()
+  labs(x="",y="Counts")+scale_x_log10()+theme_classic()
 
 
 ## ----gatGT_info2,echo=TRUE,tidy=FALSE-----------------------------------------

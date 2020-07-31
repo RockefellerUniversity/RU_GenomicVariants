@@ -108,12 +108,15 @@ vcf
 ---
 # Survey and retrieve information from each field
 - META field: general information of the VCF file
+
 - FIX field: variants, usually in VRange format
+
 - GENOTYPE field: information for each sample
+
 - Integrate information into single table
 
 ---
-## Overview
+# Overview
 
 ```r
 header(vcf)
@@ -144,7 +147,7 @@ sampleID
 ```
 
 ---
-## Contents in META field
+# Contents in META field
 
 ```r
 meta(header(vcf))
@@ -156,7 +159,7 @@ meta(header(vcf))
 ```
 
 ---
-### Retrieve informtion in META field
+## Retrieve informtion in META field
 
 ```r
 # File format
@@ -183,7 +186,7 @@ meta(header(vcf))$source
 ```
 
 ---
-### Reference contigs used
+## Reference contigs used
 
 ```r
 meta(header(vcf))$contig
@@ -207,7 +210,7 @@ meta(header(vcf))$contig
 ```
 
 ---
-## Variants information (VRange format)
+# Variants information (VRange format)
 The variant information is recorded in a VRange object. It includes chromosome, start position, end potision, reference allele, and alternative allele.
 
 ```r
@@ -231,13 +234,13 @@ rd[1:2]
 ***It's not a strand-specific library. So, the strand information would not be labeled.***
 
 ---
-### How to retrieve position of the variations?
+## How to retrieve position of the variations?
 - chromosome: seqnames()
 - start position: start()
 - end position: end()
 
 ---
-### Position of the variations
+## Position of the variations
 
 ```r
 as.vector(seqnames(rd)[1:2]) # Chromosome
@@ -264,7 +267,7 @@ end(rd)[1:2] # End position
 ```
 
 ---
-### How to get the reference alleles?
+## How to get the reference alleles?
 - ref()
 
 ```r
@@ -294,7 +297,7 @@ refBase[1:2]
 ```
 
 ---
-### How to getalternative alleles?
+## How to getalternative alleles?
 - alt(vcf)
 
 ```r
@@ -313,7 +316,7 @@ alt(vcf)[1:2]
 ```
 
 ---
-### How to getalternative alleles?
+## How to getalternative alleles?
 - Extract vectors from list by using lapply()
 
 ```r
@@ -343,7 +346,7 @@ altBase[1:2]
 ```
 
 ---
-## INFO section from FIXED field
+# INFO section from FIXED field
 - **Integrated information from all the samples**
 - Annotation information would be recored in this section
 - all information in a ***data frame***
@@ -392,7 +395,7 @@ info(vcf)[1:2,]
 ```
 
 ---
-## GENOTYPE field
+# GENOTYPE field
 - Separatd by indivisual samples
 
 ```r
@@ -412,7 +415,7 @@ geno(header(vcf))[1:2,]
 ```
 
 ---
-### Genotype information for each dample
+## Genotype information for each dample
 
 ```r
 paste0("GT: ",geno(header(vcf))[1,3])
@@ -433,7 +436,7 @@ matGT[1:2,]
 ```
 
 ---
-### GT Types
+## GT Types
 
 ```r
 tbl &lt;- table(geno(vcf)$GT)
@@ -451,7 +454,7 @@ tbl
 - 1/2: ***heterozygous mutations, both alleles are different from reference sequence***
 
 ---
-### GT Types ~ plot
+## GT Types ~ plot
 
 ```r
 ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
@@ -461,11 +464,11 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-### GT Types ~ plot
+## GT Types ~ plot
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/genoGT_varMan_disp2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### Depth for each sample
+## Depth for each sample
 
 ```r
 paste0("DP: ",geno(header(vcf))[3,3])
@@ -486,7 +489,7 @@ matDP[1:2,]
 ```
 
 ---
-### DP Distribution
+## DP Distribution
 
 ```r
 summary(as.vector(matDP))
@@ -506,7 +509,7 @@ ggplot(as.data.frame(matDP),aes(x=SAMN01882168))+geom_histogram()+
   theme_classic()
 ```
 ---
-### DP Distribution
+## DP Distribution
 
 ```
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
@@ -515,7 +518,7 @@ ggplot(as.data.frame(matDP),aes(x=SAMN01882168))+geom_histogram()+
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/genoDP_varMan_distPres2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### Genotype calling quality (GQ)
+## Genotype calling quality (GQ)
 - The confidance in gentype calling
 - Expressed as [Phred quality score](https://gatk.broadinstitute.org/hc/en-us/articles/360035531872-Phred-scaled-quality-scores)
 
@@ -559,14 +562,7 @@ ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
 ```
 
 ---
-### GQ Distribution
-
-```r
-ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
-  labs(x="",y="Counts")+
-  scale_x_log10()+
-  theme_classic()
-```
+## GQ Distribution
 
 ```
 ## Warning: Transformation introduced infinite values in continuous x-axis
@@ -583,7 +579,7 @@ ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/genoGQ_varMan_distPres2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### Gathering information ~ genotype 1/2
+# Gathering information ~ genotype 1/2
 - heterozygous mutations, both alleles are different from reference sequence
 - both ref allele and alt allele have to be retrieved from alt(vcf)
 
@@ -607,7 +603,7 @@ varTab2 &lt;- data.frame(variant=names(rd)[names(rd) %in% var_2],
 ```
 
 ---
-### Gathering information ~ genotype 0/1 and 1/1
+## Gathering information ~ genotype 0/1 and 1/1
 - ref alleles are retrieved from ref(vcf)
 - alt alleles are retrieved from alt(vcf)
 
@@ -629,7 +625,7 @@ varTab1 &lt;- data.frame(variant=names(rd)[!names(rd) %in% var_2],
 ```
 
 ---
-### Merged datatable
+## Merged datatable
 
 ```r
 varTab &lt;- rbind(varTab1,varTab2)
@@ -646,14 +642,14 @@ varTab[1:2,]
 ```
 
 ---
-## Differentiate variant types
+# Differentiate variant types
 - SNP: single-nucleotide substitutions
 - DEL: deletions
 - INS: insertions
 - Others: complicated variations, such as Ins/Del or Inversion
 
 ---
-### Variant types
+## Variant types
 
 ```r
 # differentiate SNP/INS/DEL/Others
@@ -679,7 +675,7 @@ tbl
 ```
 
 ---
-### Variant types ~ plot
+## Variant types ~ plot
 
 ```r
 ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
@@ -689,17 +685,17 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-### Variant types ~ Plot
+## Variant types ~ Plot
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/mutType_pres2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-## Nucleotide substitution pattern
+# Nucleotide substitution pattern
 - only SNPs
 - Transition (Ti): purine-to-purine, pyrimidine-to-pyrimidine
 - Transversion (Tv): purine-to-pyrimidine, pyrimidine-to-purine
 
 ---
-### Nucleotide substitution
+## Nucleotide substitution
 
 ```r
 # Transition (Ti)
@@ -722,7 +718,7 @@ varTab[1:2,]
 ```
 
 ---
-### Nucleotide substitution
+## Nucleotide substitution
 
 ```r
 varX &lt;- varTab[varTab$mutType=="SNP",]
@@ -738,7 +734,7 @@ tbl
 ```
 
 ---
-### Nucleotide substitution ~ Plot
+## Nucleotide substitution ~ Plot
 
 ```r
 ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
@@ -748,11 +744,11 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-### Nucleotide substitution ~ Plot
+## Nucleotide substitution ~ Plot
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/TiTv_pres_nuSubPres2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### Ti/Tv
+## Ti/Tv
 
 ```r
 tbl &lt;- table(varX$TiTv)
@@ -767,7 +763,7 @@ tbl
 ```
 
 ---
-### Ti/Tv ~ Plot
+## Ti/Tv ~ Plot
 
 ```r
 ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+
@@ -776,15 +772,15 @@ ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-### Ti/Tv ~ Plot
+## Ti/Tv ~ Plot
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-## Trinucleotide motif analysis
+# Trinucleotide motif analysis
 The trinucleotide motif mean the specific patterns beneath the variant sites from -1 to +1. This pattern could reflect to different causes of mutations. For instance, APOBEC is a deaminase leading to C&gt;T substitutions in the motif ***T[C&gt;T]W***. So, the proportion of T[C&gt;T]W in overall C&gt;T substitutions could reflect to APOBEC activity. More applications of the trinucleotide motifs will be discussed in [session3](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session3.html#19).
 
 ---
-### Extract C&gt;T substituion
+## Extract C&gt;T substituion
 
 ```r
 library(BSgenome.Hsapiens.UCSC.hg19)
@@ -794,7 +790,7 @@ rd_sub &lt;- rd[gsub("(.*):(.*)_(.*)","\\3",names(rd))=="C/T"]
 ```
 
 ---
-### Extract sequences beneath the mutation from -1 to +1
+## Extract sequences beneath the mutation from -1 to +1
 
 ```r
 rd_sub$triNu &lt;- getSeq(Hsapiens,
@@ -819,7 +815,7 @@ rd_sub[1:2]
 ```
 
 ---
-### Trinucleotide pattern
+## Trinucleotide pattern
 
 ```r
 tbl &lt;- table(rd_sub$triNu)
@@ -834,7 +830,7 @@ tbl
 ```
 
 ---
-### Trinucleotide pattern ~ plot
+## Trinucleotide pattern ~ plot
 
 ```r
 ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
@@ -844,11 +840,11 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-### Trinucleotide pattern ~ plot
+## Trinucleotide pattern ~ plot
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/motif_seqPat_advan3-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-### APOBEC activation in this sample?
+## APOBEC activation in this sample?
 - APOBEC target: TCW (TCA/TCT)
 
 ```r

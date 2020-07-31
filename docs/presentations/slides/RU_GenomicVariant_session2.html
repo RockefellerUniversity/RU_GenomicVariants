@@ -49,7 +49,7 @@ library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 - Integrate information into single table
 
 ---
-## Subsetting Variants in chromosome 1
+# Subsetting Variants in chromosome 1
 
 ```r
 vcf_chr1 &lt;- vcf[grepl(names(vcf),pattern = "chr1:")]
@@ -57,13 +57,13 @@ rd_chr1 &lt;- rowRanges(vcf_chr1)
 ```
 
 ---
-## Annotate rsID from dbSNP
+# Annotate rsID from dbSNP
 - Retrieve dbSNP
 - Extract SNPs by Chromosome ***memory intensive***
 - Merge SNPs and variant information by positions
 
 ---
-### Retrive dbSNP data
+## Retrive dbSNP data
 
 
 ```r
@@ -78,7 +78,7 @@ all_snps
 ```
 
 ---
-### Retrieve SNPs by chromosome
+## Retrieve SNPs by chromosome
 - Extract chromosome name from the VRange object: ***seqnames()@values***
 - Retrive SNPs by chromosome: ***snpsBySeqname()***
 
@@ -89,13 +89,13 @@ my_snps &lt;- snpsBySeqname(all_snps,c(tar_chr))
 &lt;img src="imgs/vcfMan_fig5r.png" width="75%" style="display: block; margin: auto;" /&gt;
 
 ---
-### What's wrong?
+## What's wrong?
 - **seqlevels** in the two objects dosn't match
 - **seqlevelStyle** in the two objects dosn't match
 - **genome** in the tow objects dosen't match
 
 ---
-### check seqlevels
+## check seqlevels
 
 ```r
 # seqlevels ~ rd
@@ -120,7 +120,7 @@ seqlevels(all_snps)
 seqname in rd_chr1 is *chr1* but in all_snps is *1*
 
 ---
-### check seqlevelStyle
+## check seqlevelStyle
 
 ```r
 seqlevelsStyle(rd_chr1)
@@ -140,7 +140,7 @@ seqlevelsStyle(all_snps)
 seqlevelsSytle in rd_chr1 is *UCSC* but in all_snps is *NCBI Ensembl*
 
 ---
-### check genome
+## check genome
 
 ```r
 genome(rd_chr1)
@@ -174,8 +174,7 @@ genome(all_snps)
 genome in rd_chr1 is *hg19* but in all_snps is *GRCh37.p13*
 
 ---
-### Unify seqnames and Process
-
+## Unify seqnames and Process
 
 ```r
 tar_chr &lt;- as.vector(seqnames(rd_chr1)@values)
@@ -196,7 +195,7 @@ my_snps[1:2]
 ```
 
 ---
-### Replace seq Info of my_snps
+## Replace seq Info of my_snps
 - set seqlevels to "chr" and change MT to M
 - set seqlevelsStyle  to "UCSC"
 - set genome to "hg19"
@@ -212,7 +211,7 @@ genome(my_snps) &lt;- "hg19"
 ```
 
 ---
-### Make rsID table
+## Make rsID table
 - posIDX: [chromosome]:[position] ~ the index column for merging data
 - rsID: rsID from dbSNP 
 
@@ -234,7 +233,7 @@ head(snp_ID)
 ```
 
 ---
-### Generate Variant table
+## Generate Variant table
 
 ```r
 matV1 &lt;- data.frame(Variant=names(rd_chr1),stringsAsFactors = FALSE)
@@ -254,7 +253,7 @@ matV1[1:2,]
 ```
 
 ---
-### Annotation table ~ SNP_ID
+## Annotation table ~ SNP_ID
 
 ```r
 matS &lt;- merge(matV1,snp_ID,all.x=TRUE,by="posIDX")
@@ -272,7 +271,7 @@ matS[1:2,]
 ```
 
 ---
-### How many variations in dbSNP
+## How many variations in dbSNP
 
 ```r
 taC2 &lt;- table(!is.na(matS$rsID))
@@ -287,7 +286,7 @@ taC2
 ```
 
 ---
-### Variations in dbSNP ~ Plotting
+## Variations in dbSNP ~ Plotting
 
 ```r
 ggplot(taC2_dat,aes(x=Var1,y=Freq,fill=Var1))+
@@ -297,23 +296,23 @@ ggplot(taC2_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-### Variations in dbSNP ~ Plotting
+## Variations in dbSNP ~ Plotting
 &lt;img src="RU_GenomicVariant_session2_files/figure-html/dbSNPv_varMan_muCt_disp2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-## Predict amino acid changes
+# Predict amino acid changes
 - load annotation database: TxDb
 - predict amino acid changes: ***predictCoding***
 
 ---
-### Load TxDb
+## Load TxDb
 
 ```r
 txdb &lt;- TxDb.Hsapiens.UCSC.hg19.knownGene
 ```
 
 ---
-### TxDb
+## TxDb
 
 ```r
 txdb
@@ -343,7 +342,7 @@ txdb
 ```
 
 ---
-### Predict amino acid changes
+## Predict amino acid changes
 
 ```r
 coding &lt;- predictCoding(vcf_chr1, txdb, seqSource=Hsapiens)
@@ -360,7 +359,7 @@ coding &lt;- predictCoding(vcf_chr1, txdb, seqSource=Hsapiens)
 ```
 
 ---
-### Variants and predicted consequence
+## Variants and predicted consequence
 
 ```r
 coding[1]
@@ -388,7 +387,7 @@ coding[1]
 ```
 
 ---
-### Transform into data frame
+## Transform into data frame
 
 ```r
 matA &lt;- data.frame(Variant=names(coding),
@@ -410,7 +409,7 @@ matA &lt;- dplyr::select(matA,-Protein_posi,-ref_AA,-alt_AA)
 ```
 
 ---
-### Annotation table ~ Amino Acid Changes
+## Annotation table ~ Amino Acid Changes
 
 ```r
 matA[1:2,]
@@ -426,7 +425,7 @@ matA[1:2,]
 ```
 
 ---
-### How many variations in coding region
+## How many variations in coding region
 
 ```r
 var_in_coding &lt;- data.frame(varName=names(vcf_chr1),
@@ -442,7 +441,7 @@ table(var_in_coding$in_coding)
 ```
 
 ---
-### How many types of mutations in coding region
+## How many types of mutations in coding region
 
 ```r
 taC &lt;- table(matA$Type)
@@ -460,7 +459,7 @@ taC
 - synonymous: mutations not causing amino acid changes
 
 ---
-### Mutation types in coding region
+## Mutation types in coding region
 
 ```r
 ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
@@ -470,11 +469,11 @@ ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-### Mutation types in coding region
+## Mutation types in coding region
 &lt;img src="RU_GenomicVariant_session2_files/figure-html/aaCh_varMan_muType_disp2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-## Integrate SNP and amino acid change into single table
+# Integrate SNP and amino acid change into single table
 
 ```r
 matS$GeneID &lt;- matA$GeneID[match(matS$Variant,matA$Variant)]
@@ -492,7 +491,7 @@ matS[1:2,]
 ```
 
 ---
-## Other annotation softwares
+# Other annotation softwares
 - [ANNOVAR](https://doc-openbio.readthedocs.io/projects/annovar/en/latest/)
   + Wang et al, NAR, 2010(38):e164 [link](https://academic.oup.com/nar/article/38/16/e164/1749458)
   + Detailed databases available for human genome
