@@ -23,76 +23,8 @@ library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 
 
 ## ----chrSub,eval=TRUE,tidy=FALSE,echo=TRUE------------------------------------
-# rd_chr1 <- rd[grepl(names(rd),pattern = "chr1:")]
-# vcf_chr1 <- vcf[names(rd_chr1)]
 vcf_chr1 <- vcf[grepl(names(vcf),pattern = "chr1:")]
 rd_chr1 <- rowRanges(vcf_chr1)
-
-
-## ----aaCh_varMan--------------------------------------------------------------
-txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-
-
-## ----aaCh_varMan_txdb---------------------------------------------------------
-txdb
-
-
-## ----aaCh_varMan_pred---------------------------------------------------------
-coding <- predictCoding(vcf_chr1, txdb, seqSource=Hsapiens)
-
-
-## ----aaCh_varMan_pres2--------------------------------------------------------
-coding[1]
-
-
-## ----aaCh_varMan_frame,eval=TRUE,tidy=FALSE,echo=TRUE-------------------------
-matA <- data.frame(Variant=names(coding),
-                   chromosome=seqnames(coding),
-                   start=start(coding),end=end(coding),
-                   ref_allele=as.character(coding$REF),
-                   alt_allele=unlist(lapply(lapply(
-                     coding$ALT,`[[`,1),as.character)),
-                   GeneID=coding$GENEID,
-                   TxID=coding$TXID,
-                   Protein_posi=unlist(lapply(lapply(
-                     coding$PROTEINLOC,`[[`,1),as.integer)),
-                   ref_AA=as.character(coding$REFAA),
-                   alt_AA=as.character(coding$VARAA),
-                   Type=coding$CONSEQUENCE,
-                   stringsAsFactors = FALSE)
-matA$aaChange <- paste0("p.",matA$ref_AA,matA$Protein_posi,matA$alt_AA)
-matA <- dplyr::select(matA,-Protein_posi,-ref_AA,-alt_AA)
-
-
-## ----aaCh_varMan_tbl----------------------------------------------------------
-matA[1:2,]
-
-
-## ----aaCh_varMan_muCt---------------------------------------------------------
-var_in_coding <- data.frame(varName=names(vcf_chr1),
-                            in_coding=names(vcf_chr1) %in% matA$Variant,
-                            stringsAsFactors = FALSE)
-table(var_in_coding$in_coding)
-
-
-## ----aaCh_varMan_muType-------------------------------------------------------
-taC <- table(matA$Type)
-taC_dat <- as.data.frame(taC)
-taC
-
-
-## ----aaCh_varMan_muType_disp1,tidy=FALSE,echo=TRUE,eval=FALSE-----------------
-## ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
-##   geom_bar(stat='Identity')+
-##   labs(x="",y="Counts",fill="")+
-##   theme(legend.position = "none")
-
-
-## ----aaCh_varMan_muType_disp2,tidy=FALSE,echo=FALSE,eval=TRUE,fig.align="center"----
-ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
-  geom_bar(stat='Identity')+
-  labs(x="",y="Counts",fill="")+
-  theme(legend.position = "none")
 
 
 ## ----dbSNPv_varMan------------------------------------------------------------
@@ -184,6 +116,72 @@ taC2
 ggplot(taC2_dat,aes(x=Var1,y=Freq,fill=Var1))+
   geom_bar(stat='Identity')+
   labs(x="",y="Counts",fill="in_dbSNP")+
+  theme(legend.position = "none")
+
+
+## ----aaCh_varMan--------------------------------------------------------------
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+
+
+## ----aaCh_varMan_txdb---------------------------------------------------------
+txdb
+
+
+## ----aaCh_varMan_pred---------------------------------------------------------
+coding <- predictCoding(vcf_chr1, txdb, seqSource=Hsapiens)
+
+
+## ----aaCh_varMan_pres2--------------------------------------------------------
+coding[1]
+
+
+## ----aaCh_varMan_frame,eval=TRUE,tidy=FALSE,echo=TRUE-------------------------
+matA <- data.frame(Variant=names(coding),
+                   chromosome=seqnames(coding),
+                   start=start(coding),end=end(coding),
+                   ref_allele=as.character(coding$REF),
+                   alt_allele=unlist(lapply(lapply(
+                     coding$ALT,`[[`,1),as.character)),
+                   GeneID=coding$GENEID,
+                   TxID=coding$TXID,
+                   Protein_posi=unlist(lapply(lapply(
+                     coding$PROTEINLOC,`[[`,1),as.integer)),
+                   ref_AA=as.character(coding$REFAA),
+                   alt_AA=as.character(coding$VARAA),
+                   Type=coding$CONSEQUENCE,
+                   stringsAsFactors = FALSE)
+matA$aaChange <- paste0("p.",matA$ref_AA,matA$Protein_posi,matA$alt_AA)
+matA <- dplyr::select(matA,-Protein_posi,-ref_AA,-alt_AA)
+
+
+## ----aaCh_varMan_tbl----------------------------------------------------------
+matA[1:2,]
+
+
+## ----aaCh_varMan_muCt---------------------------------------------------------
+var_in_coding <- data.frame(varName=names(vcf_chr1),
+                            in_coding=names(vcf_chr1) %in% matA$Variant,
+                            stringsAsFactors = FALSE)
+table(var_in_coding$in_coding)
+
+
+## ----aaCh_varMan_muType-------------------------------------------------------
+taC <- table(matA$Type)
+taC_dat <- as.data.frame(taC)
+taC
+
+
+## ----aaCh_varMan_muType_disp1,tidy=FALSE,echo=TRUE,eval=FALSE-----------------
+## ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
+##   geom_bar(stat='Identity')+
+##   labs(x="",y="Counts",fill="")+
+##   theme(legend.position = "none")
+
+
+## ----aaCh_varMan_muType_disp2,tidy=FALSE,echo=FALSE,eval=TRUE,fig.align="center"----
+ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat='Identity')+
+  labs(x="",y="Counts",fill="")+
   theme(legend.position = "none")
 
 

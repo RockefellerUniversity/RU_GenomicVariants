@@ -34,7 +34,6 @@ sampleID
 
 
 ## ----metaOV_META_varMan-------------------------------------------------------
-# Contents in Meta field
 meta(header(vcf))
 
 
@@ -60,26 +59,34 @@ start(rd)[1:2] # Start position
 end(rd)[1:2] # End position
 
 
-## ----range_varMan_baseInfo_Ref------------------------------------------------
+## ----range_varMan_baseInfo_Ref1-----------------------------------------------
 refBase <- ref(vcf)
-# is a DNAStringSet
+
+
+## ----range_varMan_baseInfo_Ref2-----------------------------------------------
 refBase[1:2]
+
+
+## ----range_varMan_baseInfo_Ref3-----------------------------------------------
 refBase <- as.character(refBase)
-# Convert into character
 refBase[1:2]
 
 
-## ----range_varMan_baseInfo_Alt------------------------------------------------
+## ----range_varMan_baseInfo_Alt1-----------------------------------------------
 altBase <- alt(vcf)
-# Is a list
+
+
+## ----range_varMan_baseInfo_Alt2-----------------------------------------------
 alt(vcf)[1:2] 
+
+
+## ----range_varMan_baseInfo_Alt3-----------------------------------------------
 # get the 1st vector of the list
 altBase <- lapply(altBase,`[[`,1) 
 altBase[1:2]
 
 
-## ----range_varMan_baseInfo_Alt2-----------------------------------------------
-# convert DNAString to character
+## ----range_varMan_baseInfo_Alt4-----------------------------------------------
 altBase <- unlist(lapply(altBase,as.character)) 
 altBase[1:2]
 
@@ -127,15 +134,26 @@ matDP <- geno(vcf)$DP
 matDP[1:2,]
 
 
-## ----genoDP_varMan_dist-------------------------------------------------------
+## ----genoDP_varMan_dist1,eval=FALSE,echo=TRUE,tidy=FALSE----------------------
+## summary(as.vector(matDP))
+
+
+## ----genoDP_varMan_dist2,eval=TRUE,echo=FALSE,results=TRUE--------------------
 summary(as.vector(matDP))
-#
-dist_DP <- as.vector(as.matrix(matDP))
-dist_DP <- dist_DP[!is.na(dist_DP)]
 
 
-## ----genoDP_varMan_distPres,fig.align="center"--------------------------------
-hist(dist_DP,xlab="Depth",main="")
+## ----genoDP_varMan_distPres1,fig.align="center",eval=FALSE,echo=TRUE,tidy=FALSE----
+## ggplot(as.data.frame(matDP),aes(x=SAMN01882168))+geom_histogram()+
+##   labs(x="",y="Counts")+
+##   scale_x_log10()+
+##   theme_classic()
+
+
+## ----genoDP_varMan_distPres2,fig.align="center",eval=TRUE,echo=FALSE----------
+ggplot(as.data.frame(matDP),aes(x=SAMN01882168))+geom_histogram()+
+  labs(x="",y="Counts")+
+  scale_x_log10()+
+  theme_classic()
 
 
 ## ----genoGQ_varMan------------------------------------------------------------
@@ -144,16 +162,26 @@ matGQ <- geno(vcf)$GQ
 matGQ[1:2,]
 
 
-## ----genoGQ_varMan_dist-------------------------------------------------------
+## ----genoGQ_varMan_dist1,eval=FALSE,echo=TRUE,tidy=FALSE----------------------
+## summary(as.vector(matGQ))
+
+
+## ----genoGQ_varMan_dist2,eval=TRUE,echo=FALSE,tidy=FALSE,results=TRUE---------
 summary(as.vector(matGQ))
-#
-dist_GQ <- as.vector(as.matrix(matGQ))
-dist_GQ <- dist_GQ[!is.na(dist_GQ)]
 
 
+## ----genoGQ_varMan_distPres1,fig.align="center",eval=FALSE,echo=TRUE,tidy=FALSE----
+## ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
+##   labs(x="",y="Counts")+
+##   scale_x_log10()+
+##   theme_classic()
 
-## ----genoGQ_varMan_dist2,fig.align="center"-----------------------------------
-hist(dist_GQ,xlab="Quality",ylab = "Variations",main="")
+
+## ----genoGQ_varMan_distPres2,fig.align="center",eval=TRUE,echo=TRUE-----------
+ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
+  labs(x="",y="Counts")+
+  scale_x_log10()+
+  theme_classic()
 
 
 ## ----gatGT_info2,echo=TRUE,tidy=FALSE-----------------------------------------

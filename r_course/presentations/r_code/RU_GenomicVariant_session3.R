@@ -18,7 +18,6 @@ suppressPackageStartupMessages(library(NMF))
 
 ## ----mult_mafIntro_advan------------------------------------------------------
 laml_tab <- read.delim("data/tcga_laml.maf",sep="\t")
-# laml_tab <- read.delim("../data/tcga_laml.maf",sep="\t")
 laml_tab[1:2,]
 
 
@@ -27,10 +26,13 @@ tbl <- table(laml_tab$Tumor_Sample_Barcode)
 hist(tbl,breaks = 10,xlab = "Mutations")
 
 
+## ----mafTools_intro,echo=FALSE,out.width = "75%",fig.align="center"-----------
+knitr::include_graphics("imgs/vcfMan_fig7r.png")
+
+
 ## ----mult_mafT_advan----------------------------------------------------------
 library(maftools)
 laml <- read.maf("data/tcga_laml.maf.gz")
-# laml <- read.maf("../data/tcga_laml.maf.gz")
 
 
 ## ----mult_samSum_advan--------------------------------------------------------
