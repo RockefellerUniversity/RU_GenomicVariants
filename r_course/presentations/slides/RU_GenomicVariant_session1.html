@@ -26,22 +26,20 @@ class: center, middle, inverse, title-slide
 
 
 
-# About this session
+
+
+## About this session
 Variant Call Format (VCF) is widely used file format to record genomic variants. We introduced the VCF file format in [previous section](rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#35). In this session, we want to demonstrate how to manipulate VCF file with [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html).
 
-Dataset used in this session
-- Row data from SRA: [PRJNA185252](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA185252)
+We will be using a study on `\(\alpha\)`-Thalassemia from Wei Wangs group at BGI-Shenzhen as our dataset in this session:
+- Raw data from SRA: [PRJNA185252](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA185252)
 - References: Ge H et al, Plos ONE (2013), 8(6):e67464 [LINK](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3696090/)
 - Variant calling procedure follows [GATK Best Practice](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
 - Reference genome: [BSgenome.Hsapiens.UCSC.hg19](https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg19.html)
-- Demon data: SAMN01882168 ("data/SAMN01882168_filt.vcf.gz")
+- Demo data: SAMN01882168 ("data/SAMN01882168_filt.vcf.gz")
 
 ---
-## [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html)
-&lt;img src="imgs/vcfMan_fig2.png" width="75%" style="display: block; margin: auto;" /&gt;
-
----
-# Outline of this session
+## Outline of this session
 - Load VCF file into a vcf object
 - Survey and retrieve information from each field
   + META field: general information of the VCF file
@@ -51,6 +49,19 @@ Dataset used in this session
 - Differentiate variant types
 - Retrieve nucleotide substitution pattern
 - Trinucleotide motif analysis
+
+---
+class: inverse, center, middle
+
+# VCF files
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+---
+## [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html)
+&lt;img src="imgs/vcfMan_fig2.png" width="75%" style="display: block; margin: auto;" /&gt;
 
 ---
 ## Load VCF file
@@ -106,7 +117,7 @@ vcf
 ```
 
 ---
-# Survey and retrieve information from each field
+## What is in each field?
 - META field: general information of the VCF file
 
 - FIX field: variants, usually in VRange format
@@ -116,7 +127,8 @@ vcf
 - Integrate information into single table
 
 ---
-# Overview
+## Overview
+As with objects we have met in other courses, there are accessor functions to grab the contents of our VCF object. 
 
 ```r
 header(vcf)
@@ -135,7 +147,7 @@ header(vcf)
 - GENOTYPE field: geno
 
 ---
-## How many samples in this vcf?
+## How many samples are in this VCF?
 
 ```r
 sampleID &lt;- samples(header(vcf))
@@ -147,7 +159,7 @@ sampleID
 ```
 
 ---
-# Contents in META field
+## What is in the META field?
 
 ```r
 meta(header(vcf))
@@ -159,7 +171,8 @@ meta(header(vcf))
 ```
 
 ---
-## Retrieve informtion in META field
+## Retrieve information in the META field
+Once we have the META extracted, we can use the dollar sign to extract specific fields. 
 
 ```r
 # File format
@@ -186,7 +199,8 @@ meta(header(vcf))$source
 ```
 
 ---
-## Reference contigs used
+## Retrieve information in the META field
+Once we have the META extracted, we can use the dollar sign to extract specific fields. 
 
 ```r
 meta(header(vcf))$contig
@@ -210,8 +224,8 @@ meta(header(vcf))$contig
 ```
 
 ---
-# Variants information (VRange format)
-The variant information is recorded in a VRange object. It includes chromosome, start position, end potision, reference allele, and alternative allele.
+## Variants information (VRange format)
+The variant information is recorded in a VRange object. This is a form of [GRanges](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicIntervals_In_Bioconductor.html#6) object which we regularly use and are integral to Bioconductor. It includes chromosome, start position, end potision, reference allele, and alternative allele.
 
 ```r
 rd &lt;- rowRanges(vcf)
@@ -231,10 +245,11 @@ rd[1:2]
 ##   -------
 ##   seqinfo: 25 sequences from hg19 genome
 ```
-***It's not a strand-specific library. So, the strand information would not be labeled.***
+***It's not a strand-specific library. This is indictaed by the *, which means unstranded. ***
 
 ---
-## How to retrieve position of the variations?
+## Retrieving variation information
+We can use similar accessors to those used for [GRanges](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicIntervals_In_Bioconductor.html#16) to get position information. 
 - chromosome: seqnames()
 - start position: start()
 - end position: end()
@@ -268,14 +283,10 @@ end(rd)[1:2] # End position
 
 ---
 ## How to get the reference alleles?
-- ref()
+- The *ref()* function can be used to get the reference allele for a variant. The result is a DNAStringSet.
 
 ```r
 refBase &lt;- ref(vcf)
-```
-- The result is a DNAStringSet
-
-```r
 refBase[1:2]
 ```
 
@@ -297,15 +308,11 @@ refBase[1:2]
 ```
 
 ---
-## How to getalternative alleles?
-- alt(vcf)
+## How to get alternative alleles?
+The *alt()* function can be used to get the alternative allele for a variant. The result is a DNAStringSetList ***as alternative alleles could be multiple changes.***
 
 ```r
 altBase &lt;- alt(vcf)
-```
-- result is a list ***alternative alleles could be multiple changes.***
-
-```r
 alt(vcf)[1:2] 
 ```
 
@@ -316,8 +323,8 @@ alt(vcf)[1:2]
 ```
 
 ---
-## How to getalternative alleles?
-- Extract vectors from list by using lapply()
+## How to get alternative alleles?
+- As it is a list, getting a character back is more complicated. First we can extract vectors from list by using lapply(). Specifically at this point we are subsetting the data to only the first variant. 
 
 ```r
 # get the 1st vector of the list
@@ -348,8 +355,8 @@ altBase[1:2]
 ---
 # INFO section from FIXED field
 - **Integrated information from all the samples**
-- Annotation information would be recored in this section
-- all information in a ***data frame***
+- Annotation information would be recorded in this section
+- All information is stored as a ***data frame***
 
 ```r
 info(header(vcf))[1:2,]
@@ -369,6 +376,7 @@ info(header(vcf))[1:2,]
 
 ---
 ## INFO section
+By calling *info()* directly on the whole VCF object, we get information for every variant.
 
 ```r
 info(vcf)[1:2,]
@@ -396,7 +404,7 @@ info(vcf)[1:2,]
 
 ---
 # GENOTYPE field
-- Separatd by indivisual samples
+- Separated by individual samples
 
 ```r
 geno(header(vcf))[1:2,]
@@ -415,7 +423,8 @@ geno(header(vcf))[1:2,]
 ```
 
 ---
-## Genotype information for each dample
+## Genotype information for each sample
+By calling *geno()* directly on the whole VCF object, we get information for every variant.
 
 ```r
 paste0("GT: ",geno(header(vcf))[1,3])
@@ -454,7 +463,7 @@ tbl
 - 1/2: ***heterozygous mutations, both alleles are different from reference sequence***
 
 ---
-## GT Types ~ plot
+## GT Types
 
 ```r
 ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
@@ -464,11 +473,11 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-## GT Types ~ plot
+## GT Types
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/genoGT_varMan_disp2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-## Depth for each sample
+## Depth for each sample (DP)
 
 ```r
 paste0("DP: ",geno(header(vcf))[3,3])
@@ -519,7 +528,7 @@ ggplot(as.data.frame(matDP),aes(x=SAMN01882168))+geom_histogram()+
 
 ---
 ## Genotype calling quality (GQ)
-- The confidance in gentype calling
+- The confidence in genotype calling
 - Expressed as [Phred quality score](https://gatk.broadinstitute.org/hc/en-us/articles/360035531872-Phred-scaled-quality-scores)
 
 ```r
@@ -571,12 +580,43 @@ ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/genoGQ_varMan_distPres2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-# Gathering information ~ genotype 1/2
-- heterozygous mutations, both alleles are different from reference sequence
-- both ref allele and alt allele have to be retrieved from alt(vcf)
+class: inverse, center, middle
+
+# Gathering variant information
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+---
+## Gathering information ~ genotype 0/1 and 1/1
+- Ref alleles are retrieved from ref(vcf)
+- Alt alleles are retrieved from alt(vcf)
 
 ```r
 var_2 &lt;- rownames(geno(vcf)$GT)[geno(vcf)$GT=="1/2"]
+varTab1 &lt;- data.frame(variant=names(rd)[!names(rd) %in% var_2],
+                      chr=as.vector(seqnames(rd)[!names(rd) %in% var_2]),
+                      start=start(rd)[!names(rd) %in% var_2],
+                      end=end(rd)[!names(rd) %in% var_2],
+                      refBase=as.character(ref(vcf)[!rownames(vcf) %in% var_2]),
+                      altBase=unlist(lapply(lapply(
+                        alt(vcf)[!rownames(vcf) %in% var_2],`[[`,1),as.character)),
+                      refCount=unlist(lapply(
+                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,1)),
+                      altCount=unlist(lapply(
+                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,2)),
+                      genoType=geno(vcf)$GT[!rownames(geno(vcf)$GT) %in% var_2],
+                      gtQuality=geno(vcf)$GQ[!rownames(geno(vcf)$GQ) %in% var_2],
+                      stringsAsFactors = FALSE)
+```
+
+---
+## Gathering information ~ genotype 1/2
+- Heterozygous mutations, both alleles are different from the reference sequence.
+- Both ref allele and alt allele have to be retrieved from alt(vcf)
+
+```r
 varTab2 &lt;- data.frame(variant=names(rd)[names(rd) %in% var_2],
                       chr=as.vector(seqnames(rd)[names(rd) %in% var_2]),
                       start=start(rd)[names(rd) %in% var_2],
@@ -591,28 +631,6 @@ varTab2 &lt;- data.frame(variant=names(rd)[names(rd) %in% var_2],
                         lapply(geno(vcf)$AD[rownames(geno(vcf)$AD) %in% var_2],`[[`,3)),
                       genoType=geno(vcf)$GT[rownames(geno(vcf)$GT) %in% var_2],
                       gtQuality=geno(vcf)$GQ[rownames(geno(vcf)$GQ) %in% var_2],
-                      stringsAsFactors = FALSE)
-```
-
----
-## Gathering information ~ genotype 0/1 and 1/1
-- ref alleles are retrieved from ref(vcf)
-- alt alleles are retrieved from alt(vcf)
-
-```r
-varTab1 &lt;- data.frame(variant=names(rd)[!names(rd) %in% var_2],
-                      chr=as.vector(seqnames(rd)[!names(rd) %in% var_2]),
-                      start=start(rd)[!names(rd) %in% var_2],
-                      end=end(rd)[!names(rd) %in% var_2],
-                      refBase=as.character(ref(vcf)[!rownames(vcf) %in% var_2]),
-                      altBase=unlist(lapply(lapply(
-                        alt(vcf)[!rownames(vcf) %in% var_2],`[[`,1),as.character)),
-                      refCount=unlist(lapply(
-                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,1)),
-                      altCount=unlist(lapply(
-                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,2)),
-                      genoType=geno(vcf)$GT[!rownames(geno(vcf)$GT) %in% var_2],
-                      gtQuality=geno(vcf)$GQ[!rownames(geno(vcf)$GQ) %in% var_2],
                       stringsAsFactors = FALSE)
 ```
 
@@ -634,7 +652,7 @@ varTab[1:2,]
 ```
 
 ---
-# Differentiate variant types
+## Differentiate variant types
 - SNP: single-nucleotide substitutions
 - DEL: deletions
 - INS: insertions
@@ -667,7 +685,7 @@ tbl
 ```
 
 ---
-## Variant types ~ plot
+## Variant types
 
 ```r
 ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
@@ -677,11 +695,11 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-## Variant types ~ Plot
+## Variant types
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/mutType_pres2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-# Nucleotide substitution pattern
+## Nucleotide substitution pattern
 - only SNPs
 - Transition (Ti): purine-to-purine, pyrimidine-to-pyrimidine
 - Transversion (Tv): purine-to-pyrimidine, pyrimidine-to-purine
@@ -726,7 +744,7 @@ tbl
 ```
 
 ---
-## Nucleotide substitution ~ Plot
+## Nucleotide substitution
 
 ```r
 ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
@@ -736,7 +754,7 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-## Nucleotide substitution ~ Plot
+## Nucleotide substitution
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/TiTv_pres_nuSubPres2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -755,7 +773,7 @@ tbl
 ```
 
 ---
-## Ti/Tv ~ Plot
+## Ti/Tv
 
 ```r
 ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+
@@ -764,12 +782,23 @@ ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-## Ti/Tv ~ Plot
-&lt;img src="RU_GenomicVariant_session1_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+## Ti/Tv
+&lt;img src="RU_GenomicVariant_session1_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
+class: inverse, center, middle
+
 # Trinucleotide motif analysis
-The trinucleotide motif mean the specific patterns beneath the variant sites from -1 to +1. This pattern could reflect to different causes of mutations. For instance, APOBEC is a deaminase leading to C&gt;T substitutions in the motif ***T[C&gt;T]W***. So, the proportion of T[C&gt;T]W in overall C&gt;T substitutions could reflect to APOBEC activity. More applications of the trinucleotide motifs will be discussed in [session3](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session3.html#19).
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+---
+## Trinucleotide motif analysis
+Other constraints may bias nucleotide transitions. One of these is the trinucleotide motif around the variant (from -1 to +1). This pattern could reflect different causes for the mutations.  
+
+One such example is APOBEC, a deaminase leading to C&gt;T substitutions in the motif ***T[C&gt;T]W***. So, the proportion of T[C&gt;T]W in overall C&gt;T substitutions could reflect to APOBEC activity. More applications of the trinucleotide motifs will be discussed in [session3](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session3.html#19).
 
 ---
 ## Extract C&gt;T substituion
@@ -777,12 +806,40 @@ The trinucleotide motif mean the specific patterns beneath the variant sites fro
 ```r
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(GenomicFeatures)
+library(stringr)
 #
-rd_sub &lt;- rd[gsub("(.*):(.*)_(.*)","\\3",names(rd))=="C/T"]
+rd_idx&lt;-str_split(names(rd),"_", simplify=T)
+rd_idx[1:2,]
+```
+
+```
+##      [,1]          [,2] 
+## [1,] "chr1:815337" "G/T"
+## [2,] "chr1:815341" "G/A"
+```
+
+```r
+rd_sub &lt;- rd[rd_idx[,2]=="C/T"]
+rd_sub[1:2,]
+```
+
+```
+## GRanges object with 2 ranges and 5 metadata columns:
+##                   seqnames    ranges strand | paramRangeID            REF
+##                      &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;
+##   chr1:815520_C/T     chr1    815520      * |           NA              C
+##   chr1:815573_C/T     chr1    815573      * |           NA              C
+##                                  ALT      QUAL      FILTER
+##                   &lt;DNAStringSetList&gt; &lt;numeric&gt; &lt;character&gt;
+##   chr1:815520_C/T                  T    916.77           .
+##   chr1:815573_C/T                  T     70.77           .
+##   -------
+##   seqinfo: 25 sequences from hg19 genome
 ```
 
 ---
 ## Extract sequences beneath the mutation from -1 to +1
+We can use the **getSeq()** function to get the sequence underlying these variants, as we have done with [GRanges](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicIntervals_In_Bioconductor.html#63).
 
 ```r
 rd_sub$triNu &lt;- getSeq(Hsapiens,
@@ -822,7 +879,7 @@ tbl
 ```
 
 ---
-## Trinucleotide pattern ~ plot
+## Trinucleotide pattern
 
 ```r
 ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
@@ -832,7 +889,7 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 ---
-## Trinucleotide pattern ~ plot
+## Trinucleotide pattern
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/motif_seqPat_advan3-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -853,7 +910,7 @@ apobec_dat
 ```
 
 ---
-## APOBEC activation in this sample? ~ Plot
+## APOBEC activation in this sample?
 
 ```r
 ggplot(apobec_dat,aes(x=APOBEC_target,y=Freq,fill=APOBEC_target))+
@@ -863,12 +920,12 @@ ggplot(apobec_dat,aes(x=APOBEC_target,y=Freq,fill=APOBEC_target))+
 ```
 
 ---
-## APOBEC activation in this sample? ~ Plot
+## APOBEC activation in this sample?
 &lt;img src="RU_GenomicVariant_session1_files/figure-html/motif_ApoTar_advan3-1.png" style="display: block; margin: auto;" /&gt;
-***Probably not an APOBEC-enriched***
+***Probably not APOBEC-enriched***
 
 ---
-# Exercise Time
+## Exercise Time
 - [Exercise](../../exercises/exercises/GenomicVariant_session1_exercise.html)
 - [Answer](../../exercises/answers/GenomicVariant_session1_answers.html)
     </textarea>

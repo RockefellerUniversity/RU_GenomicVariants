@@ -14,6 +14,40 @@ suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(GenomicFeatures))
 
 
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides != "yes"){
+  cat("# Genomic Variants (part 1)
+
+---
+"    
+  )
+  
+}
+
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# VCF files
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# VCF files
+
+---
+"    
+  )
+  
+}
+
+
+
 ## ----varLoad_intro,echo=FALSE,out.width = "75%",fig.align="center"------------
 knitr::include_graphics("imgs/vcfMan_fig2.png")
 
@@ -61,9 +95,6 @@ end(rd)[1:2] # End position
 
 ## ----range_varMan_baseInfo_Ref1-----------------------------------------------
 refBase <- ref(vcf)
-
-
-## ----range_varMan_baseInfo_Ref2-----------------------------------------------
 refBase[1:2]
 
 
@@ -74,9 +105,6 @@ refBase[1:2]
 
 ## ----range_varMan_baseInfo_Alt1-----------------------------------------------
 altBase <- alt(vcf)
-
-
-## ----range_varMan_baseInfo_Alt2-----------------------------------------------
 alt(vcf)[1:2] 
 
 
@@ -182,8 +210,48 @@ ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
   labs(x="",y="Counts")+scale_x_log10()+theme_classic()
 
 
-## ----gatGT_info2,echo=TRUE,tidy=FALSE-----------------------------------------
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Gathering variant information
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Gathering variant information
+
+---
+"    
+  )
+  
+}
+
+
+
+## ----gatGT_info1,echo=TRUE,tidy=FALSE-----------------------------------------
 var_2 <- rownames(geno(vcf)$GT)[geno(vcf)$GT=="1/2"]
+varTab1 <- data.frame(variant=names(rd)[!names(rd) %in% var_2],
+                      chr=as.vector(seqnames(rd)[!names(rd) %in% var_2]),
+                      start=start(rd)[!names(rd) %in% var_2],
+                      end=end(rd)[!names(rd) %in% var_2],
+                      refBase=as.character(ref(vcf)[!rownames(vcf) %in% var_2]),
+                      altBase=unlist(lapply(lapply(
+                        alt(vcf)[!rownames(vcf) %in% var_2],`[[`,1),as.character)),
+                      refCount=unlist(lapply(
+                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,1)),
+                      altCount=unlist(lapply(
+                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,2)),
+                      genoType=geno(vcf)$GT[!rownames(geno(vcf)$GT) %in% var_2],
+                      gtQuality=geno(vcf)$GQ[!rownames(geno(vcf)$GQ) %in% var_2],
+                      stringsAsFactors = FALSE)
+
+
+## ----gatGT_info2,echo=TRUE,tidy=FALSE-----------------------------------------
+
 varTab2 <- data.frame(variant=names(rd)[names(rd) %in% var_2],
                       chr=as.vector(seqnames(rd)[names(rd) %in% var_2]),
                       start=start(rd)[names(rd) %in% var_2],
@@ -198,23 +266,6 @@ varTab2 <- data.frame(variant=names(rd)[names(rd) %in% var_2],
                         lapply(geno(vcf)$AD[rownames(geno(vcf)$AD) %in% var_2],`[[`,3)),
                       genoType=geno(vcf)$GT[rownames(geno(vcf)$GT) %in% var_2],
                       gtQuality=geno(vcf)$GQ[rownames(geno(vcf)$GQ) %in% var_2],
-                      stringsAsFactors = FALSE)
-
-
-## ----gatGT_info1,echo=TRUE,tidy=FALSE-----------------------------------------
-varTab1 <- data.frame(variant=names(rd)[!names(rd) %in% var_2],
-                      chr=as.vector(seqnames(rd)[!names(rd) %in% var_2]),
-                      start=start(rd)[!names(rd) %in% var_2],
-                      end=end(rd)[!names(rd) %in% var_2],
-                      refBase=as.character(ref(vcf)[!rownames(vcf) %in% var_2]),
-                      altBase=unlist(lapply(lapply(
-                        alt(vcf)[!rownames(vcf) %in% var_2],`[[`,1),as.character)),
-                      refCount=unlist(lapply(
-                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,1)),
-                      altCount=unlist(lapply(
-                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,2)),
-                      genoType=geno(vcf)$GT[!rownames(geno(vcf)$GT) %in% var_2],
-                      gtQuality=geno(vcf)$GQ[!rownames(geno(vcf)$GQ) %in% var_2],
                       stringsAsFactors = FALSE)
 
 
@@ -298,11 +349,37 @@ tbl
 ggplot(as.data.frame(table(varX$TiTv)),aes(x=Var1,y=Freq,fill=Var1))+geom_bar(stat = 'identity')+labs(x="",y="Mutations",fill="")+theme(legend.position = "none")
 
 
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Trinucleotide motif analysis
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Trinucleotide motif analysis
+
+---
+"    
+  )
+  
+}
+
+
+
 ## ----motif_load_advAn---------------------------------------------------------
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(GenomicFeatures)
+library(stringr)
 #
-rd_sub <- rd[gsub("(.*):(.*)_(.*)","\\3",names(rd))=="C/T"]
+rd_idx<-str_split(names(rd),"_", simplify=T)
+rd_idx[1:2,]
+rd_sub <- rd[rd_idx[,2]=="C/T"]
+rd_sub[1:2,]
 
 
 ## ----motif_seqExt_advAn,tidy=FALSE--------------------------------------------
