@@ -368,6 +368,7 @@ if(params$isSlides == "yes"){
 - Ref alleles are retrieved from ref(vcf)
 - Alt alleles are retrieved from alt(vcf)
 ```{r gatGT_info1,echo=TRUE,tidy=FALSE}
+var_2 <- rownames(geno(vcf)$GT)[geno(vcf)$GT=="1/2"]
 varTab1 <- data.frame(variant=names(rd)[!names(rd) %in% var_2],
                       chr=as.vector(seqnames(rd)[!names(rd) %in% var_2]),
                       start=start(rd)[!names(rd) %in% var_2],
@@ -389,7 +390,7 @@ varTab1 <- data.frame(variant=names(rd)[!names(rd) %in% var_2],
 - Heterozygous mutations, both alleles are different from the reference sequence.
 - Both ref allele and alt allele have to be retrieved from alt(vcf)
 ```{r gatGT_info2,echo=TRUE,tidy=FALSE}
-var_2 <- rownames(geno(vcf)$GT)[geno(vcf)$GT=="1/2"]
+
 varTab2 <- data.frame(variant=names(rd)[names(rd) %in% var_2],
                       chr=as.vector(seqnames(rd)[names(rd) %in% var_2]),
                       start=start(rd)[names(rd) %in% var_2],
