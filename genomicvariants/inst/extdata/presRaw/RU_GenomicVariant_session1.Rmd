@@ -284,7 +284,7 @@ matGQ[1:2,]
 summary(as.vector(matGQ))
 ```
 
-```{r genoGQ_varMan_dist1,eval=TRUE,echo=FALSE,tidy=FALSE,results=TRUE}
+```{r genoGQ_varMan_dist2,eval=TRUE,echo=FALSE,tidy=FALSE,results=TRUE}
 summary(as.vector(matGQ))
 ```
 
