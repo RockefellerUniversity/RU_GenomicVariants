@@ -26,11 +26,15 @@ class: center, middle, inverse, title-slide
 
 
 
-# About this session
-In this session, we will demonstrte how to use several advanced analysis to decipher variants from multiple samples. In this situation, Mutation Annotation Fromat (MAF) would be a good choice for storing and presenting. The structure of MAF please refer to [previse course](rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#36). An acut myeloid leukemia (AML) dataset (tcga-laml) was fetched from [The Cancer Genome Atlas data portal](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga). The dataset is in the following path "data/tcga_laml.maf".
+
+
+## About this session
+In this session, we will demonstrate how to use several advanced analysis approaches to decipher variants from multiple samples. In this situation, the Mutation Annotation Format (MAF) would be a good choice for storing and presenting your data. For a detailesd overview of MAF file structure please refer to our previous course on [Genomic Formats](rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#36). 
+
+Today we will beusing an acute myeloid leukemia (AML) dataset (tcga-laml), which was fetched from [The Cancer Genome Atlas data portal](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga). The dataset is in the following path "data/tcga_laml.maf".
 
 ---
-# Outlines
+## Outline of this session
 - Handle MAF with maftools
 - Get summary by samples and genes
 - Any mutation hotspots?
@@ -39,11 +43,21 @@ In this session, we will demonstrte how to use several advanced analysis to deci
 - Any Mutational signatures?
 
 ---
-# MAF format
+class: inverse, center, middle
+
+# Working with MAF files
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+---
+## MAF format
+As with many data files we can very simply read MAF files into R.
 
 ```r
-laml_tab &lt;- read.delim("data/tcga_laml.maf",sep="\t")
-laml_tab[1:2,]
+laml_tab &lt;- read.delim("data/tcga_laml.maf", sep = "\t")
+laml_tab[1:2, ]
 ```
 
 ```
@@ -66,13 +80,14 @@ laml_tab[1:2,]
 
 ```r
 tbl &lt;- table(laml_tab$Tumor_Sample_Barcode)
-hist(tbl,breaks = 10,xlab = "Mutations")
+hist(tbl, breaks = 10, xlab = "Mutations")
 ```
 
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_samInfo_advan-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 ## [maftools](https://www.bioconductor.org/packages/release/bioc/html/maftools.html)
+Bioconductor has a specialist package for handling these files. 
 &lt;img src="imgs/vcfMan_fig7r.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -90,11 +105,21 @@ laml &lt;- read.maf("data/tcga_laml.maf.gz")
 ## -Summarizing
 ## -Processing clinical data
 ## --Missing clinical data
-## -Finished in 0.497s elapsed (0.368s cpu)
+## -Finished in 0.420s elapsed (0.364s cpu)
+```
+
+```r
+class(laml)
+```
+
+```
+## [1] "MAF"
+## attr(,"package")
+## [1] "maftools"
 ```
 
 ---
-# Summary by samples or genes
+## Summary by samples or genes
 maftools provides two functions to generate summary table for by samples or by genes
 - getSampleSummary: a matrix, count of mutation classes in each sample
 - getGeneSummary: a matrix, count of mutation classes in each gene
@@ -106,7 +131,7 @@ maftools provides two functions to generate summary table for by samples or by g
 
 ```r
 sample_sum &lt;- getSampleSummary(laml)
-sample_sum[1:2,]
+sample_sum[1:2, ]
 ```
 
 ```
@@ -126,10 +151,26 @@ sample_sum[1:2,]
 ```r
 var_to &lt;- sample_sum$total
 names(var_to) &lt;- sample_sum$Tumor_Sample_Barcode
-sample_sum &lt;- dplyr::select(sample_sum,-total)
-melt_dat &lt;- reshape2::melt(sample_sum,id="Tumor_Sample_Barcode")
-melt_dat$totalVar &lt;- var_to[match(melt_dat$Tumor_Sample_Barcode,names(var_to))]
-melt_dat$prop &lt;- melt_dat$value / melt_dat$totalVar
+sample_sum &lt;- dplyr::select(sample_sum, -total)
+melt_dat &lt;- reshape2::melt(sample_sum, id = "Tumor_Sample_Barcode")
+melt_dat[1:3, ]
+```
+
+```
+##   Tumor_Sample_Barcode        variable value
+## 1         TCGA-AB-3009 Frame_Shift_Del     0
+## 2         TCGA-AB-2807 Frame_Shift_Del     1
+## 3         TCGA-AB-2959 Frame_Shift_Del     0
+```
+
+---
+## Mutation classes in each sample
+- convert into table for ggplot
+- proportion: count of mutation / total mutations for each sample
+
+```r
+melt_dat$totalVar &lt;- var_to[match(melt_dat$Tumor_Sample_Barcode, names(var_to))]
+melt_dat$prop &lt;- melt_dat$value/melt_dat$totalVar
 head(melt_dat)
 ```
 
@@ -178,7 +219,7 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=prop,fill=variable))+
 
 ```r
 gene_sum &lt;- getGeneSummary(laml)
-gene_sum[1:2,]
+gene_sum[1:2, ]
 ```
 
 ```
@@ -194,8 +235,18 @@ gene_sum[1:2,]
 ```
 
 ---
-# Any mutation hotspot?
-Mutation hotspot means mutation in a given position detected in more samples than in other positions. Most activation mutations have mutaion hotspot, like G12, G13, or H61 mutation in KRAS. In contrast, loss of function mutations are usually with no mutation hotspot. The ***lollipop plot*** is a fansy plot of mutations in each position of a given gene. It's very intuitional to demonstrate any mutation hotspot.  
+class: inverse, center, middle
+
+# Functional analysis of mutations
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+---
+## Any mutation hotspot?
+Mutation hotspot means mutation in a given position detected in more samples than in other positions. Most activating mutations have mutation hotspots. A classic example  are the G12, G13, or H61 mutation in KRAS. In contrast, loss of function mutations are usually with no mutation hotspot. The ***lollipop plot*** is a fancy plot of mutations in each position of a given gene. It's very intuitive for demonstrating mutation hotspots.  
+
 ---
 ## Mutation hotspots? 
 - ***lollipopPlot()***
@@ -213,21 +264,21 @@ lollipopPlot(maf = laml,
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_lolli_advan_eval2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-# Interaction between mutations
-This means any concordnce or exclusivity of given two gene mutations. If two gene mutations concordantly identified in the same patient, it indicates the two mutations could be with synergistic effect in cancer or they are in causality. If two gene mutations are exclusive, not present in the same patient, could suggest they may lead to similar consequence. So, no need to mutate both of them. The ***oncoplot*** is an intuitional plot to show any interaction between genes. 
+## Interaction between mutations
+When mutations are send to interact, this means any concordance or exclusivity of two given gene mutations. If two gene mutations concordantly identified in the same patient, it indicates the two mutations could have synergistic effect in cancer or they are in causality. If two gene mutations are exclusive (i.e. not present in the same patient), this could suggest that they lead to similar consequence, therefore there is no selective pressure for both to mutate. The ***oncoplot*** allows comparison between genes to look for interactions between mutants. 
 
 ---
 ## Oncoplot for top 5 mutated genes
 
 ```r
-oncoplot(maf=laml,top = 5)
+oncoplot(maf = laml, top = 5)
 ```
 
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_oncoplot_advan-1.png" style="display: block; margin: auto;" /&gt;
 **IDH1 and IDH2 mutations could be exlusive.**
 
 ---
-# Pathway analysis
+## Pathway analysis
 maftools provides two functions for pathway analysis.
 - OncogenicPathways(): calculate mutations detected in each pathway and the fraction of samples affected
 - PlotOncogenicPathways(): make a waterfall plot for a given pathway
@@ -274,9 +325,21 @@ PlotOncogenicPathways(maf = laml, pathways = "RTK-RAS")
 
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_pathPlotWF_advan3-1.png" style="display: block; margin: auto;" /&gt;
 
+
 ---
-# [Mutational signatures](https://cancer.sanger.ac.uk/cosmic/signatures)
-Mutational signature means a patterrn of trinucleotide substitution. As mentioned in [session 1](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session1.html#44), the pattern may reflect to exposure of spontanious/enzymatic deamination and defect of DNA repair, etc. This information provides a different aspect for cancer research.
+class: inverse, center, middle
+
+# Mutation Signatures
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+---
+## [Mutational signatures](https://cancer.sanger.ac.uk/cosmic/signatures)
+Mutational signature means a patterrn of trinucleotide substitution. As mentioned in [session 1](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session1.html#44), the pattern may reflect to exposure of spontaneous/enzymatic deamination and defect of DNA repair, etc.  
+
+This is another common area of study for cancer and genome integrity research.
 
 ---
 ## Steps for mutational signature analysis
@@ -299,7 +362,7 @@ plotTiTv(res = laml.titv)
 ---
 ## Ti/Tv plot
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_TiTv_advan2-1.png" style="display: block; margin: auto;" /&gt;
-**C&gt;T mutations is in majority.**
+**The majority of mutations are C&gt;T.**
 
 ---
 ## Trinucleotide matrix
@@ -336,7 +399,7 @@ dim(laml.tnm$nmf_matrix)
 ```
 
 ```r
-laml.tnm$nmf_matrix[1,]
+laml.tnm$nmf_matrix[1, ]
 ```
 
 ```
@@ -364,13 +427,13 @@ laml.tnm$nmf_matrix[1,]
 
 ---
 ## Trinucleotide pattern in TCGA-AB-3009
+Lets focus on a single sample
 
 ```r
-yd &lt;- data.frame(triNuc=colnames(laml.tnm$nmf_matrix),
-                 count=laml.tnm$nmf_matrix['TCGA-AB-3009',],
-                 stringsAsFactors = FALSE)
-yd$cat &lt;- gsub("(.*)\\[(.*)\\](.*)","\\2",yd$triNuc)
-yd$num &lt;- seq(1,length(yd$triNuc))
+yd &lt;- data.frame(triNuc = colnames(laml.tnm$nmf_matrix), count = laml.tnm$nmf_matrix["TCGA-AB-3009", 
+    ], stringsAsFactors = FALSE)
+yd$cat &lt;- gsub("(.*)\\[(.*)\\](.*)", "\\2", yd$triNuc)
+yd$num &lt;- seq(1, length(yd$triNuc))
 ```
 
 ---
@@ -386,10 +449,10 @@ ggplot(yd,aes(x=num,y=count,fill=cat))+
 ---
 ## Trinucleotide pattern in TCGA-AB-3009
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_triMutPat_advan3-1.png" style="display: block; margin: auto;" /&gt;
-**What does this pattern stand for?**
+**What does this pattern mean?**
 
 ---
-## Estimate number of signautres
+## Estimate number of signatures
 
 ```r
 library('NMF')
@@ -399,7 +462,7 @@ laml.sign &lt;- estimateSignatures(mat = laml.tnm,
                                 parallel = 1)
 ```
 - [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation)
-- Measure of how faithfully a clustering results represent the original data
+- Measure of how faithfully a clustering results represent the original data.
 
 ---
 ## Estimate number of signautres
@@ -460,7 +523,7 @@ pheatmap::pheatmap(mat = laml.og30.cosm$cosine_similarities, cluster_rows = FALS
 
 ```r
 laml.sign.sbs = compareSignatures(nmfRes = laml.sig.ext, sig_db = "SBS")
-laml.sign.sbs$cosine_similarities[,1:5]
+laml.sign.sbs$cosine_similarities[, 1:5]
 ```
 
 ```
@@ -547,7 +610,7 @@ laml.se = signatureEnrichment(maf = laml,
 - Genes mutated in samples with particular mutational signature
 
 ```r
-laml.se$groupwise_comparision[1:2,]
+laml.se$groupwise_comparision[1:2, ]
 ```
 
 ```
@@ -569,7 +632,7 @@ plotEnrichmentResults(enrich_res = laml.se, pVal = 0.05)
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_enrichGenePlot_advan1-1.png" height="70%" style="display: block; margin: auto;" /&gt;
 
 ---
-# Exercise Time
+## Exercise Time
 - [Exercise](../../exercises/exercises/GenomicVariant_session3_exercise.html)
 - [Answer](../../exercises/answers/GenomicVariant_session3_answers.html)
     </textarea>

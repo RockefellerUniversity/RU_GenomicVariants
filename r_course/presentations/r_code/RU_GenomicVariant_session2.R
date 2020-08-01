@@ -2,7 +2,7 @@ params <-
 list(isSlides = "no")
 
 ## ----setup_varManS2, include=FALSE--------------------------------------------
-knitr::opts_chunk$set(echo = TRUE,cache = TRUE,cache.lazy = FALSE)
+knitr::opts_chunk$set(echo = TRUE,cache = TRUE,cache.lazy = FALSE, tidy = T)
 # AsSlides <- TRUE
 #
 suppressPackageStartupMessages(library(VariantAnnotation))

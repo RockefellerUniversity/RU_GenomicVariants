@@ -2,7 +2,7 @@ params <-
 list(isSlides = "no")
 
 ## ----setup_varManS3, include=FALSE--------------------------------------------
-knitr::opts_chunk$set(echo = TRUE,cache = TRUE,cache.lazy = FALSE,message = FALSE,warning = FALSE)
+knitr::opts_chunk$set(echo = TRUE,cache = TRUE,cache.lazy = FALSE,message = FALSE,warning = FALSE, tidy = T)
 # AsSlides <- TRUE
 #
 suppressPackageStartupMessages(library(VariantAnnotation))
@@ -16,6 +16,40 @@ suppressPackageStartupMessages(library(maftools))
 suppressPackageStartupMessages(library(NMF))
 
 
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides != "yes"){
+  cat("# Genomic Variants (part 3)
+
+---
+"    
+  )
+  
+}
+
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Working with MAF files
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Working with MAF files
+
+---
+"    
+  )
+  
+}
+
+
+
 ## ----mult_mafIntro_advan------------------------------------------------------
 laml_tab <- read.delim("data/tcga_laml.maf",sep="\t")
 laml_tab[1:2,]
@@ -23,7 +57,7 @@ laml_tab[1:2,]
 
 ## ----mult_samInfo_advan,fig.align="center"------------------------------------
 tbl <- table(laml_tab$Tumor_Sample_Barcode)
-hist(tbl,breaks = 10,xlab = "Mutations")
+hist(tbl,breaks = 10, xlab = "Mutations")
 
 
 ## ----mafTools_intro,echo=FALSE,out.width = "50%",fig.align="center"-----------
@@ -33,6 +67,7 @@ knitr::include_graphics("imgs/vcfMan_fig7r.png")
 ## ----mult_mafT_advan----------------------------------------------------------
 library(maftools)
 laml <- read.maf("data/tcga_laml.maf.gz")
+class(laml)
 
 
 ## ----mult_samSum_advan--------------------------------------------------------
@@ -44,7 +79,11 @@ sample_sum[1:2,]
 var_to <- sample_sum$total
 names(var_to) <- sample_sum$Tumor_Sample_Barcode
 sample_sum <- dplyr::select(sample_sum,-total)
-melt_dat <- reshape2::melt(sample_sum,id="Tumor_Sample_Barcode")
+melt_dat <- reshape2::melt(sample_sum, id="Tumor_Sample_Barcode")
+melt_dat[1:3,]
+
+
+## -----------------------------------------------------------------------------
 melt_dat$totalVar <- var_to[match(melt_dat$Tumor_Sample_Barcode,names(var_to))]
 melt_dat$prop <- melt_dat$value / melt_dat$totalVar
 head(melt_dat)
@@ -83,6 +122,28 @@ gene_sum <- getGeneSummary(laml)
 gene_sum[1:2,]
 
 
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Functional analysis of mutations
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Functional analysis of mutations
+
+---
+"    
+  )
+  
+}
+
+
+
 ## ----mult_lolli_advan_eval1,echo=TRUE,eval=FALSE,tidy=FALSE-------------------
 ## lollipopPlot(maf = laml,
 ##              gene = 'NRAS',
@@ -109,6 +170,28 @@ OncogenicPathways(maf = laml)
 
 ## ----mult_pathPlotWF_advan3,echo=TRUE,eval=TRUE,tidy=FALSE,fig.align="center"----
 PlotOncogenicPathways(maf = laml, pathways = "RTK-RAS")
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Mutation Signatures
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Mutation Signatures
+
+---
+"    
+  )
+  
+}
+
 
 
 ## ----mult_mutSig_TiTv_advan1,eval=FALSE,echo=TRUE,tidy=FALSE------------------

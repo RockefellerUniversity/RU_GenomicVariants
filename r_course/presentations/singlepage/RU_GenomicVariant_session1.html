@@ -1619,7 +1619,7 @@ div.tocify {
 <div id="load-vcf-file" class="section level2">
 <h2>Load VCF file</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(VariantAnnotation)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">vcf &lt;-<span class="st"> </span><span class="kw">readVcf</span>(<span class="st">&quot;data/SAMN01882168_filt.vcf.gz&quot;</span>,<span class="st">&quot;hg19&quot;</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">vcf &lt;-<span class="st"> </span><span class="kw">readVcf</span>(<span class="st">&quot;data/SAMN01882168_filt.vcf.gz&quot;</span>, <span class="st">&quot;hg19&quot;</span>)</a>
 <a class="sourceLine" id="cb1-3" data-line-number="3">vcf</a></code></pre></div>
 <pre><code>## class: CollapsedVCF 
 ## dim: 72244 1 
@@ -1759,11 +1759,11 @@ div.tocify {
 </div>
 <div id="position-of-the-variations" class="section level2">
 <h2>Position of the variations</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">as.vector</span>(<span class="kw">seqnames</span>(rd)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]) <span class="co"># Chromosome</span></a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">as.vector</span>(<span class="kw">seqnames</span>(rd)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])  <span class="co"># Chromosome</span></a></code></pre></div>
 <pre><code>## [1] &quot;chr1&quot; &quot;chr1&quot;</code></pre>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">start</span>(rd)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="co"># Start position</span></a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">start</span>(rd)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]  <span class="co"># Start position</span></a></code></pre></div>
 <pre><code>## [1] 815337 815341</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">end</span>(rd)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="co"># End position</span></a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">end</span>(rd)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]  <span class="co"># End position</span></a></code></pre></div>
 <pre><code>## [1] 815337 815341</code></pre>
 </div>
 <div id="how-to-get-the-reference-alleles" class="section level2">
@@ -1788,7 +1788,7 @@ div.tocify {
 <h2>How to get alternative alleles?</h2>
 <p>The <em>alt()</em> function can be used to get the alternative allele for a variant. The result is a DNAStringSetList <strong><em>as alternative alleles could be multiple changes.</em></strong></p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">altBase &lt;-<span class="st"> </span><span class="kw">alt</span>(vcf)</a>
-<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">alt</span>(vcf)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] </a></code></pre></div>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">alt</span>(vcf)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</a></code></pre></div>
 <pre><code>## DNAStringSetList of length 2
 ## [[1]] T
 ## [[2]] A</code></pre>
@@ -1799,7 +1799,7 @@ div.tocify {
 <li>As it is a list, getting a character back is more complicated. First we can extract vectors from list by using lapply(). Specifically at this point we are subsetting the data to only the first variant.</li>
 </ul>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="co"># get the 1st vector of the list</span></a>
-<a class="sourceLine" id="cb29-2" data-line-number="2">altBase &lt;-<span class="st"> </span><span class="kw">lapply</span>(altBase,<span class="st">`</span><span class="dt">[[</span><span class="st">`</span>,<span class="dv">1</span>) </a>
+<a class="sourceLine" id="cb29-2" data-line-number="2">altBase &lt;-<span class="st"> </span><span class="kw">lapply</span>(altBase, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb29-3" data-line-number="3">altBase[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</a></code></pre></div>
 <pre><code>## [[1]]
 ## 1-letter DNAString object
@@ -1811,7 +1811,7 @@ div.tocify {
 <ul>
 <li>Convert DNAString object to character</li>
 </ul>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">altBase &lt;-<span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(altBase,as.character)) </a>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">altBase &lt;-<span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(altBase, as.character))</a>
 <a class="sourceLine" id="cb31-2" data-line-number="2">altBase[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</a></code></pre></div>
 <pre><code>## [1] &quot;T&quot; &quot;A&quot;</code></pre>
 </div>
@@ -1823,7 +1823,7 @@ div.tocify {
 <li>Annotation information would be recorded in this section</li>
 <li>All information is stored as a <strong><em>data frame</em></strong></li>
 </ul>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw">info</span>(<span class="kw">header</span>(vcf))[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw">info</span>(<span class="kw">header</span>(vcf))[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a></code></pre></div>
 <pre><code>## DataFrame with 2 rows and 3 columns
 ##         Number        Type
 ##    &lt;character&gt; &lt;character&gt;
@@ -1836,7 +1836,7 @@ div.tocify {
 <div id="info-section" class="section level2">
 <h2>INFO section</h2>
 <p>By calling <em>info()</em> directly on the whole VCF object, we get information for every variant.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1"><span class="kw">info</span>(vcf)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1"><span class="kw">info</span>(vcf)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a></code></pre></div>
 <pre><code>## DataFrame with 2 rows and 19 columns
 ##                            AC            AF        AN BaseQRankSum
 ##                 &lt;IntegerList&gt; &lt;NumericList&gt; &lt;integer&gt;    &lt;numeric&gt;
@@ -1861,7 +1861,7 @@ div.tocify {
 <ul>
 <li>Separated by individual samples</li>
 </ul>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw">geno</span>(<span class="kw">header</span>(vcf))[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw">geno</span>(<span class="kw">header</span>(vcf))[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a></code></pre></div>
 <pre><code>## DataFrame with 2 rows and 3 columns
 ##         Number        Type
 ##    &lt;character&gt; &lt;character&gt;
@@ -1874,10 +1874,10 @@ div.tocify {
 <div id="genotype-information-for-each-sample" class="section level2">
 <h2>Genotype information for each sample</h2>
 <p>By calling <em>geno()</em> directly on the whole VCF object, we get information for every variant.</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw">paste0</span>(<span class="st">&quot;GT: &quot;</span>,<span class="kw">geno</span>(<span class="kw">header</span>(vcf))[<span class="dv">1</span>,<span class="dv">3</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw">paste0</span>(<span class="st">&quot;GT: &quot;</span>, <span class="kw">geno</span>(<span class="kw">header</span>(vcf))[<span class="dv">1</span>, <span class="dv">3</span>])</a></code></pre></div>
 <pre><code>## [1] &quot;GT: Genotype&quot;</code></pre>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">matGT &lt;-<span class="st"> </span><span class="kw">geno</span>(vcf)<span class="op">$</span>GT</a>
-<a class="sourceLine" id="cb41-2" data-line-number="2">matGT[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</a></code></pre></div>
+<a class="sourceLine" id="cb41-2" data-line-number="2">matGT[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a></code></pre></div>
 <pre><code>## chr1:815337_G/T chr1:815341_G/A 
 ##           &quot;0/1&quot;           &quot;0/1&quot;</code></pre>
 </div>
@@ -1908,10 +1908,10 @@ div.tocify {
 </div>
 <div id="depth-for-each-sample-dp" class="section level2">
 <h2>Depth for each sample (DP)</h2>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="kw">paste0</span>(<span class="st">&quot;DP: &quot;</span>,<span class="kw">geno</span>(<span class="kw">header</span>(vcf))[<span class="dv">3</span>,<span class="dv">3</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="kw">paste0</span>(<span class="st">&quot;DP: &quot;</span>, <span class="kw">geno</span>(<span class="kw">header</span>(vcf))[<span class="dv">3</span>, <span class="dv">3</span>])</a></code></pre></div>
 <pre><code>## [1] &quot;DP: Approximate read depth (reads with MQ=255 or with bad mates are filtered)&quot;</code></pre>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1">matDP &lt;-<span class="st"> </span><span class="kw">geno</span>(vcf)<span class="op">$</span>DP</a>
-<a class="sourceLine" id="cb48-2" data-line-number="2">matDP[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</a></code></pre></div>
+<a class="sourceLine" id="cb48-2" data-line-number="2">matDP[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a></code></pre></div>
 <pre><code>## chr1:815337_G/T chr1:815341_G/A 
 ##              11              11</code></pre>
 </div>
@@ -1936,10 +1936,10 @@ div.tocify {
 <li>The confidence in genotype calling</li>
 <li>Expressed as <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035531872-Phred-scaled-quality-scores">Phred quality score</a></li>
 </ul>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1"><span class="kw">paste0</span>(<span class="st">&quot;GQ: &quot;</span>,<span class="kw">geno</span>(<span class="kw">header</span>(vcf))[<span class="dv">4</span>,<span class="dv">3</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1"><span class="kw">paste0</span>(<span class="st">&quot;GQ: &quot;</span>, <span class="kw">geno</span>(<span class="kw">header</span>(vcf))[<span class="dv">4</span>, <span class="dv">3</span>])</a></code></pre></div>
 <pre><code>## [1] &quot;GQ: Genotype Quality&quot;</code></pre>
 <div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1">matGQ &lt;-<span class="st"> </span><span class="kw">geno</span>(vcf)<span class="op">$</span>GQ</a>
-<a class="sourceLine" id="cb56-2" data-line-number="2">matGQ[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</a></code></pre></div>
+<a class="sourceLine" id="cb56-2" data-line-number="2">matGQ[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a></code></pre></div>
 <pre><code>## chr1:815337_G/T chr1:815341_G/A 
 ##              61              61</code></pre>
 </div>
@@ -2008,8 +2008,8 @@ div.tocify {
 </div>
 <div id="merged-datatable" class="section level2">
 <h2>Merged datatable</h2>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1">varTab &lt;-<span class="st"> </span><span class="kw">rbind</span>(varTab1,varTab2)</a>
-<a class="sourceLine" id="cb64-2" data-line-number="2">varTab[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1">varTab &lt;-<span class="st"> </span><span class="kw">rbind</span>(varTab1, varTab2)</a>
+<a class="sourceLine" id="cb64-2" data-line-number="2">varTab[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a></code></pre></div>
 <pre><code>##           variant  chr  start    end refBase altBase refCount altCount genoType
 ## 1 chr1:815337_G/T chr1 815337 815337       G       T        8        3      0/1
 ## 2 chr1:815341_G/A chr1 815341 815341       G       A        8        3      0/1
@@ -2029,19 +2029,21 @@ div.tocify {
 <div id="variant-types" class="section level2">
 <h2>Variant types</h2>
 <div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" data-line-number="1"><span class="co"># differentiate SNP/INS/DEL/Others</span></a>
-<a class="sourceLine" id="cb66-2" data-line-number="2"><span class="cf">for</span>(k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(varTab<span class="op">$</span>variant)){</a>
-<a class="sourceLine" id="cb66-3" data-line-number="3">  <span class="cf">if</span>(<span class="kw">width</span>(varTab<span class="op">$</span>refBase[k]) <span class="op">&lt;</span><span class="st"> </span><span class="kw">width</span>(varTab<span class="op">$</span>altBase[k])){</a>
-<a class="sourceLine" id="cb66-4" data-line-number="4">    varTab<span class="op">$</span>mutType[k] &lt;-<span class="st"> &quot;INS&quot;</span></a>
-<a class="sourceLine" id="cb66-5" data-line-number="5">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">width</span>(varTab<span class="op">$</span>refBase[k]) <span class="op">&gt;</span><span class="st"> </span><span class="kw">width</span>(varTab<span class="op">$</span>altBase[k])){</a>
-<a class="sourceLine" id="cb66-6" data-line-number="6">    varTab<span class="op">$</span>mutType[k] &lt;-<span class="st"> &quot;DEL&quot;</span></a>
-<a class="sourceLine" id="cb66-7" data-line-number="7">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">width</span>(varTab<span class="op">$</span>refBase[k])<span class="op">==</span><span class="dv">1</span><span class="op">&amp;</span><span class="kw">width</span>(varTab<span class="op">$</span>altBase[k])<span class="op">==</span><span class="dv">1</span>){</a>
-<a class="sourceLine" id="cb66-8" data-line-number="8">    varTab<span class="op">$</span>mutType[k] &lt;-<span class="st"> &quot;SNP&quot;</span></a>
-<a class="sourceLine" id="cb66-9" data-line-number="9">  }<span class="cf">else</span>{</a>
-<a class="sourceLine" id="cb66-10" data-line-number="10">    varTab<span class="op">$</span>mutType[k] &lt;-<span class="st"> &quot;Others&quot;</span>}}</a>
-<a class="sourceLine" id="cb66-11" data-line-number="11"><span class="co">#</span></a>
-<a class="sourceLine" id="cb66-12" data-line-number="12">tbl &lt;-<span class="st"> </span><span class="kw">table</span>(varTab<span class="op">$</span>mutType)</a>
-<a class="sourceLine" id="cb66-13" data-line-number="13">tbl_dat &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(tbl)</a>
-<a class="sourceLine" id="cb66-14" data-line-number="14">tbl</a></code></pre></div>
+<a class="sourceLine" id="cb66-2" data-line-number="2"><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(varTab<span class="op">$</span>variant)) {</a>
+<a class="sourceLine" id="cb66-3" data-line-number="3">    <span class="cf">if</span> (<span class="kw">width</span>(varTab<span class="op">$</span>refBase[k]) <span class="op">&lt;</span><span class="st"> </span><span class="kw">width</span>(varTab<span class="op">$</span>altBase[k])) {</a>
+<a class="sourceLine" id="cb66-4" data-line-number="4">        varTab<span class="op">$</span>mutType[k] &lt;-<span class="st"> &quot;INS&quot;</span></a>
+<a class="sourceLine" id="cb66-5" data-line-number="5">    } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">width</span>(varTab<span class="op">$</span>refBase[k]) <span class="op">&gt;</span><span class="st"> </span><span class="kw">width</span>(varTab<span class="op">$</span>altBase[k])) {</a>
+<a class="sourceLine" id="cb66-6" data-line-number="6">        varTab<span class="op">$</span>mutType[k] &lt;-<span class="st"> &quot;DEL&quot;</span></a>
+<a class="sourceLine" id="cb66-7" data-line-number="7">    } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">width</span>(varTab<span class="op">$</span>refBase[k]) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span><span class="kw">width</span>(varTab<span class="op">$</span>altBase[k]) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb66-8" data-line-number="8">        varTab<span class="op">$</span>mutType[k] &lt;-<span class="st"> &quot;SNP&quot;</span></a>
+<a class="sourceLine" id="cb66-9" data-line-number="9">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb66-10" data-line-number="10">        varTab<span class="op">$</span>mutType[k] &lt;-<span class="st"> &quot;Others&quot;</span></a>
+<a class="sourceLine" id="cb66-11" data-line-number="11">    }</a>
+<a class="sourceLine" id="cb66-12" data-line-number="12">}</a>
+<a class="sourceLine" id="cb66-13" data-line-number="13"><span class="co"># </span></a>
+<a class="sourceLine" id="cb66-14" data-line-number="14">tbl &lt;-<span class="st"> </span><span class="kw">table</span>(varTab<span class="op">$</span>mutType)</a>
+<a class="sourceLine" id="cb66-15" data-line-number="15">tbl_dat &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(tbl)</a>
+<a class="sourceLine" id="cb66-16" data-line-number="16">tbl</a></code></pre></div>
 <pre><code>## 
 ##    DEL    INS Others    SNP 
 ##   4351   3174      5  64714</code></pre>
@@ -2084,7 +2086,7 @@ div.tocify {
 </div>
 <div id="nucleotide-substitution-1" class="section level2">
 <h2>Nucleotide substitution</h2>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" data-line-number="1">varX &lt;-<span class="st"> </span>varTab[varTab<span class="op">$</span>mutType<span class="op">==</span><span class="st">&quot;SNP&quot;</span>,]</a>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" data-line-number="1">varX &lt;-<span class="st"> </span>varTab[varTab<span class="op">$</span>mutType <span class="op">==</span><span class="st"> &quot;SNP&quot;</span>, ]</a>
 <a class="sourceLine" id="cb71-2" data-line-number="2">tbl &lt;-<span class="st"> </span><span class="kw">table</span>(varX<span class="op">$</span>nuSub)</a>
 <a class="sourceLine" id="cb71-3" data-line-number="3">tbl_dat &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(tbl)</a>
 <a class="sourceLine" id="cb71-4" data-line-number="4">tbl</a></code></pre></div>
@@ -2136,14 +2138,14 @@ div.tocify {
 <div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1"><span class="kw">library</span>(BSgenome.Hsapiens.UCSC.hg19)</a>
 <a class="sourceLine" id="cb77-2" data-line-number="2"><span class="kw">library</span>(GenomicFeatures)</a>
 <a class="sourceLine" id="cb77-3" data-line-number="3"><span class="kw">library</span>(stringr)</a>
-<a class="sourceLine" id="cb77-4" data-line-number="4"><span class="co">#</span></a>
-<a class="sourceLine" id="cb77-5" data-line-number="5">rd_idx&lt;-<span class="kw">str_split</span>(<span class="kw">names</span>(rd),<span class="st">&quot;_&quot;</span>, <span class="dt">simplify=</span>T)</a>
-<a class="sourceLine" id="cb77-6" data-line-number="6">rd_idx[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</a></code></pre></div>
+<a class="sourceLine" id="cb77-4" data-line-number="4"><span class="co"># </span></a>
+<a class="sourceLine" id="cb77-5" data-line-number="5">rd_idx &lt;-<span class="st"> </span><span class="kw">str_split</span>(<span class="kw">names</span>(rd), <span class="st">&quot;_&quot;</span>, <span class="dt">simplify =</span> T)</a>
+<a class="sourceLine" id="cb77-6" data-line-number="6">rd_idx[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a></code></pre></div>
 <pre><code>##      [,1]          [,2] 
 ## [1,] &quot;chr1:815337&quot; &quot;G/T&quot;
 ## [2,] &quot;chr1:815341&quot; &quot;G/A&quot;</code></pre>
-<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1">rd_sub &lt;-<span class="st"> </span>rd[rd_idx[,<span class="dv">2</span>]<span class="op">==</span><span class="st">&quot;C/T&quot;</span>]</a>
-<a class="sourceLine" id="cb79-2" data-line-number="2">rd_sub[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</a></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1">rd_sub &lt;-<span class="st"> </span>rd[rd_idx[, <span class="dv">2</span>] <span class="op">==</span><span class="st"> &quot;C/T&quot;</span>]</a>
+<a class="sourceLine" id="cb79-2" data-line-number="2">rd_sub[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a></code></pre></div>
 <pre><code>## GRanges object with 2 ranges and 5 metadata columns:
 ##                   seqnames    ranges strand | paramRangeID            REF
 ##                      &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;
@@ -2202,8 +2204,8 @@ div.tocify {
 <li>APOBEC target: TCW (TCA/TCT)</li>
 </ul>
 <div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb86-1" data-line-number="1"><span class="co"># TCW: TCA/TCT</span></a>
-<a class="sourceLine" id="cb86-2" data-line-number="2">tbl_dat<span class="op">$</span>APOBEC_target &lt;-<span class="st"> </span>tbl_dat<span class="op">$</span>Var1 <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;TCA&quot;</span>,<span class="st">&quot;TCT&quot;</span>)</a>
-<a class="sourceLine" id="cb86-3" data-line-number="3">apobec_dat &lt;-<span class="st"> </span><span class="kw">aggregate</span>(Freq <span class="op">~</span><span class="st"> </span>APOBEC_target,tbl_dat,<span class="dt">FUN=</span>sum,<span class="dt">na.rm=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb86-2" data-line-number="2">tbl_dat<span class="op">$</span>APOBEC_target &lt;-<span class="st"> </span>tbl_dat<span class="op">$</span>Var1 <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;TCA&quot;</span>, <span class="st">&quot;TCT&quot;</span>)</a>
+<a class="sourceLine" id="cb86-3" data-line-number="3">apobec_dat &lt;-<span class="st"> </span><span class="kw">aggregate</span>(Freq <span class="op">~</span><span class="st"> </span>APOBEC_target, tbl_dat, <span class="dt">FUN =</span> sum, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb86-4" data-line-number="4">apobec_dat</a></code></pre></div>
 <pre><code>##   APOBEC_target Freq
 ## 1         FALSE 9046

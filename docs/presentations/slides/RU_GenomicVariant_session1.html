@@ -68,7 +68,7 @@ class: inverse, center, middle
 
 ```r
 library(VariantAnnotation)
-vcf &lt;- readVcf("data/SAMN01882168_filt.vcf.gz","hg19")
+vcf &lt;- readVcf("data/SAMN01882168_filt.vcf.gz", "hg19")
 vcf
 ```
 
@@ -258,7 +258,7 @@ We can use similar accessors to those used for [GRanges](https://rockefelleruniv
 ## Position of the variations
 
 ```r
-as.vector(seqnames(rd)[1:2]) # Chromosome
+as.vector(seqnames(rd)[1:2])  # Chromosome
 ```
 
 ```
@@ -266,7 +266,7 @@ as.vector(seqnames(rd)[1:2]) # Chromosome
 ```
 
 ```r
-start(rd)[1:2] # Start position
+start(rd)[1:2]  # Start position
 ```
 
 ```
@@ -274,7 +274,7 @@ start(rd)[1:2] # Start position
 ```
 
 ```r
-end(rd)[1:2] # End position
+end(rd)[1:2]  # End position
 ```
 
 ```
@@ -313,7 +313,7 @@ The *alt()* function can be used to get the alternative allele for a variant. Th
 
 ```r
 altBase &lt;- alt(vcf)
-alt(vcf)[1:2] 
+alt(vcf)[1:2]
 ```
 
 ```
@@ -328,7 +328,7 @@ alt(vcf)[1:2]
 
 ```r
 # get the 1st vector of the list
-altBase &lt;- lapply(altBase,`[[`,1) 
+altBase &lt;- lapply(altBase, `[[`, 1)
 altBase[1:2]
 ```
 
@@ -344,7 +344,7 @@ altBase[1:2]
 - Convert DNAString object to character
 
 ```r
-altBase &lt;- unlist(lapply(altBase,as.character)) 
+altBase &lt;- unlist(lapply(altBase, as.character))
 altBase[1:2]
 ```
 
@@ -359,7 +359,7 @@ altBase[1:2]
 - All information is stored as a ***data frame***
 
 ```r
-info(header(vcf))[1:2,]
+info(header(vcf))[1:2, ]
 ```
 
 ```
@@ -379,7 +379,7 @@ info(header(vcf))[1:2,]
 By calling *info()* directly on the whole VCF object, we get information for every variant.
 
 ```r
-info(vcf)[1:2,]
+info(vcf)[1:2, ]
 ```
 
 ```
@@ -407,7 +407,7 @@ info(vcf)[1:2,]
 - Separated by individual samples
 
 ```r
-geno(header(vcf))[1:2,]
+geno(header(vcf))[1:2, ]
 ```
 
 ```
@@ -427,7 +427,7 @@ geno(header(vcf))[1:2,]
 By calling *geno()* directly on the whole VCF object, we get information for every variant.
 
 ```r
-paste0("GT: ",geno(header(vcf))[1,3])
+paste0("GT: ", geno(header(vcf))[1, 3])
 ```
 
 ```
@@ -436,7 +436,7 @@ paste0("GT: ",geno(header(vcf))[1,3])
 
 ```r
 matGT &lt;- geno(vcf)$GT
-matGT[1:2,]
+matGT[1:2, ]
 ```
 
 ```
@@ -480,7 +480,7 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ## Depth for each sample (DP)
 
 ```r
-paste0("DP: ",geno(header(vcf))[3,3])
+paste0("DP: ", geno(header(vcf))[3, 3])
 ```
 
 ```
@@ -489,7 +489,7 @@ paste0("DP: ",geno(header(vcf))[3,3])
 
 ```r
 matDP &lt;- geno(vcf)$DP
-matDP[1:2,]
+matDP[1:2, ]
 ```
 
 ```
@@ -532,7 +532,7 @@ ggplot(as.data.frame(matDP),aes(x=SAMN01882168))+geom_histogram()+
 - Expressed as [Phred quality score](https://gatk.broadinstitute.org/hc/en-us/articles/360035531872-Phred-scaled-quality-scores)
 
 ```r
-paste0("GQ: ",geno(header(vcf))[4,3])
+paste0("GQ: ", geno(header(vcf))[4, 3])
 ```
 
 ```
@@ -541,7 +541,7 @@ paste0("GQ: ",geno(header(vcf))[4,3])
 
 ```r
 matGQ &lt;- geno(vcf)$GQ
-matGQ[1:2,]
+matGQ[1:2, ]
 ```
 
 ```
@@ -638,8 +638,8 @@ varTab2 &lt;- data.frame(variant=names(rd)[names(rd) %in% var_2],
 ## Merged datatable
 
 ```r
-varTab &lt;- rbind(varTab1,varTab2)
-varTab[1:2,]
+varTab &lt;- rbind(varTab1, varTab2)
+varTab[1:2, ]
 ```
 
 ```
@@ -663,16 +663,18 @@ varTab[1:2,]
 
 ```r
 # differentiate SNP/INS/DEL/Others
-for(k in 1:length(varTab$variant)){
-  if(width(varTab$refBase[k]) &lt; width(varTab$altBase[k])){
-    varTab$mutType[k] &lt;- "INS"
-  }else if(width(varTab$refBase[k]) &gt; width(varTab$altBase[k])){
-    varTab$mutType[k] &lt;- "DEL"
-  }else if(width(varTab$refBase[k])==1&amp;width(varTab$altBase[k])==1){
-    varTab$mutType[k] &lt;- "SNP"
-  }else{
-    varTab$mutType[k] &lt;- "Others"}}
-#
+for (k in 1:length(varTab$variant)) {
+    if (width(varTab$refBase[k]) &lt; width(varTab$altBase[k])) {
+        varTab$mutType[k] &lt;- "INS"
+    } else if (width(varTab$refBase[k]) &gt; width(varTab$altBase[k])) {
+        varTab$mutType[k] &lt;- "DEL"
+    } else if (width(varTab$refBase[k]) == 1 &amp; width(varTab$altBase[k]) == 1) {
+        varTab$mutType[k] &lt;- "SNP"
+    } else {
+        varTab$mutType[k] &lt;- "Others"
+    }
+}
+# 
 tbl &lt;- table(varTab$mutType)
 tbl_dat &lt;- as.data.frame(tbl)
 tbl
@@ -731,7 +733,7 @@ varTab[1:2,]
 ## Nucleotide substitution
 
 ```r
-varX &lt;- varTab[varTab$mutType=="SNP",]
+varX &lt;- varTab[varTab$mutType == "SNP", ]
 tbl &lt;- table(varX$nuSub)
 tbl_dat &lt;- as.data.frame(tbl)
 tbl
@@ -807,9 +809,9 @@ One such example is APOBEC, a deaminase leading to C&gt;T substitutions in the m
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(GenomicFeatures)
 library(stringr)
-#
-rd_idx&lt;-str_split(names(rd),"_", simplify=T)
-rd_idx[1:2,]
+# 
+rd_idx &lt;- str_split(names(rd), "_", simplify = T)
+rd_idx[1:2, ]
 ```
 
 ```
@@ -819,8 +821,8 @@ rd_idx[1:2,]
 ```
 
 ```r
-rd_sub &lt;- rd[rd_idx[,2]=="C/T"]
-rd_sub[1:2,]
+rd_sub &lt;- rd[rd_idx[, 2] == "C/T"]
+rd_sub[1:2, ]
 ```
 
 ```
@@ -898,8 +900,8 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 
 ```r
 # TCW: TCA/TCT
-tbl_dat$APOBEC_target &lt;- tbl_dat$Var1 %in% c("TCA","TCT")
-apobec_dat &lt;- aggregate(Freq ~ APOBEC_target,tbl_dat,FUN=sum,na.rm=TRUE)
+tbl_dat$APOBEC_target &lt;- tbl_dat$Var1 %in% c("TCA", "TCT")
+apobec_dat &lt;- aggregate(Freq ~ APOBEC_target, tbl_dat, FUN = sum, na.rm = TRUE)
 apobec_dat
 ```
 

@@ -114,7 +114,7 @@ all_snps
 
 ```r
 tar_chr &lt;- as.vector(seqnames(rd_chr1)@values)
-my_snps &lt;- snpsBySeqname(all_snps,c(tar_chr))
+my_snps &lt;- snpsBySeqname(all_snps, c(tar_chr))
 ```
 &lt;img src="imgs/vcfMan_fig5r.png" width="75%" style="display: block; margin: auto;" /&gt;
 
@@ -209,9 +209,9 @@ Lets first grab all SNPs that are on Chr1. Though there are simpler ways to do t
 
 ```r
 tar_chr &lt;- as.vector(seqnames(rd_chr1)@values)
-tar_chr &lt;- gsub("chr","",tar_chr)
-tar_chr[grepl(tar_chr,pattern = "M")] &lt;- "MT"
-my_snps &lt;- snpsBySeqname(all_snps,c(tar_chr))
+tar_chr &lt;- gsub("chr", "", tar_chr)
+tar_chr[grepl(tar_chr, pattern = "M")] &lt;- "MT"
+my_snps &lt;- snpsBySeqname(all_snps, c(tar_chr))
 my_snps[1:2]
 ```
 
@@ -243,9 +243,8 @@ We can extract out information about the SNPs to generate a reference data.frame
 - rsID: rsID from dbSNP 
 
 ```r
-snp_ID &lt;- data.frame(
-  posIDX=paste0(seqnames(my_snps),":",pos(my_snps)),
-  rsID=my_snps$RefSNP_id,stringsAsFactors = FALSE)
+snp_ID &lt;- data.frame(posIDX = paste0(seqnames(my_snps), ":", pos(my_snps)), rsID = my_snps$RefSNP_id, 
+    stringsAsFactors = FALSE)
 head(snp_ID)
 ```
 
@@ -264,14 +263,14 @@ head(snp_ID)
 Next we will reformat our variant information into a data.frame with our fields of interest. To do this we will have to break up the Variant strings. 
 
 ```r
-matV1 &lt;- data.frame(Variant=names(rd_chr1),stringsAsFactors = FALSE)
-matV1$chromosome &lt;- gsub("(.*):(.*)_(.*)/(.*)","\\1",matV1$Variant)
-matV1$start &lt;- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
-matV1$end &lt;- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
-matV1$ref_allele &lt;- gsub("(.*):(.*)_(.*)/(.*)","\\3",matV1$Variant)
-matV1$alt_allele &lt;- gsub("(.*):(.*)_(.*)/(.*)","\\4",matV1$Variant)
-matV1$posIDX &lt;- gsub("(.*)_(.*)","\\1",matV1$Variant)
-matV1[1:2,]
+matV1 &lt;- data.frame(Variant = names(rd_chr1), stringsAsFactors = FALSE)
+matV1$chromosome &lt;- gsub("(.*):(.*)_(.*)/(.*)", "\\1", matV1$Variant)
+matV1$start &lt;- gsub("(.*):(.*)_(.*)/(.*)", "\\2", matV1$Variant)
+matV1$end &lt;- gsub("(.*):(.*)_(.*)/(.*)", "\\2", matV1$Variant)
+matV1$ref_allele &lt;- gsub("(.*):(.*)_(.*)/(.*)", "\\3", matV1$Variant)
+matV1$alt_allele &lt;- gsub("(.*):(.*)_(.*)/(.*)", "\\4", matV1$Variant)
+matV1$posIDX &lt;- gsub("(.*)_(.*)", "\\1", matV1$Variant)
+matV1[1:2, ]
 ```
 
 ```
@@ -385,7 +384,7 @@ txdb
 We can run the **predictcoding()** function by providing our VCF object. It will use the Ranges contained within it, to look within a TxDb object. 
 
 ```r
-coding &lt;- predictCoding(vcf_chr1, txdb, seqSource=Hsapiens)
+coding &lt;- predictCoding(vcf_chr1, txdb, seqSource = Hsapiens)
 ```
 
 ```
@@ -451,7 +450,7 @@ matA &lt;- dplyr::select(matA,-Protein_posi,-ref_AA,-alt_AA)
 ## Annotation table ~ Amino Acid Changes
 
 ```r
-matA[1:2,]
+matA[1:2, ]
 ```
 
 ```
@@ -467,9 +466,8 @@ matA[1:2,]
 ## How many variations in coding region
 
 ```r
-var_in_coding &lt;- data.frame(varName=names(vcf_chr1),
-                            in_coding=names(vcf_chr1) %in% matA$Variant,
-                            stringsAsFactors = FALSE)
+var_in_coding &lt;- data.frame(varName = names(vcf_chr1), in_coding = names(vcf_chr1) %in% 
+    matA$Variant, stringsAsFactors = FALSE)
 table(var_in_coding$in_coding)
 ```
 
@@ -515,9 +513,9 @@ ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ## Integrate SNP and amino acid change into single table
 
 ```r
-matS$GeneID &lt;- matA$GeneID[match(matS$Variant,matA$Variant)]
-matS$AAChange &lt;- matA$GeneID[match(matS$Variant,matA$Variant)]
-matS[1:2,]
+matS$GeneID &lt;- matA$GeneID[match(matS$Variant, matA$Variant)]
+matS$AAChange &lt;- matA$GeneID[match(matS$Variant, matA$Variant)]
+matS[1:2, ]
 ```
 
 ```
