@@ -145,7 +145,7 @@ melt_dat[1:3,]
 ## Mutation classes in each sample
 - convert into table for ggplot
 - proportion: count of mutation / total mutations for each sample
-```{r}
+```{r mult_samSumPlot_advan15}
 melt_dat$totalVar <- var_to[match(melt_dat$Tumor_Sample_Barcode,names(var_to))]
 melt_dat$prop <- melt_dat$value / melt_dat$totalVar
 head(melt_dat)
@@ -300,9 +300,7 @@ if(params$isSlides == "yes"){
 
 ```
 
----
-## [Mutational signatures](https://cancer.sanger.ac.uk/cosmic/signatures)
-Mutational signature means a patterrn of trinucleotide substitution. As mentioned in [session 1](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session1.html#44), the pattern may reflect to exposure of spontaneous/enzymatic deamination and defect of DNA repair, etc.  
+[Mutational signatures](https://cancer.sanger.ac.uk/cosmic/signatures) mean the patterrns of trinucleotide substitution. As mentioned in [session 1](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session1.html#44), the pattern may reflect to exposure of spontaneous/enzymatic deamination and defect of DNA repair, etc.  
 
 This is another common area of study for cancer and genome integrity research.
 
@@ -354,8 +352,13 @@ laml.tnm$nmf_matrix[1,]
 ## Trinucleotide pattern in TCGA-AB-3009
 Lets focus on a single sample
 ```{r mult_mutSig_triMutPat_advan1}
-yd <- data.frame(triNuc=colnames(laml.tnm$nmf_matrix),
-                 count=laml.tnm$nmf_matrix['TCGA-AB-3009',],
+tarSam_triNuc <- laml.tnm$nmf_matrix['TCGA-AB-3009',]
+tarSam_triNuc[1:2]
+```
+
+```{r mult_mutSig_triMutPat_advan2}
+yd <- data.frame(triNuc=names(tarSam_triNuc),
+                 count=tarSam_triNuc,
                  stringsAsFactors = FALSE)
 yd$cat <- gsub("(.*)\\[(.*)\\](.*)","\\2",yd$triNuc)
 yd$num <- seq(1,length(yd$triNuc))
@@ -363,7 +366,7 @@ yd$num <- seq(1,length(yd$triNuc))
 
 ---
 ## Trinucleotide pattern in TCGA-AB-3009
-```{r mult_mutSig_triMutPat_advan2,eval=FALSE,echo=TRUE,tidy=FALSE}
+```{r mult_mutSig_triMutPat_advan3,eval=FALSE,echo=TRUE,tidy=FALSE}
 ggplot(yd,aes(x=num,y=count,fill=cat))+
   geom_bar(stat='identity')+
   labs(x="",y="Counts",fill="")+
@@ -372,7 +375,7 @@ ggplot(yd,aes(x=num,y=count,fill=cat))+
 
 ---
 ## Trinucleotide pattern in TCGA-AB-3009
-```{r mult_mutSig_triMutPat_advan3,eval=TRUE,echo=FALSE,tidy=FALSE,fig.align="center"}
+```{r mult_mutSig_triMutPat_advan4,eval=TRUE,echo=FALSE,tidy=FALSE,fig.align="center"}
 ggplot(yd,aes(x=num,y=count,fill=cat))+geom_bar(stat='identity')+
   labs(x="",y="Counts",fill="")+theme(axis.text.x=element_blank())
 ```
@@ -380,6 +383,7 @@ ggplot(yd,aes(x=num,y=count,fill=cat))+geom_bar(stat='identity')+
 
 ---
 ## Estimate number of signatures
+In this step, [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation), ***which represents how faithfully a clustering results represent the original data***, would be used to estimate how many signatures could be identified in this dataset. 
 ```{r mult_mutSig_sigEst_advan1,eval=FALSE,echo=TRUE,tidy=FALSE}
 library('NMF')
 laml.sign <- estimateSignatures(mat = laml.tnm,
@@ -387,8 +391,6 @@ laml.sign <- estimateSignatures(mat = laml.tnm,
                                 pConstant = 0.1,
                                 parallel = 1)
 ```
-- [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation)
-- Measure of how faithfully a clustering results represent the original data.
 
 ---
 ## Estimate number of signautres

@@ -199,6 +199,10 @@ head(snp_ID)
 Next we will reformat our variant information into a data.frame with our fields of interest. To do this we will have to break up the Variant strings. 
 ```{r dbSNPV_varMan_tbl_1}
 matV1 <- data.frame(Variant=names(rd_chr1),stringsAsFactors = FALSE)
+matV1[1:2,]
+```
+- Extract information of variants
+```{r dbSNPV_varMan_tbl_2}
 matV1$chromosome <- gsub("(.*):(.*)_(.*)/(.*)","\\1",matV1$Variant)
 matV1$start <- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
 matV1$end <- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
@@ -216,6 +220,7 @@ matS <- merge(matV1,snp_ID,all.x=TRUE,by="posIDX")
 matS <- dplyr::select(matS,-posIDX)
 matS[1:2,]
 ```
+***dplyr::select*** is used to select or remove specific columns in a data frame.
 
 ---
 ## How many variations in dbSNP
