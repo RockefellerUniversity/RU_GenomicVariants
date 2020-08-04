@@ -83,7 +83,7 @@ melt_dat <- reshape2::melt(sample_sum, id="Tumor_Sample_Barcode")
 melt_dat[1:3,]
 
 
-## -----------------------------------------------------------------------------
+## ----mult_samSumPlot_advan15--------------------------------------------------
 melt_dat$totalVar <- var_to[match(melt_dat$Tumor_Sample_Barcode,names(var_to))]
 melt_dat$prop <- melt_dat$value / melt_dat$totalVar
 head(melt_dat)
@@ -218,21 +218,26 @@ laml.tnm$nmf_matrix[1,]
 
 
 ## ----mult_mutSig_triMutPat_advan1---------------------------------------------
-yd <- data.frame(triNuc=colnames(laml.tnm$nmf_matrix),
-                 count=laml.tnm$nmf_matrix['TCGA-AB-3009',],
+tarSam_triNuc <- laml.tnm$nmf_matrix['TCGA-AB-3009',]
+tarSam_triNuc[1:2]
+
+
+## ----mult_mutSig_triMutPat_advan2---------------------------------------------
+yd <- data.frame(triNuc=names(tarSam_triNuc),
+                 count=tarSam_triNuc,
                  stringsAsFactors = FALSE)
 yd$cat <- gsub("(.*)\\[(.*)\\](.*)","\\2",yd$triNuc)
 yd$num <- seq(1,length(yd$triNuc))
 
 
-## ----mult_mutSig_triMutPat_advan2,eval=FALSE,echo=TRUE,tidy=FALSE-------------
+## ----mult_mutSig_triMutPat_advan3,eval=FALSE,echo=TRUE,tidy=FALSE-------------
 ## ggplot(yd,aes(x=num,y=count,fill=cat))+
 ##   geom_bar(stat='identity')+
 ##   labs(x="",y="Counts",fill="")+
 ##   theme(axis.text.x=element_blank())
 
 
-## ----mult_mutSig_triMutPat_advan3,eval=TRUE,echo=FALSE,tidy=FALSE,fig.align="center"----
+## ----mult_mutSig_triMutPat_advan4,eval=TRUE,echo=FALSE,tidy=FALSE,fig.align="center"----
 ggplot(yd,aes(x=num,y=count,fill=cat))+geom_bar(stat='identity')+
   labs(x="",y="Counts",fill="")+theme(axis.text.x=element_blank())
 

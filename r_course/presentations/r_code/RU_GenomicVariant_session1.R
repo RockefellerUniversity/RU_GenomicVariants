@@ -233,25 +233,47 @@ if(params$isSlides == "yes"){
 
 
 ## ----gatGT_info1,echo=TRUE,tidy=FALSE-----------------------------------------
-var_2 <- rownames(geno(vcf)$GT)[geno(vcf)$GT=="1/2"]
-varTab1 <- data.frame(variant=names(rd)[!names(rd) %in% var_2],
-                      chr=as.vector(seqnames(rd)[!names(rd) %in% var_2]),
-                      start=start(rd)[!names(rd) %in% var_2],
-                      end=end(rd)[!names(rd) %in% var_2],
-                      refBase=as.character(ref(vcf)[!rownames(vcf) %in% var_2]),
-                      altBase=unlist(lapply(lapply(
-                        alt(vcf)[!rownames(vcf) %in% var_2],`[[`,1),as.character)),
-                      refCount=unlist(lapply(
-                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,1)),
-                      altCount=unlist(lapply(
-                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,2)),
-                      genoType=geno(vcf)$GT[!rownames(geno(vcf)$GT) %in% var_2],
-                      gtQuality=geno(vcf)$GQ[!rownames(geno(vcf)$GQ) %in% var_2],
-                      stringsAsFactors = FALSE)
+var_1 <- rownames(geno(vcf)$GT)[
+  geno(vcf)$GT=="0/1" | 
+    geno(vcf)$GT=="1/1"]
 
 
 ## ----gatGT_info2,echo=TRUE,tidy=FALSE-----------------------------------------
+varTab1 <- data.frame(variant=names(rd)[names(rd) %in% var_1],
+                      chr=as.vector(seqnames(rd)[names(rd) %in% var_1]),
+                      start=start(rd)[names(rd) %in% var_1],
+                      end=end(rd)[names(rd) %in% var_1],
+                      stringsAsFactors = FALSE)
 
+
+## ----gatGT_info3,echo=TRUE,tidy=FALSE-----------------------------------------
+ref_base <- ref(vcf)[rownames(vcf) %in% var_1]
+ref_base[1:2]
+varTab1$refBase <- as.character(ref_base)
+
+
+## ----gatGT_info4,echo=TRUE,tidy=FALSE-----------------------------------------
+alt_base <- lapply(alt(vcf)[rownames(vcf) %in% var_1],`[[`,1)
+alt_base[1]
+alt_base <- lapply(alt_base,as.character)
+alt_base[1]
+varTab1$altBase <- unlist(alt_base)
+
+
+## ----gatGT_info5,echo=TRUE,tidy=FALSE-----------------------------------------
+adCount <- geno(vcf)$AD[rownames(geno(vcf)$AD) %in% var_1]
+adCount[1]
+varTab1$refCount <- unlist(lapply(adCount,`[[`,1))
+varTab1$altCount <- unlist(lapply(adCount,`[[`,2))
+
+
+## ----gatGT_info6,echo=TRUE,tidy=FALSE-----------------------------------------
+varTab1$genoType <- geno(vcf)$GT[rownames(geno(vcf)$GT) %in% var_1]
+varTab1$gtQuality <- geno(vcf)$GQ[rownames(geno(vcf)$GQ) %in% var_1]
+
+
+## ----gatGT_info7,echo=TRUE,tidy=FALSE-----------------------------------------
+var_2 <- rownames(geno(vcf)$GT)[geno(vcf)$GT=="1/2"]
 varTab2 <- data.frame(variant=names(rd)[names(rd) %in% var_2],
                       chr=as.vector(seqnames(rd)[names(rd) %in% var_2]),
                       start=start(rd)[names(rd) %in% var_2],

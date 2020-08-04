@@ -105,7 +105,7 @@ laml &lt;- read.maf("data/tcga_laml.maf.gz")
 ## -Summarizing
 ## -Processing clinical data
 ## --Missing clinical data
-## -Finished in 0.420s elapsed (0.364s cpu)
+## -Finished in 4.659s elapsed (4.525s cpu)
 ```
 
 ```r
@@ -335,9 +335,7 @@ class: inverse, center, middle
 
 ---
 
----
-## [Mutational signatures](https://cancer.sanger.ac.uk/cosmic/signatures)
-Mutational signature means a patterrn of trinucleotide substitution. As mentioned in [session 1](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session1.html#44), the pattern may reflect to exposure of spontaneous/enzymatic deamination and defect of DNA repair, etc.  
+[Mutational signatures](https://cancer.sanger.ac.uk/cosmic/signatures) mean the patterrns of trinucleotide substitution. As mentioned in [session 1](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session1.html#44), the pattern may reflect to exposure of spontaneous/enzymatic deamination and defect of DNA repair, etc.  
 
 This is another common area of study for cancer and genome integrity research.
 
@@ -430,8 +428,18 @@ laml.tnm$nmf_matrix[1, ]
 Lets focus on a single sample
 
 ```r
-yd &lt;- data.frame(triNuc = colnames(laml.tnm$nmf_matrix), count = laml.tnm$nmf_matrix["TCGA-AB-3009", 
-    ], stringsAsFactors = FALSE)
+tarSam_triNuc &lt;- laml.tnm$nmf_matrix["TCGA-AB-3009", ]
+tarSam_triNuc[1:2]
+```
+
+```
+## A[C&gt;A]A A[C&gt;A]C 
+##       1       1
+```
+
+
+```r
+yd &lt;- data.frame(triNuc = names(tarSam_triNuc), count = tarSam_triNuc, stringsAsFactors = FALSE)
 yd$cat &lt;- gsub("(.*)\\[(.*)\\](.*)", "\\2", yd$triNuc)
 yd$num &lt;- seq(1, length(yd$triNuc))
 ```
@@ -448,11 +456,12 @@ ggplot(yd,aes(x=num,y=count,fill=cat))+
 
 ---
 ## Trinucleotide pattern in TCGA-AB-3009
-&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_triMutPat_advan3-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_triMutPat_advan4-1.png" style="display: block; margin: auto;" /&gt;
 **What does this pattern mean?**
 
 ---
 ## Estimate number of signatures
+In this step, [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation), ***which represents how faithfully a clustering results represent the original data***, would be used to estimate how many signatures could be identified in this dataset. 
 
 ```r
 library('NMF')
@@ -461,8 +470,6 @@ laml.sign &lt;- estimateSignatures(mat = laml.tnm,
                                 pConstant = 0.1,
                                 parallel = 1)
 ```
-- [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation)
-- Measure of how faithfully a clustering results represent the original data.
 
 ---
 ## Estimate number of signautres

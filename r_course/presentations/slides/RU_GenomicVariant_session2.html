@@ -264,6 +264,15 @@ Next we will reformat our variant information into a data.frame with our fields 
 
 ```r
 matV1 &lt;- data.frame(Variant = names(rd_chr1), stringsAsFactors = FALSE)
+matV1[1:2, ]
+```
+
+```
+## [1] "chr1:815337_G/T" "chr1:815341_G/A"
+```
+- Extract information of variants
+
+```r
 matV1$chromosome &lt;- gsub("(.*):(.*)_(.*)/(.*)", "\\1", matV1$Variant)
 matV1$start &lt;- gsub("(.*):(.*)_(.*)/(.*)", "\\2", matV1$Variant)
 matV1$end &lt;- gsub("(.*):(.*)_(.*)/(.*)", "\\2", matV1$Variant)
@@ -297,6 +306,7 @@ matS[1:2,]
 ## 1 rs520644
 ## 2     &lt;NA&gt;
 ```
+***dplyr::select*** is used to select or remove specific columns in a data frame.
 
 ---
 ## How many variations in dbSNP

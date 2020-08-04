@@ -117,6 +117,10 @@ head(snp_ID)
 
 ## ----dbSNPV_varMan_tbl_1------------------------------------------------------
 matV1 <- data.frame(Variant=names(rd_chr1),stringsAsFactors = FALSE)
+matV1[1:2,]
+
+
+## ----dbSNPV_varMan_tbl_2------------------------------------------------------
 matV1$chromosome <- gsub("(.*):(.*)_(.*)/(.*)","\\1",matV1$Variant)
 matV1$start <- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
 matV1$end <- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)

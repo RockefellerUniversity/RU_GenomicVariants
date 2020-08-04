@@ -31,11 +31,14 @@ class: center, middle, inverse, title-slide
 ## About this session
 Variant Call Format (VCF) is widely used file format to record genomic variants. We introduced the VCF file format in [previous section](rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#35). In this session, we want to demonstrate how to manipulate VCF file with [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html).
 
-We will be using a study on `\(\alpha\)`-Thalassemia from Wei Wangs group at BGI-Shenzhen as our dataset in this session:
-- Raw data from SRA: [PRJNA185252](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA185252)
-- References: Ge H et al, Plos ONE (2013), 8(6):e67464 [LINK](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3696090/)
-- Variant calling procedure follows [GATK Best Practice](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
+We will be using a study on bladder cancer from Wei Wangs group at BGI-Shenzhen as our dataset in this session:
+- Raw data from SRA: [PRJNA185252](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA185252) [LINK](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3696090/)
 - Reference genome: [BSgenome.Hsapiens.UCSC.hg19](https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg19.html)
+- Variant calling procedure is based on [GATK Best Practice](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
+  + Align to reference genome: [Burrows-Wheeler Aligner](http://bio-bwa.sourceforge.net/bwa.shtml), bwa-mem
+  + Sort and remove duplicates: [Picard-tools](http://broadinstitute.github.io/picard/command-line-overview.html), [SortSam](https://broadinstitute.github.io/picard/command-line-overview.html#SortSam)/[MarkDuplicates](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates)
+  + Recalibrate Base Quality Scores: [GATK](https://gatk.broadinstitute.org/hc/en-us/articles/360036433132--Tool-Documentation-Index), [BaseRecalibrator](https://gatk.broadinstitute.org/hc/en-us/articles/360036434532-BaseRecalibrator)/[ApplyBQSR](https://gatk.broadinstitute.org/hc/en-us/articles/360036433652-ApplyBQSR)
+  + Variant Calling: [GATK](https://gatk.broadinstitute.org/hc/en-us/articles/360036433132--Tool-Documentation-Index), [HaplotypeCaller](https://gatk.broadinstitute.org/hc/en-us/articles/360036803991-HaplotypeCaller)/[GenotypeGVCFs](https://gatk.broadinstitute.org/hc/en-us/articles/360036806011-GenotypeGVCFs)
 - Demo data: SAMN01882168 ("data/SAMN01882168_filt.vcf.gz")
 
 ---
@@ -245,7 +248,7 @@ rd[1:2]
 ##   -------
 ##   seqinfo: 25 sequences from hg19 genome
 ```
-***It's not a strand-specific library. This is indictaed by the *, which means unstranded. ***
+***It's not a strand-specific library. This is indictaed by the \*, which means unstranded. ***
 
 ---
 ## Retrieving variation information
@@ -517,6 +520,7 @@ ggplot(as.data.frame(matDP),aes(x=SAMN01882168))+geom_histogram()+
   scale_x_log10()+
   theme_classic()
 ```
+
 ---
 ## DP Distribution
 
@@ -588,27 +592,100 @@ class: inverse, center, middle
 
 ---
 
+## Gathering information ~ GT 0/1 and 1/1
+- select variants with GT 0/1 or 1/1
 
-## Gathering information ~ genotype 0/1 and 1/1
+```r
+var_1 &lt;- rownames(geno(vcf)$GT)[
+  geno(vcf)$GT=="0/1" | 
+    geno(vcf)$GT=="1/1"]
+```
+- Extract variant information
+
+```r
+varTab1 &lt;- data.frame(variant=names(rd)[names(rd) %in% var_1],
+                      chr=as.vector(seqnames(rd)[names(rd) %in% var_1]),
+                      start=start(rd)[names(rd) %in% var_1],
+                      end=end(rd)[names(rd) %in% var_1],
+                      stringsAsFactors = FALSE)
+```
+
+---
+## Gathering information ~ GT 0/1 and 1/1
 - Ref alleles are retrieved from ref(vcf)
+
+```r
+ref_base &lt;- ref(vcf)[rownames(vcf) %in% var_1]
+ref_base[1:2]
+```
+
+```
+## DNAStringSet object of length 2:
+##     width seq
+## [1]     1 G
+## [2]     1 G
+```
+
+```r
+varTab1$refBase &lt;- as.character(ref_base)
+```
+
+---
+## Gathering information ~ GT 0/1 and 1/1
 - Alt alleles are retrieved from alt(vcf)
 
 ```r
-var_2 &lt;- rownames(geno(vcf)$GT)[geno(vcf)$GT=="1/2"]
-varTab1 &lt;- data.frame(variant=names(rd)[!names(rd) %in% var_2],
-                      chr=as.vector(seqnames(rd)[!names(rd) %in% var_2]),
-                      start=start(rd)[!names(rd) %in% var_2],
-                      end=end(rd)[!names(rd) %in% var_2],
-                      refBase=as.character(ref(vcf)[!rownames(vcf) %in% var_2]),
-                      altBase=unlist(lapply(lapply(
-                        alt(vcf)[!rownames(vcf) %in% var_2],`[[`,1),as.character)),
-                      refCount=unlist(lapply(
-                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,1)),
-                      altCount=unlist(lapply(
-                        geno(vcf)$AD[!rownames(geno(vcf)$AD) %in% var_2],`[[`,2)),
-                      genoType=geno(vcf)$GT[!rownames(geno(vcf)$GT) %in% var_2],
-                      gtQuality=geno(vcf)$GQ[!rownames(geno(vcf)$GQ) %in% var_2],
-                      stringsAsFactors = FALSE)
+alt_base &lt;- lapply(alt(vcf)[rownames(vcf) %in% var_1],`[[`,1)
+alt_base[1]
+```
+
+```
+## [[1]]
+## 1-letter DNAString object
+## seq: T
+```
+
+```r
+alt_base &lt;- lapply(alt_base,as.character)
+alt_base[1]
+```
+
+```
+## [[1]]
+## [1] "T"
+```
+
+```r
+varTab1$altBase &lt;- unlist(alt_base)
+```
+
+---
+## Gathering information ~ GT 0/1 and 1/1
+- Extract counts from AD
+
+```r
+adCount &lt;- geno(vcf)$AD[rownames(geno(vcf)$AD) %in% var_1]
+adCount[1]
+```
+
+```
+## [[1]]
+## [1] 8 3
+```
+
+```r
+varTab1$refCount &lt;- unlist(lapply(adCount,`[[`,1))
+varTab1$altCount &lt;- unlist(lapply(adCount,`[[`,2))
+```
+
+---
+## Gathering information ~ GT 0/1 and 1/1
+- genoType: genotype (GT)
+- gtQuality: genotyping quality (GQ)
+
+```r
+varTab1$genoType &lt;- geno(vcf)$GT[rownames(geno(vcf)$GT) %in% var_1]
+varTab1$gtQuality &lt;- geno(vcf)$GQ[rownames(geno(vcf)$GQ) %in% var_1]
 ```
 
 ---
@@ -617,6 +694,7 @@ varTab1 &lt;- data.frame(variant=names(rd)[!names(rd) %in% var_2],
 - Both ref allele and alt allele have to be retrieved from alt(vcf)
 
 ```r
+var_2 &lt;- rownames(geno(vcf)$GT)[geno(vcf)$GT=="1/2"]
 varTab2 &lt;- data.frame(variant=names(rd)[names(rd) %in% var_2],
                       chr=as.vector(seqnames(rd)[names(rd) %in% var_2]),
                       start=start(rd)[names(rd) %in% var_2],
@@ -800,7 +878,7 @@ class: inverse, center, middle
 ## Trinucleotide motif analysis
 Other constraints may bias nucleotide transitions. One of these is the trinucleotide motif around the variant (from -1 to +1). This pattern could reflect different causes for the mutations.  
 
-One such example is APOBEC, a deaminase leading to C&gt;T substitutions in the motif ***T[C&gt;T]W***. So, the proportion of T[C&gt;T]W in overall C&gt;T substitutions could reflect to APOBEC activity. More applications of the trinucleotide motifs will be discussed in [session3](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session3.html#19).
+One such example is APOBEC, a deaminase leading to C&gt;T substitutions in the motif ***T[C&gt;T]W***. So, the proportion of ***T[C&gt;T]W*** in overall C&gt;T substitutions could reflect to APOBEC activity. More applications of the trinucleotide motifs will be discussed in [session3](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session3.html#19).
 
 ---
 ## Extract C&gt;T substituion
