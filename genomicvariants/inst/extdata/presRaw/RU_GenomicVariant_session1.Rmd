@@ -164,7 +164,7 @@ The variant information is recorded in a VRange object. This is a form of [GRang
 rd <- rowRanges(vcf)
 rd[1:2]
 ```
-***It's not a strand-specific library. This is indictaed by the \*, which means unstranded. ***
+***It's not a strand-specific library. This is indicated by the \*, which means unstranded. ***
 
 ---
 ## Retrieving variation information

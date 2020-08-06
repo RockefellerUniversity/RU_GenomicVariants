@@ -40,13 +40,13 @@ vcf <- readVcf(vcf_file,"hg19")
 rd <- rowRanges(vcf)
 ```
 
-2. Please extract the genotype field  and explain the abbreviations
+2. Please extract the genotype field and explain the abbreviations
 
 ```{r genoInfo, eval=TRUE, echo=toMessage}
 geno(header(vcf))
 ```
 
-3. Please calculate the incidance of mutation occurce in each chromosome.
+3. Please calculate the incidence of mutation occurence in each chromosome.
   - Incidence: variant per kilobase
   - Chromosome length in reference genome: ***seqlengths()***
   - Variants per chromosome: ***table(seqnames())***
@@ -70,14 +70,14 @@ ggplot(var_leng_dat,aes(x=reorder(chr,-incidence),y=incidence,label=chr))+
   theme(axis.text.x=element_blank())
 ```
 
-4. Substract variants in Chr21
+4. Subset to just the variants on Chr21.
 
 ```{r subVCF, eval=TRUE, echo=toMessage}
 rd_sub <- rd[seqnames(rd) == "chr21"]
 vcf_sub <- vcf[names(rd_sub)]
 ```
 
-5. Extract GT information from vcf subset and make barchart to describe variant number in each genotype
+5. Extract GT information from VCF subset and make a barchart to describe the variant number in each genotype.
 
 ```{r extGT, eval=TRUE, echo=toMessage}
 tbl <- table(geno(vcf_sub)$GT)
@@ -88,7 +88,7 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
   labs(x="",y="Counts",fill="")+theme_classic()
 ```
 
-6. Extract DP information from vcf subset and make histogram
+6. Extract DP information from VCFf subset and make a histogram.
   - use ggplot to make histogram
   - scale x axis as log10: ***scale_x_log10()***
 
@@ -102,7 +102,7 @@ ggplot(as.data.frame(matDP),aes(x=SAMN01882168))+geom_histogram()+
   theme_classic()
 ```
 
-7. Extract GQ information from vcf subset and make histogram
+7. Extract GQ information from VCF subset and make histogram
   - use ggplot to make histogram
   - scale x axis as log10
 
@@ -116,7 +116,7 @@ ggplot(as.data.frame(matGQ),aes(x=SAMN01882168))+geom_histogram()+
   theme_classic()
 ```
 
-8. Please make a data frame including the following information demonstrated below.
+8. Please make a data.frame including the following information demonstrated below.
 
 ```{r gatherInfo, eval=TRUE, echo=toMessage}
 # Genotype 1/2
@@ -158,11 +158,11 @@ varTab <- rbind(varTab1,varTab2)
 varTab[1:2,]
 ```
 
-9. Please differnentiate variants by types (SNP/INS/DEL/Others) and count variants by each type 
+9. Please differentiate variants by types (SNP/INS/DEL/Others) and count variants by each type 
   - SNP: single nucleotide substitution, length(refBase) = length(altBase) = 1
   - INS: insertion, length(refBase) < length(altBase)
   - DEL: deletion, length(refBase) > length(altBase)
-  - Others: might be conplicated substitutions, eg. insdel, length(refBase) = length(altBase) <> 1
+  - Others: might be complicated substitutions, eg. insdel, length(refBase) = length(altBase) <> 1
 
 ```{r varClass, eval=TRUE, echo=toMessage}
 for(k in 1:length(varTab$variant)){

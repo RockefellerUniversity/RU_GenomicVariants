@@ -29,7 +29,7 @@ library(VariantAnnotation)
 
 ## Variant annotation
 
-In this exercise, we will practice how to annotate variants. Please find this VCF file "data/SAMN01882168_filt.vcf.gz" and subset variants in chromosome 21. 
+In this exercise, we will practice how to annotate variants. Please find this VCF file "data/SAMN01882168_filt.vcf.gz" and subset to variants in chromosome 21. 
 
 ```{r makeSubset,eval=TRUE, echo=toMessage}
 library(VariantAnnotation)
@@ -70,7 +70,7 @@ coding
 head(matA)
 ```
 
-2. How many variants in coding region
+2. How many variants are in coding regions?
 
 ```{r codingVar,eval=TRUE, echo=toMessage}
 var_in_coding <- data.frame(varName=names(vcf_sub),
@@ -127,7 +127,7 @@ matV1$posIDX <- gsub("(.*)_(.*)","\\1",matV1$Variant)
 matV1$rsID <- snp_ID$rsID[match(matV1$posIDX,snp_ID$posIDX)]
 ```
 
-4. How many variants in dbSNP
+4. How many variants are in dbSNP?
 
 ```{r incPlot, eval=TRUE, echo=toMessage}
 taC2 <- table(!is.na(matV1$rsID))

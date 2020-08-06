@@ -35,7 +35,7 @@ library(NMF)
 
 In this exercise, we will practice how to handle variants from multiple samples. An MAF file of breast carcinoma (BRCA) was fetched from TCGA. Please find this MAF file "data/tcga_brca.maf" and answer the following questions.
 
-1. Make a sample summary of this dataset and make a plot to demonstrate the composition of mutations in each sample
+1. Make a sample summary of this dataset and make a plot to demonstrate the composition of mutations in each sample.
 
 ```{r makeSubset,eval=TRUE, echo=toMessage}
 library(maftools)
@@ -62,7 +62,7 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=log10(value),fill=variable))+
   theme(axis.text.x=element_blank())
 ```
 
-2. Please list top five mutated genes and evalutate the interactions between them
+2. Please list top five mutated genes and evaluate the interactions between them
   - TTN is a huge gene usually with more mutations than others.
   - The interactions of gene mutations can be shown in oncoplot.
 
@@ -95,7 +95,7 @@ PlotOncogenicPathways(maf = brca, pathways = "WNT")
 
 5. Please identify mutational signatures in BRCA dataset
   - Make trinucleotide matrix: ***trinucleotideMatrix()***
-  - Estimate number of signaturez: ***estimateSignatures()***
+  - Estimate number of signatures: ***estimateSignatures()***
   - Extract signature: ***extractSignatues()***
   - Map to COSMIC database and display: ***compareSignature()***
   - Enrichment analysis: ***signatureEnrichment()***
