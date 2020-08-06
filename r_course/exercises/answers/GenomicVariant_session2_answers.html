@@ -435,7 +435,7 @@ summary {
 
 <div id="variant-annotation" class="section level2">
 <h2>Variant annotation</h2>
-<p>In this exercise, we will practice how to annotate variants. Please find this VCF file “data/SAMN01882168_filt.vcf.gz” and subset variants in chromosome 21.</p>
+<p>In this exercise, we will practice how to annotate variants. Please find this VCF file “data/SAMN01882168_filt.vcf.gz” and subset to variants in chromosome 21.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(VariantAnnotation)</span>
 <span id="cb1-2"><a href="#cb1-2"></a>vcf_file &lt;-<span class="st"> &quot;data/SAMN01882168_filt.vcf.gz&quot;</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a>vcf &lt;-<span class="st"> </span><span class="kw">readVcf</span>(vcf_file,<span class="st">&quot;hg19&quot;</span>)</span>
@@ -575,7 +575,7 @@ summary {
 ## 5   7179 72996 nonsynonymous  p.R195Q
 ## 6   7179 72997 nonsynonymous  p.R177Q</code></pre>
 <ol start="2" style="list-style-type: decimal">
-<li>How many variants in coding region</li>
+<li>How many variants are in coding regions?</li>
 </ol>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>var_in_coding &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">varName=</span><span class="kw">names</span>(vcf_sub),</span>
 <span id="cb8-2"><a href="#cb8-2"></a>                            <span class="dt">in_coding=</span><span class="kw">names</span>(vcf_sub) <span class="op">%in%</span><span class="st"> </span>matA<span class="op">$</span>Variant,</span>
@@ -658,7 +658,7 @@ summary {
 <span id="cb21-20"><a href="#cb21-20"></a><span class="co">#</span></span>
 <span id="cb21-21"><a href="#cb21-21"></a>matV1<span class="op">$</span>rsID &lt;-<span class="st"> </span>snp_ID<span class="op">$</span>rsID[<span class="kw">match</span>(matV1<span class="op">$</span>posIDX,snp_ID<span class="op">$</span>posIDX)]</span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
-<li>How many variants in dbSNP</li>
+<li>How many variants are in dbSNP?</li>
 </ol>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>taC2 &lt;-<span class="st"> </span><span class="kw">table</span>(<span class="op">!</span><span class="kw">is.na</span>(matV1<span class="op">$</span>rsID))</span>
 <span id="cb22-2"><a href="#cb22-2"></a>taC2_dat &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(taC2)</span>
