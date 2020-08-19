@@ -218,7 +218,8 @@ matA[1:2,]
 
 ## ----aaCh_varMan_muCt---------------------------------------------------------
 var_in_coding <- data.frame(varName=names(vcf_chr1),
-                            in_coding=names(vcf_chr1) %in% matA$Variant,
+                            in_coding=names(vcf_chr1)
+                            %in% matA$Variant,
                             stringsAsFactors = FALSE)
 table(var_in_coding$in_coding)
 

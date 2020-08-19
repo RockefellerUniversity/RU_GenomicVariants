@@ -1591,8 +1591,8 @@ div.tocify {
 <hr />
 <div id="about-this-session" class="section level2">
 <h2>About this session</h2>
-<p>Variant Call Format (VCF) is widely used file format to record genomic variants. We introduced the VCF file format in <a href="rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#35">previous section</a>. In this session, we want to demonstrate how to manipulate VCF file with <a href="https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html">VariantAnnotation</a>.</p>
-<p>We will be using a study on bladder cancer from Wei Wangs group at BGI-Shenzhen as our dataset in this session: - Raw data from SRA: <a href="https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA185252">PRJNA185252</a> <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3696090/">LINK</a> - Reference genome: <a href="https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg19.html">BSgenome.Hsapiens.UCSC.hg19</a> - Variant calling procedure is based on <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-">GATK Best Practice</a> + Align to reference genome: <a href="http://bio-bwa.sourceforge.net/bwa.shtml">Burrows-Wheeler Aligner</a>, bwa-mem + Sort and remove duplicates: <a href="http://broadinstitute.github.io/picard/command-line-overview.html">Picard-tools</a>, <a href="https://broadinstitute.github.io/picard/command-line-overview.html#SortSam">SortSam</a>/<a href="https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates">MarkDuplicates</a> + Recalibrate Base Quality Scores: <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036433132--Tool-Documentation-Index">GATK</a>, <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036434532-BaseRecalibrator">BaseRecalibrator</a>/<a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036433652-ApplyBQSR">ApplyBQSR</a> + Variant Calling: <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036433132--Tool-Documentation-Index">GATK</a>, <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036803991-HaplotypeCaller">HaplotypeCaller</a>/<a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036806011-GenotypeGVCFs">GenotypeGVCFs</a> - Demo data: SAMN01882168 (“data/SAMN01882168_filt.vcf.gz”)</p>
+<p>Variant Call Format (VCF) is widely used file format to record genomic variants. We introduced the VCF file format in <a href="http://rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#35">previous section</a>. In this session, we want to demonstrate how to manipulate VCF file with <a href="https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html">VariantAnnotation</a>.</p>
+<p>We will be using a study on bladder cancer from Wei Wangs group at BGI-Shenzhen as our dataset in this session: - Raw data from SRA: <a href="https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA185252">PRJNA185252</a> - Reference genome: <a href="https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg19.html">BSgenome.Hsapiens.UCSC.hg19</a> - Variant calling procedure is based on <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-">GATK Best Practice</a> + Align to reference genome: <a href="http://bio-bwa.sourceforge.net/bwa.shtml">Burrows-Wheeler Aligner</a>, bwa-mem + Sort and remove duplicates: <a href="http://broadinstitute.github.io/picard/command-line-overview.html">Picard-tools</a>, <a href="https://broadinstitute.github.io/picard/command-line-overview.html#SortSam">SortSam</a>/<a href="https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates">MarkDuplicates</a> + Recalibrate Base Quality Scores: <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036433132--Tool-Documentation-Index">GATK</a>, <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036434532-BaseRecalibrator">BaseRecalibrator</a>/<a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036433652-ApplyBQSR">ApplyBQSR</a> + Variant Calling: <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036433132--Tool-Documentation-Index">GATK</a>, <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036803991-HaplotypeCaller">HaplotypeCaller</a>/<a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036806011-GenotypeGVCFs">GenotypeGVCFs</a> - Demo data: SAMN01882168 (“data/SAMN01882168_filt.vcf.gz”)</p>
 </div>
 <div id="outline-of-this-session" class="section level2">
 <h2>Outline of this session</h2>
@@ -1665,15 +1665,6 @@ div.tocify {
 ##    RGQ    1      Integer Unconditional reference genotype confidence, encode...
 ##    SB     4      Integer Per-sample component statistics which comprise the ...</code></pre>
 </div>
-<div id="what-is-in-each-field" class="section level2">
-<h2>What is in each field?</h2>
-<ul>
-<li><p>META field: general information of the VCF file</p></li>
-<li><p>FIX field: variants, usually in VRange format</p></li>
-<li><p>GENOTYPE field: information for each sample</p></li>
-<li><p>Integrate information into single table</p></li>
-</ul>
-</div>
 <div id="overview" class="section level2">
 <h2>Overview</h2>
 <p>As with objects we have met in other courses, there are accessor functions to grab the contents of our VCF object.</p>
@@ -1685,9 +1676,9 @@ div.tocify {
 ## info(19): AC AF ... ReadPosRankSum SOR
 ## geno(10): GT AD ... RGQ SB</code></pre>
 <ul>
-<li>META field: meta</li>
-<li>FIX field: rowRange, info</li>
-<li>GENOTYPE field: geno</li>
+<li>META field: general information of the VCF file; <strong><em>meta</em></strong></li>
+<li>FIX field: variants, usually in VRange format; <strong><em>rowRange</em></strong>, <strong><em>info</em></strong></li>
+<li>GENOTYPE field: information for each sample; <strong><em>geno</em></strong></li>
 </ul>
 </div>
 <div id="how-many-samples-are-in-this-vcf" class="section level2">
@@ -1753,7 +1744,7 @@ div.tocify {
 ##   chr1:815341_G/A                  A     32.77           .
 ##   -------
 ##   seqinfo: 25 sequences from hg19 genome</code></pre>
-<p><strong><em>It’s not a strand-specific library. This is indicated by the *, which means unstranded. </em></strong></p>
+<p><strong><em>It’s not a strand-specific library. This is indicated by the &quot;</em>&quot;, which means unstranded. </strong>*</p>
 </div>
 <div id="retrieving-variation-information" class="section level2">
 <h2>Retrieving variation information</h2>
@@ -1823,7 +1814,7 @@ div.tocify {
 <ul>
 <li><strong>Integrated information from all the samples</strong></li>
 <li>Annotation information would be recorded in this section</li>
-<li>All information is stored as a <strong><em>data frame</em></strong></li>
+<li>All information is stored as a <em>data frame</em></li>
 </ul>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="kw">info</span>(<span class="kw">header</span>(vcf))[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</span></code></pre></div>
 <pre><code>## DataFrame with 2 rows and 3 columns
@@ -1892,9 +1883,9 @@ div.tocify {
 ##   0/1   1/1   1/2 
 ## 70215  1853   176</code></pre>
 <ul>
-<li>0/1: <strong><em>heterozygous mutations, one allele is the same as reference sequence</em></strong></li>
-<li>1/1: <strong><em>homozygous mutations, both alleles are different from reference sequence</em></strong></li>
-<li>1/2: <strong><em>heterozygous mutations, both alleles are different from reference sequence</em></strong></li>
+<li>0/1: <em>heterozygous mutations, one allele is the same as reference sequence</em></li>
+<li>1/1: <em>homozygous mutations, both alleles are different from reference sequence</em></li>
+<li>1/2: <em>heterozygous mutations, both alleles are different from reference sequence</em></li>
 </ul>
 </div>
 <div id="gt-types-1" class="section level2">
@@ -2179,7 +2170,7 @@ div.tocify {
 <div id="trinucleotide-motif-analysis-1" class="section level2">
 <h2>Trinucleotide motif analysis</h2>
 <p>Other constraints may bias nucleotide transitions. One of these is the trinucleotide motif around the variant (from -1 to +1). This pattern could reflect different causes for the mutations.</p>
-<p>One such example is APOBEC, a deaminase leading to C&gt;T substitutions in the motif <strong><em>T[C&gt;T]W</em></strong>. So, the proportion of <strong><em>T[C&gt;T]W</em></strong> in overall C&gt;T substitutions could reflect to APOBEC activity. More applications of the trinucleotide motifs will be discussed in <a href="https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session3.html#19">session3</a>.</p>
+<p>One such example is APOBEC, a deaminase leading to C&gt;T substitutions in the motif <strong>T[C&gt;T]W</strong>. So, the proportion of <strong>T[C&gt;T]W</strong> in overall C&gt;T substitutions could reflect to APOBEC activity. More applications of the trinucleotide motifs will be discussed in <a href="https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session3.html#19">session3</a>.</p>
 </div>
 <div id="extract-ct-substituion" class="section level2">
 <h2>Extract C&gt;T substituion</h2>
@@ -2208,7 +2199,7 @@ div.tocify {
 </div>
 <div id="extract-sequences-beneath-the-mutation-from--1-to-1" class="section level2">
 <h2>Extract sequences beneath the mutation from -1 to +1</h2>
-<p>We can use the <strong>getSeq()</strong> function to get the sequence underlying these variants, as we have done with <a href="https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicIntervals_In_Bioconductor.html#63">GRanges</a>.</p>
+<p>We can use the <em>getSeq()</em> function to get the sequence underlying these variants, as we have done with <a href="https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicIntervals_In_Bioconductor.html#63">GRanges</a>.</p>
 <div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1"></a>rd_sub<span class="op">$</span>triNu &lt;-<span class="st"> </span><span class="kw">getSeq</span>(Hsapiens,</span>
 <span id="cb94-2"><a href="#cb94-2"></a>                 <span class="kw">seqnames</span>(rd_sub),</span>
 <span id="cb94-3"><a href="#cb94-3"></a>                 <span class="dt">start=</span><span class="kw">start</span>(rd_sub)<span class="op">-</span><span class="dv">1</span>,</span>
@@ -2253,18 +2244,37 @@ div.tocify {
 </ul>
 <div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1"></a><span class="co"># TCW: TCA/TCT</span></span>
 <span id="cb99-2"><a href="#cb99-2"></a>tbl_dat<span class="op">$</span>APOBEC_target &lt;-<span class="st"> </span>tbl_dat<span class="op">$</span>Var1 <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;TCA&quot;</span>, <span class="st">&quot;TCT&quot;</span>)</span>
-<span id="cb99-3"><a href="#cb99-3"></a>apobec_dat &lt;-<span class="st"> </span><span class="kw">aggregate</span>(Freq <span class="op">~</span><span class="st"> </span>APOBEC_target, tbl_dat, <span class="dt">FUN =</span> sum, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb99-4"><a href="#cb99-4"></a>apobec_dat</span></code></pre></div>
+<span id="cb99-3"><a href="#cb99-3"></a>tbl_dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</span></code></pre></div>
+<pre><code>##    Var1 Freq
+## 1   ACA 1176
+## 2   ACC  535
+## 3   ACG 1096
+## 4   ACT  879
+## 5   CCA  619
+## 6   CCC  429
+## 7   CCG  544
+## 8   CCT  641
+## 9   GCA  554
+## 10  GCC  387
+## 11  GCG  511
+## 12  GCT  556
+## 13  TCA  633
+## 14  TCC  535
+## 15  TCG  584
+## 16  TCT  706</code></pre>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1"></a><span class="co"># collapse by APOBEC_target</span></span>
+<span id="cb101-2"><a href="#cb101-2"></a>apobec_dat &lt;-<span class="st"> </span><span class="kw">aggregate</span>(Freq <span class="op">~</span><span class="st"> </span>APOBEC_target, tbl_dat, <span class="dt">FUN =</span> sum, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb101-3"><a href="#cb101-3"></a>apobec_dat</span></code></pre></div>
 <pre><code>##   APOBEC_target Freq
 ## 1         FALSE 9046
 ## 2          TRUE 1339</code></pre>
 </div>
 <div id="apobec-activation-in-this-sample-1" class="section level2">
 <h2>APOBEC activation in this sample?</h2>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1"></a><span class="kw">ggplot</span>(apobec_dat,<span class="kw">aes</span>(<span class="dt">x=</span>APOBEC_target,<span class="dt">y=</span>Freq,<span class="dt">fill=</span>APOBEC_target))<span class="op">+</span></span>
-<span id="cb101-2"><a href="#cb101-2"></a><span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat=</span><span class="st">&#39;identity&#39;</span>)<span class="op">+</span></span>
-<span id="cb101-3"><a href="#cb101-3"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x=</span><span class="st">&quot;&quot;</span>,<span class="dt">y=</span><span class="st">&quot;Variants&quot;</span>,<span class="dt">fill=</span><span class="st">&quot;&quot;</span>)<span class="op">+</span></span>
-<span id="cb101-4"><a href="#cb101-4"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1"></a><span class="kw">ggplot</span>(apobec_dat,<span class="kw">aes</span>(<span class="dt">x=</span>APOBEC_target,<span class="dt">y=</span>Freq,<span class="dt">fill=</span>APOBEC_target))<span class="op">+</span></span>
+<span id="cb103-2"><a href="#cb103-2"></a><span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat=</span><span class="st">&#39;identity&#39;</span>)<span class="op">+</span></span>
+<span id="cb103-3"><a href="#cb103-3"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x=</span><span class="st">&quot;&quot;</span>,<span class="dt">y=</span><span class="st">&quot;Variants&quot;</span>,<span class="dt">fill=</span><span class="st">&quot;&quot;</span>)<span class="op">+</span></span>
+<span id="cb103-4"><a href="#cb103-4"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span></code></pre></div>
 </div>
 <div id="apobec-activation-in-this-sample-2" class="section level2">
 <h2>APOBEC activation in this sample?</h2>

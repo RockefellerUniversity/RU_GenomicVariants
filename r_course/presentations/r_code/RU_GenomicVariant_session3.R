@@ -280,15 +280,6 @@ laml.og30.cosm$cosine_similarities[,1:5]
 pheatmap::pheatmap(mat = laml.og30.cosm$cosine_similarities, cluster_rows = FALSE)
 
 
-## ----mult_muSig_mapSigSBS_advan1,fig.align="center"---------------------------
-laml.sign.sbs = compareSignatures(nmfRes = laml.sig.ext, sig_db = "SBS")
-laml.sign.sbs$cosine_similarities[,1:5]
-
-
-## ----mult_muSig_mapSigSBS_advan2,fig.align="center"---------------------------
-pheatmap::pheatmap(mat = laml.sign.sbs$cosine_similarities, cluster_rows = FALSE)
-
-
 ## ----mult_muSig_plotSigCOS_advan1,eval=FALSE,echo=TRUE,tidy=FALSE-------------
 ## plotSignatures(nmfRes = laml.sig.ext,
 ##                title_size = 1.2,
@@ -303,6 +294,15 @@ plotSignatures(nmfRes = laml.sig.ext,
                contributions = FALSE,
                show_title = TRUE,
                sig_db = 'legacy')
+
+
+## ----mult_muSig_mapSigSBS_advan1,fig.align="center"---------------------------
+laml.sign.sbs = compareSignatures(nmfRes = laml.sig.ext, sig_db = "SBS")
+laml.sign.sbs$cosine_similarities[,1:5]
+
+
+## ----mult_muSig_mapSigSBS_advan2,fig.align="center"---------------------------
+pheatmap::pheatmap(mat = laml.sign.sbs$cosine_similarities, cluster_rows = FALSE)
 
 
 ## ----mult_muSig_plotSigSBS_advan1,eval=FALSE,echo=TRUE,tidy=FALSE-------------

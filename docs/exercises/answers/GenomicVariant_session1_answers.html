@@ -441,9 +441,8 @@ summary {
 </ol>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(VariantAnnotation)</span>
 <span id="cb1-2"><a href="#cb1-2"></a>vcf_file &lt;-<span class="st"> &quot;data/SAMN01882168_filt.vcf.gz&quot;</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co"># vcf_file &lt;- &quot;../extData/data/SAMN01882168_filt.vcf.gz&quot;</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a>vcf &lt;-<span class="st"> </span><span class="kw">readVcf</span>(vcf_file,<span class="st">&quot;hg19&quot;</span>)</span>
-<span id="cb1-5"><a href="#cb1-5"></a>rd &lt;-<span class="st"> </span><span class="kw">rowRanges</span>(vcf)</span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3"></a>vcf &lt;-<span class="st"> </span><span class="kw">readVcf</span>(vcf_file,<span class="st">&quot;hg19&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4"></a>rd &lt;-<span class="st"> </span><span class="kw">rowRanges</span>(vcf)</span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Please extract the genotype field and explain the abbreviations</li>
 </ol>
@@ -478,8 +477,8 @@ summary {
 </ol>
 <ul>
 <li>Incidence: variant per kilobase</li>
-<li>Chromosome length in reference genome: <strong><em>seqlengths()</em></strong></li>
-<li>Variants per chromosome: <strong><em>table(seqnames())</em></strong></li>
+<li>Chromosome length in reference genome: <em>seqlengths()</em></li>
+<li>Variants per chromosome: <em>table(seqnames())</em></li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>contig_leng &lt;-<span class="st"> </span><span class="kw">seqlengths</span>(rd)</span>
 <span id="cb4-2"><a href="#cb4-2"></a>tbl &lt;-<span class="st"> </span><span class="kw">table</span>(<span class="kw">seqnames</span>(rd))</span>

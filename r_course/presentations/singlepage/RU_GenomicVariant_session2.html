@@ -1601,10 +1601,10 @@ div.tocify {
 <div id="outline-of-this-session" class="section level2">
 <h2>Outline of this session</h2>
 <ul>
-<li>Subset variants in chromosome 1</li>
-<li>Annotate rsID from dbSNP</li>
-<li>Predict amino acid changes</li>
-<li>Integrate information into single table</li>
+<li><p>Subset variants in chromosome 1</p></li>
+<li><p>Annotate rsID from dbSNP</p></li>
+<li><p>Predict amino acid changes</p></li>
+<li><p>Integrate information into single table</p></li>
 </ul>
 </div>
 <div id="subsetting-variants-in-chromosome-1" class="section level2">
@@ -1624,9 +1624,9 @@ div.tocify {
 <div id="annotate-rsid-from-dbsnp" class="section level2">
 <h2>Annotate rsID from dbSNP</h2>
 <ul>
-<li>Retrieve dbSNP</li>
-<li>Extract SNPs by Chromosome <strong><em>memory intensive</em></strong></li>
-<li>Merge SNPs and variant information by positions</li>
+<li><p>Retrieve dbSNP</p></li>
+<li><p>Extract SNPs by Chromosome <strong>memory intensive</strong></p></li>
+<li><p>Merge SNPs and variant information by positions</p></li>
 </ul>
 </div>
 <div id="retrive-dbsnp-data" class="section level2">
@@ -1640,8 +1640,8 @@ div.tocify {
 <div id="retrieve-snps-by-chromosome" class="section level2">
 <h2>Retrieve SNPs by chromosome</h2>
 <ul>
-<li>Extract chromosome name from the VRange object: <strong><em>seqnames()<span class="citation">@values</span></em></strong></li>
-<li>Retrive SNPs by chromosome: <strong><em>snpsBySeqname()</em></strong></li>
+<li>Extract chromosome name from the VRange object: <em>seqnames()<span class="citation">@values</span></em></li>
+<li>Retrive SNPs by chromosome: <em>snpsBySeqname()</em></li>
 </ul>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>tar_chr &lt;-<span class="st"> </span><span class="kw">as.vector</span>(<span class="kw">seqnames</span>(rd_chr1)<span class="op">@</span>values)</span>
 <span id="cb9-2"><a href="#cb9-2"></a>my_snps &lt;-<span class="st"> </span><span class="kw">snpsBySeqname</span>(all_snps, <span class="kw">c</span>(tar_chr))</span></code></pre></div>
@@ -1666,7 +1666,7 @@ div.tocify {
 <span id="cb12-2"><a href="#cb12-2"></a><span class="kw">seqlevels</span>(all_snps)</span></code></pre></div>
 <pre><code>##  [1] &quot;1&quot;  &quot;2&quot;  &quot;3&quot;  &quot;4&quot;  &quot;5&quot;  &quot;6&quot;  &quot;7&quot;  &quot;8&quot;  &quot;9&quot;  &quot;10&quot; &quot;11&quot; &quot;12&quot; &quot;13&quot; &quot;14&quot; &quot;15&quot;
 ## [16] &quot;16&quot; &quot;17&quot; &quot;18&quot; &quot;19&quot; &quot;20&quot; &quot;21&quot; &quot;22&quot; &quot;X&quot;  &quot;Y&quot;  &quot;MT&quot;</code></pre>
-<p>seqname in rd_chr1 is <em>chr1</em> but in all_snps is <em>1</em></p>
+<p>seqname in rd_chr1 is <strong>chr1</strong> but in all_snps is <strong>1</strong></p>
 </div>
 <div id="check-seqlevelstyle" class="section level2">
 <h2>check seqlevelStyle</h2>
@@ -1674,7 +1674,7 @@ div.tocify {
 <pre><code>## [1] &quot;UCSC&quot;</code></pre>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">seqlevelsStyle</span>(all_snps)</span></code></pre></div>
 <pre><code>## [1] &quot;NCBI&quot;    &quot;Ensembl&quot;</code></pre>
-<p>seqlevelsSytle in rd_chr1 is <em>UCSC</em>, but in all_snps is <em>NCBI Ensembl</em></p>
+<p>seqlevelsSytle in rd_chr1 is <strong>UCSC</strong>, but in all_snps is <strong>NCBI Ensembl</strong></p>
 </div>
 <div id="check-genome" class="section level2">
 <h2>check genome</h2>
@@ -1696,7 +1696,7 @@ div.tocify {
 ## &quot;GRCh37.p13&quot; &quot;GRCh37.p13&quot; &quot;GRCh37.p13&quot; &quot;GRCh37.p13&quot; &quot;GRCh37.p13&quot; &quot;GRCh37.p13&quot; 
 ##           MT 
 ## &quot;GRCh37.p13&quot;</code></pre>
-<p>genome in rd_chr1 is <em>hg19</em>, but in all_snps is <em>GRCh37.p13</em></p>
+<p>genome in rd_chr1 is <strong>hg19</strong>, but in all_snps is <strong>GRCh37.p13</strong></p>
 </div>
 <div id="unify-seqnames-and-process" class="section level2">
 <h2>Unify seqnames and Process</h2>
@@ -1768,7 +1768,7 @@ div.tocify {
 ##       rsID
 ## 1 rs520644
 ## 2     &lt;NA&gt;</code></pre>
-<p><strong><em>dplyr::select</em></strong> is used to select or remove specific columns in a data frame.</p>
+<p><em>dplyr::select</em> is used to select or remove specific columns in a data frame.</p>
 </div>
 <div id="how-many-variations-in-dbsnp" class="section level2">
 <h2>How many variations in dbSNP</h2>
@@ -1798,15 +1798,15 @@ div.tocify {
 <h2>Predict amino acid changes</h2>
 <ul>
 <li>load annotation database: TxDb</li>
-<li>predict amino acid changes: <strong><em>predictCoding</em></strong></li>
+<li>predict amino acid changes: <em>predictCoding</em></li>
 </ul>
 </div>
-<div id="load-txdb" class="section level2">
-<h2>Load TxDb</h2>
+<div id="txdb-annotation-database" class="section level2">
+<h2>TxDb: annotation database</h2>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>txdb &lt;-<span class="st"> </span>TxDb.Hsapiens.UCSC.hg19.knownGene</span></code></pre></div>
 </div>
-<div id="txdb" class="section level2">
-<h2>TxDb</h2>
+<div id="txdb-annotation-database-1" class="section level2">
+<h2>TxDb: annotation database</h2>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>txdb</span></code></pre></div>
 <pre><code>## TxDb object:
 ## # Db type: TxDb
@@ -1909,9 +1909,9 @@ div.tocify {
 ##      nonsense nonsynonymous    synonymous 
 ##             1            49            20</code></pre>
 <ul>
-<li>nonsense: mutations causing the appearance of stop codon</li>
-<li>nonsynonymous: mutations causing amino acid changes</li>
-<li>synonymous: mutations not causing amino acid changes</li>
+<li><em>nonsense</em>: mutations causing the appearance of stop codon</li>
+<li><em>nonsynonymous</em>: mutations causing amino acid changes</li>
+<li><em>synonymous</em>: mutations not causing amino acid changes</li>
 </ul>
 </div>
 <div id="mutation-types-in-coding-region" class="section level2">
@@ -1943,14 +1943,14 @@ div.tocify {
 <li><a href="https://doc-openbio.readthedocs.io/projects/annovar/en/latest/">ANNOVAR</a>
 <ul>
 <li>Wang et al, NAR, 2010(38):e164 <a href="https://academic.oup.com/nar/article/38/16/e164/1749458">link</a></li>
-<li>Detailed databases available for human genome</li>
 <li>Perl-based</li>
+<li>Detailed databases available for human genome</li>
 </ul></li>
 <li><a href="http://snpeff.sourceforge.net/">SnpEff</a>
 <ul>
 <li>Cingolani et al, Landes Biosciense, 2012(6):1 <a href="http://snpeff.sourceforge.net/SnpEff_paper.pdf">link</a></li>
-<li>Support over 38,000 genomes</li>
 <li>Java-based</li>
+<li>Support over 38,000 genomes</li>
 </ul></li>
 </ul>
 </div>

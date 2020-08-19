@@ -29,10 +29,10 @@ class: center, middle, inverse, title-slide
 
 
 ## About this session
-Variant Call Format (VCF) is widely used file format to record genomic variants. We introduced the VCF file format in [previous section](rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#35). In this session, we want to demonstrate how to manipulate VCF file with [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html).
+Variant Call Format (VCF) is widely used file format to record genomic variants. We introduced the VCF file format in [previous section](http://rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#35). In this session, we want to demonstrate how to manipulate VCF file with [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html).
 
 We will be using a study on bladder cancer from Wei Wangs group at BGI-Shenzhen as our dataset in this session:
-- Raw data from SRA: [PRJNA185252](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA185252) [LINK](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3696090/)
+- Raw data from SRA: [PRJNA185252](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA185252)
 - Reference genome: [BSgenome.Hsapiens.UCSC.hg19](https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg19.html)
 - Variant calling procedure is based on [GATK Best Practice](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
   + Align to reference genome: [Burrows-Wheeler Aligner](http://bio-bwa.sourceforge.net/bwa.shtml), bwa-mem
@@ -120,16 +120,6 @@ vcf
 ```
 
 ---
-## What is in each field?
-- META field: general information of the VCF file
-
-- FIX field: variants, usually in VRange format
-
-- GENOTYPE field: information for each sample
-
-- Integrate information into single table
-
----
 ## Overview
 As with objects we have met in other courses, there are accessor functions to grab the contents of our VCF object. 
 
@@ -145,9 +135,9 @@ header(vcf)
 ## info(19): AC AF ... ReadPosRankSum SOR
 ## geno(10): GT AD ... RGQ SB
 ```
-- META field: meta
-- FIX field: rowRange, info
-- GENOTYPE field: geno
+- META field: general information of the VCF file; ***meta***
+- FIX field: variants, usually in VRange format; ***rowRange***, ***info***
+- GENOTYPE field: information for each sample; ***geno***
 
 ---
 ## How many samples are in this VCF?
@@ -248,7 +238,7 @@ rd[1:2]
 ##   -------
 ##   seqinfo: 25 sequences from hg19 genome
 ```
-***It's not a strand-specific library. This is indicated by the \*, which means unstranded. ***
+***It's not a strand-specific library. This is indicated by the "*", which means unstranded. ***
 
 ---
 ## Retrieving variation information
@@ -359,7 +349,7 @@ altBase[1:2]
 # INFO section from FIXED field
 - **Integrated information from all the samples**
 - Annotation information would be recorded in this section
-- All information is stored as a ***data frame***
+- All information is stored as a *data frame*
 
 ```r
 info(header(vcf))[1:2, ]
@@ -461,9 +451,9 @@ tbl
 ##   0/1   1/1   1/2 
 ## 70215  1853   176
 ```
-- 0/1: ***heterozygous mutations, one allele is the same as reference sequence***
-- 1/1: ***homozygous mutations, both alleles are different from reference sequence***
-- 1/2: ***heterozygous mutations, both alleles are different from reference sequence***
+- 0/1: *heterozygous mutations, one allele is the same as reference sequence*
+- 1/1: *homozygous mutations, both alleles are different from reference sequence*
+- 1/2: *heterozygous mutations, both alleles are different from reference sequence*
 
 ---
 ## GT Types
@@ -878,7 +868,7 @@ class: inverse, center, middle
 ## Trinucleotide motif analysis
 Other constraints may bias nucleotide transitions. One of these is the trinucleotide motif around the variant (from -1 to +1). This pattern could reflect different causes for the mutations.  
 
-One such example is APOBEC, a deaminase leading to C&gt;T substitutions in the motif ***T[C&gt;T]W***. So, the proportion of ***T[C&gt;T]W*** in overall C&gt;T substitutions could reflect to APOBEC activity. More applications of the trinucleotide motifs will be discussed in [session3](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session3.html#19).
+One such example is APOBEC, a deaminase leading to C&gt;T substitutions in the motif **T[C&gt;T]W**. So, the proportion of **T[C&gt;T]W** in overall C&gt;T substitutions could reflect to APOBEC activity. More applications of the trinucleotide motifs will be discussed in [session3](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session3.html#19).
 
 ---
 ## Extract C&gt;T substituion
@@ -919,7 +909,7 @@ rd_sub[1:2, ]
 
 ---
 ## Extract sequences beneath the mutation from -1 to +1
-We can use the **getSeq()** function to get the sequence underlying these variants, as we have done with [GRanges](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicIntervals_In_Bioconductor.html#63).
+We can use the *getSeq()* function to get the sequence underlying these variants, as we have done with [GRanges](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicIntervals_In_Bioconductor.html#63).
 
 ```r
 rd_sub$triNu &lt;- getSeq(Hsapiens,
@@ -979,6 +969,31 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```r
 # TCW: TCA/TCT
 tbl_dat$APOBEC_target &lt;- tbl_dat$Var1 %in% c("TCA", "TCT")
+tbl_dat[1:2]
+```
+
+```
+##    Var1 Freq
+## 1   ACA 1176
+## 2   ACC  535
+## 3   ACG 1096
+## 4   ACT  879
+## 5   CCA  619
+## 6   CCC  429
+## 7   CCG  544
+## 8   CCT  641
+## 9   GCA  554
+## 10  GCC  387
+## 11  GCG  511
+## 12  GCT  556
+## 13  TCA  633
+## 14  TCC  535
+## 15  TCG  584
+## 16  TCT  706
+```
+
+```r
+# collapse by APOBEC_target
 apobec_dat &lt;- aggregate(Freq ~ APOBEC_target, tbl_dat, FUN = sum, na.rm = TRUE)
 apobec_dat
 ```

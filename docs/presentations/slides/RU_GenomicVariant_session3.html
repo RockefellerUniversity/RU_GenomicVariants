@@ -29,7 +29,7 @@ class: center, middle, inverse, title-slide
 
 
 ## About this session
-In this session, we will demonstrate how to use several advanced analysis approaches to decipher variants from multiple samples. In this situation, the Mutation Annotation Format (MAF) would be a good choice for storing and presenting your data. For a detailesd overview of MAF file structure please refer to our previous course on [Genomic Formats](rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#36). 
+In this session, we will demonstrate how to use several advanced analysis approaches to decipher variants from multiple samples. In this situation, the Mutation Annotation Format (MAF) would be a good choice for storing and presenting your data. For a detailesd overview of MAF file structure please refer to our previous course on [Genomic Formats](http://rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#36). 
 
 Today we will beusing an acute myeloid leukemia (AML) dataset (tcga-laml), which was fetched from [The Cancer Genome Atlas data portal](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga). The dataset is in the following path "data/tcga_laml.maf".
 
@@ -37,10 +37,8 @@ Today we will beusing an acute myeloid leukemia (AML) dataset (tcga-laml), which
 ## Outline of this session
 - Handle MAF with maftools
 - Get summary by samples and genes
-- Any mutation hotspots?
-- Any interactions between mutations?
-- Any enriched pathways?
-- Any Mutational signatures?
+- Functional analysis
+- Mutational signatures
 
 ---
 class: inverse, center, middle
@@ -51,7 +49,7 @@ class: inverse, center, middle
 
 ---
 
----
+
 ## MAF format
 As with many data files we can very simply read MAF files into R.
 
@@ -105,7 +103,7 @@ laml &lt;- read.maf("data/tcga_laml.maf.gz")
 ## -Summarizing
 ## -Processing clinical data
 ## --Missing clinical data
-## -Finished in 3.601s elapsed (3.485s cpu)
+## -Finished in 0.337s elapsed (0.281s cpu)
 ```
 
 ```r
@@ -126,7 +124,7 @@ maftools provides two functions to generate summary table for by samples or by g
 
 ---
 ## How many mutations in each sample
-- ***getSampleSummary()***
+- *getSampleSummary()*
 - a matrix of mutation classes in each sample
 
 ```r
@@ -214,7 +212,7 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=prop,fill=variable))+
 
 ---
 ## How many mutations in each gene
-- ***getGeneSummary()***
+- *getGeneSummary()*
 - A matrix, counts of each mutation classes in each gene
 
 ```r
@@ -243,13 +241,12 @@ class: inverse, center, middle
 
 ---
 
----
 ## Any mutation hotspot?
-Mutation hotspot means mutation in a given position detected in more samples than in other positions. Most activating mutations have mutation hotspots. A classic example  are the G12, G13, or H61 mutation in KRAS. In contrast, loss of function mutations are usually with no mutation hotspot. The ***lollipop plot*** is a fancy plot of mutations in each position of a given gene. It's very intuitive for demonstrating mutation hotspots.  
+Mutation hotspot means mutation in a given position detected in more samples than in other positions. Most activating mutations have mutation hotspots. A classic example  are the *G12*, *G13*, or *Q61* mutation in KRAS. In contrast, loss of function mutations are usually with no mutation hotspot. The **lollipop plot** is a fancy plot of mutations in each position of a given gene. It's very intuitive for demonstrating mutation hotspots.  
 
 ---
 ## Mutation hotspots? 
-- ***lollipopPlot()***
+- *lollipopPlot()*
 
 ```r
 lollipopPlot(maf = laml, 
@@ -265,7 +262,7 @@ lollipopPlot(maf = laml,
 
 ---
 ## Interaction between mutations
-When mutations are send to interact, this means any concordance or exclusivity of two given gene mutations. If two gene mutations concordantly identified in the same patient, it indicates the two mutations could have synergistic effect in cancer or they are in causality. If two gene mutations are exclusive (i.e. not present in the same patient), this could suggest that they lead to similar consequence, therefore there is no selective pressure for both to mutate. The ***oncoplot*** allows comparison between genes to look for interactions between mutants. 
+When mutations are send to interact, this means any concordance or exclusivity of two given gene mutations. If two gene mutations concordantly identified in the same patient, it indicates the two mutations could have synergistic effect in cancer or they are in causality. If two gene mutations are exclusive (i.e. not present in the same patient), this could suggest that they lead to similar consequence, therefore there is no selective pressure for both to mutate. The **oncoplot** allows comparison between genes to look for interactions between mutants. 
 
 ---
 ## Oncoplot for top 5 mutated genes
@@ -280,8 +277,8 @@ oncoplot(maf = laml, top = 5)
 ---
 ## Pathway analysis
 maftools provides two functions for pathway analysis.
-- OncogenicPathways(): calculate mutations detected in each pathway and the fraction of samples affected
-- PlotOncogenicPathways(): make a waterfall plot for a given pathway
+- **OncogenicPathways()**: calculate mutations detected in each pathway and the fraction of samples affected
+- **PlotOncogenicPathways()**: make a waterfall plot for a given pathway
 
 ---
 ## Any enriched pathways?
@@ -314,7 +311,7 @@ OncogenicPathways(maf = laml)
 ---
 ## Any enriched pathways?
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_pathPlotWF_advan2-1.png" style="display: block; margin: auto;" /&gt;
-**Mutations in RTK-RAS pathway is much higher than others**
+Mutations in **RTK-RAS pathway** is much higher than others
 
 ---
 ## Mutations enriched in pathways?
@@ -324,7 +321,6 @@ PlotOncogenicPathways(maf = laml, pathways = "RTK-RAS")
 ```
 
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_pathPlotWF_advan3-1.png" style="display: block; margin: auto;" /&gt;
-
 
 ---
 class: inverse, center, middle
@@ -350,7 +346,7 @@ This is another common area of study for cancer and genome integrity research.
 ---
 ## Ti/Tv plot
 - Evaluate single-nucleotide substitution
-- ***titv()***
+- **titv()**
 
 ```r
 laml.titv = titv(maf = laml, plot = FALSE, useSyn = TRUE)
@@ -360,12 +356,12 @@ plotTiTv(res = laml.titv)
 ---
 ## Ti/Tv plot
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_mutSig_TiTv_advan2-1.png" style="display: block; margin: auto;" /&gt;
-**The majority of mutations are C&gt;T.**
+The majority of mutations are **C&gt;T**.
 
 ---
 ## Trinucleotide matrix
 - calcualte trinucleotide substituion pattern
-- ***trinucleotideMatrix()***
+- **trinucleotideMatrix()**
 
 ```r
 library(BSgenome.Hsapiens.UCSC.hg19, quietly = TRUE)
@@ -461,7 +457,7 @@ ggplot(yd,aes(x=num,y=count,fill=cat))+
 
 ---
 ## Estimate number of signatures
-In this step, [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation), ***which represents how faithfully a clustering results represent the original data***, would be used to estimate how many signatures could be identified in this dataset. 
+In this step, [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation), *which represents how faithfully a clustering results represent the original data*, would be used to estimate how many signatures could be identified in this dataset. 
 
 ```r
 library('NMF')
@@ -501,7 +497,7 @@ laml.sig.ext$signatures[1:5,] # use for mapping to mutational signature database
 
 ---
 ## What do the signtures stand for?
-- Map to mutational signatures databases eg. COSMIC
+- Map to mutational signatures databases eg. *COSMIC*
 
 ```r
 laml.og30.cosm = compareSignatures(nmfRes = laml.sig.ext,
@@ -524,6 +520,23 @@ pheatmap::pheatmap(mat = laml.og30.cosm$cosine_similarities, cluster_rows = FALS
 ```
 
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_mapSigPres_advan-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## plot signatures ~ COSMIC
+- plots signature pattern and annotate basing on COSMIC database
+
+```r
+plotSignatures(nmfRes = laml.sig.ext, 
+               title_size = 1.2,
+               contributions = FALSE,
+               show_title = TRUE,
+               sig_db = 'legacy')
+```
+
+
+---
+## plot signatures ~ COSMIC
+&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_plotSigCOS_advan2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 ## Map the signatures to SBS database
@@ -550,22 +563,6 @@ pheatmap::pheatmap(mat = laml.sign.sbs$cosine_similarities, cluster_rows = FALSE
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_mapSigSBS_advan2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-## plot signatures ~ COSMIC
-- plots signature pattern and annotate basing on COSMIC database
-
-```r
-plotSignatures(nmfRes = laml.sig.ext, 
-               title_size = 1.2,
-               contributions = FALSE,
-               show_title = TRUE,
-               sig_db = 'legacy')
-```
-
----
-## plot signatures ~ COSMIC
-&lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_plotSigCOS_advan2-1.png" style="display: block; margin: auto;" /&gt;
-
----
 ## plot signatures ~ SBS
 - plots signature pattern and annotate basing on SBS database
 
@@ -581,10 +578,9 @@ plotSignatures(nmfRes = laml.sig.ext,
 ## plot signatures ~ SBS
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_plotSigSBS_advan2-1.png" style="display: block; margin: auto;" /&gt;
 
-
 ---
 ## Mutational signautes in each sample
-- Display mutational signatures in each sample
+- Display mutational signatures exposure in each sample
 
 ```r
 plotSignatures(nmfRes = laml.sig.ext,
@@ -594,7 +590,7 @@ plotSignatures(nmfRes = laml.sig.ext,
 ```
 
 ---
-## Mutational signautes in each sample
+## Mutational signautes exposure in each sample
 &lt;img src="RU_GenomicVariant_session3_files/figure-html/mult_muSig_plotSigSAM_advan2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---

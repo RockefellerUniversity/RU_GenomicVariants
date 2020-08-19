@@ -435,6 +435,8 @@ ggplot(tbl_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ## ----motif_ApoTar_advan1------------------------------------------------------
 # TCW: TCA/TCT
 tbl_dat$APOBEC_target <- tbl_dat$Var1 %in% c("TCA","TCT")
+tbl_dat[1:2]
+# collapse by APOBEC_target
 apobec_dat <- aggregate(Freq ~ APOBEC_target,tbl_dat,FUN=sum,na.rm=TRUE)
 apobec_dat
 
