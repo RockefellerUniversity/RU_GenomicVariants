@@ -48,7 +48,7 @@ if(params$isSlides != "yes"){
 ```
 
 ## About this session
-In this session, we will demonstrate how to use several advanced analysis approaches to decipher variants from multiple samples. In this situation, the Mutation Annotation Format (MAF) would be a good choice for storing and presenting your data. For a detailesd overview of MAF file structure please refer to our previous course on [Genomic Formats](rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#36). 
+In this session, we will demonstrate how to use several advanced analysis approaches to decipher variants from multiple samples. In this situation, the Mutation Annotation Format (MAF) would be a good choice for storing and presenting your data. For a detailesd overview of MAF file structure please refer to our previous course on [Genomic Formats](http://rockefelleruniversity.github.io/Genomic_Data//presentations/slides/GenomicsData.html#36). 
 
 Today we will beusing an acute myeloid leukemia (AML) dataset (tcga-laml), which was fetched from [The Cancer Genome Atlas data portal](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga). The dataset is in the following path "data/tcga_laml.maf".
 
@@ -56,10 +56,8 @@ Today we will beusing an acute myeloid leukemia (AML) dataset (tcga-laml), which
 ## Outline of this session
 - Handle MAF with maftools
 - Get summary by samples and genes
-- Any mutation hotspots?
-- Any interactions between mutations?
-- Any enriched pathways?
-- Any Mutational signatures?
+- Functional analysis
+- Mutational signatures
 
 ---
 ```{r, results='asis',include=TRUE,echo=FALSE}
@@ -84,7 +82,7 @@ if(params$isSlides == "yes"){
 
 ```
 
----
+
 ## MAF format
 As with many data files we can very simply read MAF files into R.
 ```{r mult_mafIntro_advan}
@@ -122,7 +120,7 @@ maftools provides two functions to generate summary table for by samples or by g
 
 ---
 ## How many mutations in each sample
-- ***getSampleSummary()***
+- *getSampleSummary()*
 - a matrix of mutation classes in each sample
 ```{r mult_samSum_advan}
 sample_sum <- getSampleSummary(laml)
@@ -189,7 +187,7 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=prop,fill=variable))+
 
 ---
 ## How many mutations in each gene
-- ***getGeneSummary()***
+- *getGeneSummary()*
 - A matrix, counts of each mutation classes in each gene
 ```{r mult_geneSum_advan}
 gene_sum <- getGeneSummary(laml)
@@ -219,13 +217,12 @@ if(params$isSlides == "yes"){
 
 ```
 
----
 ## Any mutation hotspot?
-Mutation hotspot means mutation in a given position detected in more samples than in other positions. Most activating mutations have mutation hotspots. A classic example  are the G12, G13, or H61 mutation in KRAS. In contrast, loss of function mutations are usually with no mutation hotspot. The ***lollipop plot*** is a fancy plot of mutations in each position of a given gene. It's very intuitive for demonstrating mutation hotspots.  
+Mutation hotspot means mutation in a given position detected in more samples than in other positions. Most activating mutations have mutation hotspots. A classic example  are the *G12*, *G13*, or *Q61* mutation in KRAS. In contrast, loss of function mutations are usually with no mutation hotspot. The **lollipop plot** is a fancy plot of mutations in each position of a given gene. It's very intuitive for demonstrating mutation hotspots.  
 
 ---
 ## Mutation hotspots? 
-- ***lollipopPlot()***
+- *lollipopPlot()*
 ```{r mult_lolli_advan_eval1,echo=TRUE,eval=FALSE,tidy=FALSE}
 lollipopPlot(maf = laml, 
              gene = 'NRAS', 
@@ -242,7 +239,7 @@ lollipopPlot(maf = laml, gene = 'NRAS', AACol = 'Protein_Change', showMutationRa
 
 ---
 ## Interaction between mutations
-When mutations are send to interact, this means any concordance or exclusivity of two given gene mutations. If two gene mutations concordantly identified in the same patient, it indicates the two mutations could have synergistic effect in cancer or they are in causality. If two gene mutations are exclusive (i.e. not present in the same patient), this could suggest that they lead to similar consequence, therefore there is no selective pressure for both to mutate. The ***oncoplot*** allows comparison between genes to look for interactions between mutants. 
+When mutations are send to interact, this means any concordance or exclusivity of two given gene mutations. If two gene mutations concordantly identified in the same patient, it indicates the two mutations could have synergistic effect in cancer or they are in causality. If two gene mutations are exclusive (i.e. not present in the same patient), this could suggest that they lead to similar consequence, therefore there is no selective pressure for both to mutate. The **oncoplot** allows comparison between genes to look for interactions between mutants. 
 
 ---
 ## Oncoplot for top 5 mutated genes
@@ -254,8 +251,8 @@ oncoplot(maf=laml,top = 5)
 ---
 ## Pathway analysis
 maftools provides two functions for pathway analysis.
-- OncogenicPathways(): calculate mutations detected in each pathway and the fraction of samples affected
-- PlotOncogenicPathways(): make a waterfall plot for a given pathway
+- **OncogenicPathways()**: calculate mutations detected in each pathway and the fraction of samples affected
+- **PlotOncogenicPathways()**: make a waterfall plot for a given pathway
 
 ---
 ## Any enriched pathways?
@@ -268,14 +265,13 @@ OncogenicPathways(maf = laml)
 ```{r mult_pathPlotWF_advan2,eval=TRUE,echo=FALSE,tidy=FALSE,results="hide",fig.align="center"}
 OncogenicPathways(maf = laml)
 ```
-**Mutations in RTK-RAS pathway is much higher than others**
+Mutations in **RTK-RAS pathway** is much higher than others
 
 ---
 ## Mutations enriched in pathways?
 ```{r mult_pathPlotWF_advan3,echo=TRUE,eval=TRUE,tidy=FALSE,fig.align="center"}
 PlotOncogenicPathways(maf = laml, pathways = "RTK-RAS")
 ```
-
 
 ---
 ```{r, results='asis',include=TRUE,echo=FALSE}
@@ -315,7 +311,7 @@ This is another common area of study for cancer and genome integrity research.
 ---
 ## Ti/Tv plot
 - Evaluate single-nucleotide substitution
-- ***titv()***
+- **titv()**
 ```{r mult_mutSig_TiTv_advan1,eval=FALSE,echo=TRUE,tidy=FALSE}
 laml.titv = titv(maf = laml, plot = FALSE, useSyn = TRUE)
 plotTiTv(res = laml.titv)
@@ -327,12 +323,12 @@ plotTiTv(res = laml.titv)
 laml.titv = titv(maf = laml, plot = FALSE, useSyn = TRUE)
 plotTiTv(res = laml.titv)
 ```
-**The majority of mutations are C>T.**
+The majority of mutations are **C>T**.
 
 ---
 ## Trinucleotide matrix
 - calcualte trinucleotide substituion pattern
-- ***trinucleotideMatrix()***
+- **trinucleotideMatrix()**
 ```{r mult_mutSig_triMut_advan,tidy=FALSE}
 library(BSgenome.Hsapiens.UCSC.hg19, quietly = TRUE)
 laml.tnm = trinucleotideMatrix(maf = laml,
@@ -383,7 +379,7 @@ ggplot(yd,aes(x=num,y=count,fill=cat))+geom_bar(stat='identity')+
 
 ---
 ## Estimate number of signatures
-In this step, [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation), ***which represents how faithfully a clustering results represent the original data***, would be used to estimate how many signatures could be identified in this dataset. 
+In this step, [Cophenetic correlation](https://en.wikipedia.org/wiki/Cophenetic_correlation), *which represents how faithfully a clustering results represent the original data*, would be used to estimate how many signatures could be identified in this dataset. 
 ```{r mult_mutSig_sigEst_advan1,eval=FALSE,echo=TRUE,tidy=FALSE}
 library('NMF')
 laml.sign <- estimateSignatures(mat = laml.tnm,
@@ -420,7 +416,7 @@ laml.sig.ext$signatures[1:5,] # use for mapping to mutational signature database
 
 ---
 ## What do the signtures stand for?
-- Map to mutational signatures databases eg. COSMIC
+- Map to mutational signatures databases eg. *COSMIC*
 ```{r mult_muSig_mapSig_advan,tidy=FALSE}
 laml.og30.cosm = compareSignatures(nmfRes = laml.sig.ext,
                                    sig_db = "legacy")
@@ -434,19 +430,6 @@ pheatmap::pheatmap(mat = laml.og30.cosm$cosine_similarities, cluster_rows = FALS
 ```
 
 ---
-## Map the signatures to SBS database
-```{r mult_muSig_mapSigSBS_advan1,fig.align="center"}
-laml.sign.sbs = compareSignatures(nmfRes = laml.sig.ext, sig_db = "SBS")
-laml.sign.sbs$cosine_similarities[,1:5]
-```
-
----
-## Map the signatures to SBS database
-```{r mult_muSig_mapSigSBS_advan2,fig.align="center"}
-pheatmap::pheatmap(mat = laml.sign.sbs$cosine_similarities, cluster_rows = FALSE)
-```
-
----
 ## plot signatures ~ COSMIC
 - plots signature pattern and annotate basing on COSMIC database
 ```{r mult_muSig_plotSigCOS_advan1,eval=FALSE,echo=TRUE,tidy=FALSE}
@@ -457,6 +440,7 @@ plotSignatures(nmfRes = laml.sig.ext,
                sig_db = 'legacy')
 ```
 
+
 ---
 ## plot signatures ~ COSMIC
 ```{r mult_muSig_plotSigCOS_advan2,eval=TRUE,echo=FALSE,tidy=FALSE,fig.align="center"}
@@ -465,6 +449,19 @@ plotSignatures(nmfRes = laml.sig.ext,
                contributions = FALSE,
                show_title = TRUE,
                sig_db = 'legacy')
+```
+
+---
+## Map the signatures to SBS database
+```{r mult_muSig_mapSigSBS_advan1,fig.align="center"}
+laml.sign.sbs = compareSignatures(nmfRes = laml.sig.ext, sig_db = "SBS")
+laml.sign.sbs$cosine_similarities[,1:5]
+```
+
+---
+## Map the signatures to SBS database
+```{r mult_muSig_mapSigSBS_advan2,fig.align="center"}
+pheatmap::pheatmap(mat = laml.sign.sbs$cosine_similarities, cluster_rows = FALSE)
 ```
 
 ---
@@ -488,10 +485,9 @@ plotSignatures(nmfRes = laml.sig.ext,
                sig_db = 'SBS')
 ```
 
-
 ---
 ## Mutational signautes in each sample
-- Display mutational signatures in each sample
+- Display mutational signatures exposure in each sample
 ```{r mult_muSig_plotSigSAM_advan1,eval=FALSE,echo=TRUE,tidy=FALSE}
 plotSignatures(nmfRes = laml.sig.ext,
                title_size = 0.8,
@@ -500,7 +496,7 @@ plotSignatures(nmfRes = laml.sig.ext,
 ```
 
 ---
-## Mutational signautes in each sample
+## Mutational signautes exposure in each sample
 ```{r mult_muSig_plotSigSAM_advan2,eval=TRUE,echo=FALSE,tidy=FALSE,fig.align="center"}
 plotSignatures(nmfRes = laml.sig.ext,
                title_size = 0.8,

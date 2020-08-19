@@ -35,7 +35,6 @@ In this exercise, we will practice how to manipulate VCF files. Please find this
 ```{r readVCF, eval=TRUE, echo=toMessage}
 library(VariantAnnotation)
 vcf_file <- "data/SAMN01882168_filt.vcf.gz"
-# vcf_file <- "../extData/data/SAMN01882168_filt.vcf.gz"
 vcf <- readVcf(vcf_file,"hg19")
 rd <- rowRanges(vcf)
 ```
@@ -48,8 +47,8 @@ geno(header(vcf))
 
 3. Please calculate the incidence of mutation occurence in each chromosome.
   - Incidence: variant per kilobase
-  - Chromosome length in reference genome: ***seqlengths()***
-  - Variants per chromosome: ***table(seqnames())***
+  - Chromosome length in reference genome: *seqlengths()*
+  - Variants per chromosome: *table(seqnames())*
 
 ```{r incPlot, eval=TRUE, echo=toMessage}
 contig_leng <- seqlengths(rd)

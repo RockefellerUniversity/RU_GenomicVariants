@@ -66,8 +66,11 @@ library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 ---
 ## Outline of this session
 - Subset variants in chromosome 1
+
 - Annotate rsID from dbSNP
+
 - Predict amino acid changes
+
 - Integrate information into single table
 
 ---
@@ -106,7 +109,9 @@ if(params$isSlides == "yes"){
 
 ## Annotate rsID from dbSNP
 - Retrieve dbSNP
-- Extract SNPs by Chromosome ***memory intensive***
+
+- Extract SNPs by Chromosome **memory intensive**
+
 - Merge SNPs and variant information by positions
 
 ---
@@ -119,8 +124,8 @@ all_snps
 
 ---
 ## Retrieve SNPs by chromosome
-- Extract chromosome name from the VRange object: ***seqnames()@values***
-- Retrive SNPs by chromosome: ***snpsBySeqname()***
+- Extract chromosome name from the VRange object: *seqnames()@values*
+- Retrive SNPs by chromosome: *snpsBySeqname()*
 ```{r dbSNPv_varMan_load_fail,eval=FALSE}
 tar_chr <- as.vector(seqnames(rd_chr1)@values)
 my_snps <- snpsBySeqname(all_snps,c(tar_chr))
@@ -143,7 +148,7 @@ seqlevels(rd_chr1)
 # seqlevels ~ dbSNP
 seqlevels(all_snps)
 ```
-seqname in rd_chr1 is *chr1* but in all_snps is *1*
+seqname in rd_chr1 is **chr1** but in all_snps is **1**
 
 ---
 ## check seqlevelStyle
@@ -151,7 +156,7 @@ seqname in rd_chr1 is *chr1* but in all_snps is *1*
 seqlevelsStyle(rd_chr1)
 seqlevelsStyle(all_snps)
 ```
-seqlevelsSytle in rd_chr1 is *UCSC*, but in all_snps is *NCBI Ensembl*
+seqlevelsSytle in rd_chr1 is **UCSC**, but in all_snps is **NCBI Ensembl**
 
 ---
 ## check genome
@@ -159,7 +164,7 @@ seqlevelsSytle in rd_chr1 is *UCSC*, but in all_snps is *NCBI Ensembl*
 genome(rd_chr1)
 genome(all_snps)
 ```
-genome in rd_chr1 is *hg19*, but in all_snps is *GRCh37.p13*
+genome in rd_chr1 is **hg19**, but in all_snps is **GRCh37.p13**
 
 ---
 ## Unify seqnames and Process
@@ -220,7 +225,7 @@ matS <- merge(matV1,snp_ID,all.x=TRUE,by="posIDX")
 matS <- dplyr::select(matS,-posIDX)
 matS[1:2,]
 ```
-***dplyr::select*** is used to select or remove specific columns in a data frame.
+*dplyr::select* is used to select or remove specific columns in a data frame.
 
 ---
 ## How many variations in dbSNP
@@ -275,16 +280,16 @@ if(params$isSlides == "yes"){
 ## Predict amino acid changes
 
 - load annotation database: TxDb
-- predict amino acid changes: ***predictCoding***
+- predict amino acid changes: *predictCoding*
 
 ---
-## Load TxDb
+## TxDb: annotation database
 ```{r aaCh_varMan}
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 ```
 
 ---
-## TxDb
+## TxDb: annotation database
 ```{r aaCh_varMan_txdb}
 txdb
 ```
@@ -332,7 +337,8 @@ matA[1:2,]
 ## How many variations in coding region
 ```{r aaCh_varMan_muCt}
 var_in_coding <- data.frame(varName=names(vcf_chr1),
-                            in_coding=names(vcf_chr1) %in% matA$Variant,
+                            in_coding=names(vcf_chr1)
+                            %in% matA$Variant,
                             stringsAsFactors = FALSE)
 table(var_in_coding$in_coding)
 ```
@@ -344,9 +350,9 @@ taC <- table(matA$Type)
 taC_dat <- as.data.frame(taC)
 taC
 ```
-- nonsense: mutations causing the appearance of stop codon
-- nonsynonymous: mutations causing amino acid changes
-- synonymous: mutations not causing amino acid changes
+- *nonsense*: mutations causing the appearance of stop codon
+- *nonsynonymous*: mutations causing amino acid changes
+- *synonymous*: mutations not causing amino acid changes
 
 ---
 ## Mutation types in coding region
@@ -378,13 +384,13 @@ matS[1:2,]
 ## Other annotation softwares
 - [ANNOVAR](https://doc-openbio.readthedocs.io/projects/annovar/en/latest/)
   + Wang et al, NAR, 2010(38):e164 [link](https://academic.oup.com/nar/article/38/16/e164/1749458)
-  + Detailed databases available for human genome
   + Perl-based
+  + Detailed databases available for human genome
 
 - [SnpEff](http://snpeff.sourceforge.net/)
   + Cingolani et al, Landes Biosciense, 2012(6):1 [link](http://snpeff.sourceforge.net/SnpEff_paper.pdf)
-  + Support over 38,000 genomes
   + Java-based
+  + Support over 38,000 genomes
 
 ---
 ## Exercise Time

@@ -5,6 +5,6 @@
 This section demonstrates how to annotate variants by using TxDb and dbSNP
 Session sections:
 
-* Annotate variants in coding region
 * Annotate SNPs by using dbSNP
+* Annotate variants in coding region
 * Integrate information in a data frame

@@ -40,8 +40,8 @@ rd_sub <- rowRanges(vcf_sub)
 ```
 
 1. Please predict amino acid changes by using TxDb
-  - loading ***TxDb.Hsapiens.UCSC.hg19.knownGene***
-  - predict amino acid changes: ***predictCoding()***
+  - loading *TxDb.Hsapiens.UCSC.hg19.knownGene*
+  - predict amino acid changes: **predictCoding()**
   - make a data frame
 
 ```{r readVCF,eval=TRUE, echo=toMessage}
@@ -70,14 +70,9 @@ coding
 head(matA)
 ```
 
-2. How many variants are in coding regions?
+2. How many variant types in the variants of coding regions?
 
 ```{r codingVar,eval=TRUE, echo=toMessage}
-var_in_coding <- data.frame(varName=names(vcf_sub),
-                            in_coding=names(vcf_sub) %in% matA$Variant,
-                            stringsAsFactors = FALSE)
-table(var_in_coding$in_coding)
-#
 taC <- table(matA$Type)
 taC_dat <- as.data.frame(taC)
 taC
@@ -89,8 +84,8 @@ ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ```
 
 3. Please annotate variants by using dbSNP
-  - dbSNP version: ***SNPlocs.Hsapiens.dbSNP144.GRCh37***
-  - make sure ***seqevels***, ***seqengths***, ***seqlevelsStyle***, and ***genome*** are comparable
+  - dbSNP version: *SNPlocs.Hsapiens.dbSNP144.GRCh37*
+  - make sure *seqevels*, *seqengths*, *seqlevelsStyle*, and *genome* are comparable
 
 ```{r dbSNPVar,eval=TRUE, echo=toMessage}
 library(SNPlocs.Hsapiens.dbSNP144.GRCh37)

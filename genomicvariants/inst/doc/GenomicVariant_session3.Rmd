@@ -40,7 +40,6 @@ In this exercise, we will practice how to handle variants from multiple samples.
 ```{r makeSubset,eval=TRUE, echo=toMessage}
 library(maftools)
 maf_file <- "data/tcga_brca.maf"
-# maf_file <- "../extdata/data/tcga_brca.maf"
 brca <- read.maf(maf_file)
 ```
 
@@ -63,8 +62,8 @@ ggplot(melt_dat,aes(x=Tumor_Sample_Barcode,y=log10(value),fill=variable))+
 ```
 
 2. Please list top five mutated genes and evaluate the interactions between them
-  - TTN is a huge gene usually with more mutations than others.
-  - The interactions of gene mutations can be shown in oncoplot.
+  - *TTN* is a huge gene usually with more mutations than others.
+  - The interactions of gene mutations can be shown in **oncoplot**.
 
 ```{r oncoPlot,eval=TRUE, echo=toMessage}
 gene_sum <- getGeneSummary(brca)
@@ -73,32 +72,32 @@ gene_sum[1:5]
 oncoplot(brca,top=5,genesToIgnore = "TTN")
 ```
 
-3. Mutations in PIK3CA is the most common in BRCA dataset. Please plot mutations in a lollipop plot to demonstrate any hotspots. ***(PIK3CA may have hotspots at E542, E545, and H1047.)***
+3. Mutations in PIK3CA is the most common in BRCA dataset. Please plot mutations in a lollipop plot to demonstrate any hotspots. PIK3CA may have hotspots at *E542*, *E545*, and *H1047*.
 
 ```{r lollipopPlot,eval=TRUE, echo=toMessage}
 lollipopPlot(brca,gene="PIK3CA",AACol="Protein_Change",labelPos = c(542,545,1047))
 ```
 
 4. Is there any enriched pathways in BRCA dataset and evaluate the top 3 enriched pathways
-  - Select enriched pathways: ***OncogenicPathways()***
-  - Display mutations in enriched pathway: ***PlotOncogenicPathways()***
+  - Select enriched pathways: **OncogenicPathways()**
+  - Display mutations in enriched pathway: **PlotOncogenicPathways()**
 
 ```{r enrichPath, eval=TRUE, echo=toMessage}
 OncogenicPathways(maf = brca)
 #
+PlotOncogenicPathways(maf = brca, pathways = "PI3K")
+#
+PlotOncogenicPathways(maf = brca, pathways = "TP53")
+#
 PlotOncogenicPathways(maf = brca, pathways = "RTK-RAS")
-#
-PlotOncogenicPathways(maf = brca, pathways = "NOTCH")
-#
-PlotOncogenicPathways(maf = brca, pathways = "WNT")
 ```
 
 5. Please identify mutational signatures in BRCA dataset
-  - Make trinucleotide matrix: ***trinucleotideMatrix()***
-  - Estimate number of signatures: ***estimateSignatures()***
-  - Extract signature: ***extractSignatues()***
-  - Map to COSMIC database and display: ***compareSignature()***
-  - Enrichment analysis: ***signatureEnrichment()***
+  - Make trinucleotide matrix: **trinucleotideMatrix()**
+  - Estimate number of signatures: ***estimateSignatures()**
+  - Extract signature: **extractSignatues()**
+  - Map to COSMIC database and display: **compareSignature()**
+  - Enrichment analysis: **signatureEnrichment()**
 
 ```{r mutSig, eval=TRUE, echo=toMessage}
 library(BSgenome.Hsapiens.UCSC.hg19, quietly = TRUE)
