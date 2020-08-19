@@ -299,6 +299,7 @@ if(params$isSlides == "yes"){
 [Mutational signatures](https://cancer.sanger.ac.uk/cosmic/signatures) mean the patterrns of trinucleotide substitution. As mentioned in [session 1](https://rockefelleruniversity.github.io/RU_GenomicVariants/presentations/slides/RU_GenomicVariant_session1.html#44), the pattern may reflect to exposure of spontaneous/enzymatic deamination and defect of DNA repair, etc.  
 
 This is another common area of study for cancer and genome integrity research.
+- Example: T-W Chen, C-C Lee, and Y-S Chang et al, *Nat Commun*(2017), 8:465 [link](https://www.nature.com/articles/s41467-017-00493-9)
 
 ---
 ## Steps for mutational signature analysis
