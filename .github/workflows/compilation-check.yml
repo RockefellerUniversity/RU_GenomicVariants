@@ -209,6 +209,7 @@ jobs:
       - name: commit
         run: |
           git config --global user.email "tc.infomatics@gmail.com"
+          git config --global http.postBuffer 2631120
           git add docs/\* r_course/\*
           git commit -m 'Autobuild' 
           git push origin HEAD:refs/heads/master
