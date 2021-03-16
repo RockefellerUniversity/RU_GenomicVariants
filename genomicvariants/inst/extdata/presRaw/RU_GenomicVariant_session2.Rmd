@@ -169,7 +169,7 @@ genome in rd_chr1 is **hg19**, but in all_snps is **GRCh37.p13**
 ---
 ## Unify seqnames and Process
 Lets first grab all SNPs that are on Chr1. Though there are simpler ways to do this, this code will all still work if you are looking at all chromosomes. 
-```{r dbSNPv_varMan_load}
+```{r dbSNPv_varMan_load, cache=F}
 tar_chr <- as.vector(seqnames(rd_chr1)@values)
 tar_chr <- gsub("chr","",tar_chr)
 tar_chr[grepl(tar_chr,pattern = "M")] <- "MT"
@@ -180,7 +180,7 @@ my_snps[1:2]
 ---
 ## Convert seqInfo to UCSC style
 We can update the seqlevelsStyle to "UCSC". This automatically updates all the chromosome names to be UCSC style.We will then just have to update the genome to "hg19".
-```{r change_seqlvl}
+```{r change_seqlvl, cache=F}
 # change seqlevelsStyle
 seqlevelsStyle(my_snps) <- "UCSC"
 # change genome
@@ -192,7 +192,7 @@ genome(my_snps) <- "hg19"
 We can extract out information about the SNPs to generate a reference data.frame that contains their position and ID. 
 - posIDX: [chromosome]:[position] ~ the index column for merging data
 - rsID: rsID from dbSNP 
-```{r makeTab_varMan}
+```{r makeTab_varMan, cache=F}
 snp_ID <- data.frame(
   posIDX=paste0(seqnames(my_snps),":",pos(my_snps)),
   rsID=my_snps$RefSNP_id,stringsAsFactors = FALSE)
@@ -202,12 +202,12 @@ head(snp_ID)
 ---
 ## Generate Variant table
 Next we will reformat our variant information into a data.frame with our fields of interest. To do this we will have to break up the Variant strings. 
-```{r dbSNPV_varMan_tbl_1}
+```{r dbSNPV_varMan_tbl_1, cache=F}
 matV1 <- data.frame(Variant=names(rd_chr1),stringsAsFactors = FALSE)
 matV1[1:2,]
 ```
 - Extract information of variants
-```{r dbSNPV_varMan_tbl_2}
+```{r dbSNPV_varMan_tbl_2, cache=F}
 matV1$chromosome <- gsub("(.*):(.*)_(.*)/(.*)","\\1",matV1$Variant)
 matV1$start <- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
 matV1$end <- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
