@@ -117,7 +117,7 @@ if(params$isSlides == "yes"){
 ---
 ## Retrive dbSNP data
 
-```{r dbSNPv_varMan}
+```{r dbSNPv_varMan, cache=F}
 all_snps <- SNPlocs.Hsapiens.dbSNP144.GRCh37
 all_snps
 ```
