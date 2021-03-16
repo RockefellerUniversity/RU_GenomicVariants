@@ -103,7 +103,7 @@ laml &lt;- read.maf("data/tcga_laml.maf.gz")
 ## -Summarizing
 ## -Processing clinical data
 ## --Missing clinical data
-## -Finished in 3.221s elapsed (3.134s cpu)
+## -Finished in 2.524s elapsed (0.410s cpu)
 ```
 
 ```r
@@ -621,9 +621,9 @@ laml.se$groupwise_comparision[1:2, ]
 ##    Hugo_Symbol      Group1 Group2 n_mutated_group1 n_mutated_group2
 ## 1:        IDH2 Signature_2   Rest         14 of 65         6 of 123
 ## 2:        NPM1 Signature_3   Rest         18 of 63        14 of 125
-##         p_value OR_low   OR_high        fdr
-## 1: 0.0007078259      0 0.4811362 0.04246955
-## 2: 0.0032158292      0 0.6539739 0.09647487
+##         p_value       OR   OR_low   OR_high        fdr
+## 1: 0.0008227612 5.299864 1.790632 17.818258 0.04936567
+## 2: 0.0039456214 3.149946 1.351675  7.491285 0.08958865
 ```
 
 ---

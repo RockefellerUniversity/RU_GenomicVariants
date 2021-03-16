@@ -63,7 +63,7 @@ if(params$isSlides == "yes"){
 
 
 
-## ----dbSNPv_varMan------------------------------------------------------------
+## ----dbSNPv_varMan, cache=F---------------------------------------------------
 all_snps <- SNPlocs.Hsapiens.dbSNP144.GRCh37
 all_snps
 
@@ -93,7 +93,7 @@ genome(rd_chr1)
 genome(all_snps)
 
 
-## ----dbSNPv_varMan_load-------------------------------------------------------
+## ----dbSNPv_varMan_load, cache=F----------------------------------------------
 tar_chr <- as.vector(seqnames(rd_chr1)@values)
 tar_chr <- gsub("chr","",tar_chr)
 tar_chr[grepl(tar_chr,pattern = "M")] <- "MT"
@@ -101,26 +101,26 @@ my_snps <- snpsBySeqname(all_snps,c(tar_chr))
 my_snps[1:2]
 
 
-## ----change_seqlvl------------------------------------------------------------
+## ----change_seqlvl, cache=F---------------------------------------------------
 # change seqlevelsStyle
 seqlevelsStyle(my_snps) <- "UCSC"
 # change genome
 genome(my_snps) <- "hg19"
 
 
-## ----makeTab_varMan-----------------------------------------------------------
+## ----makeTab_varMan, cache=F--------------------------------------------------
 snp_ID <- data.frame(
   posIDX=paste0(seqnames(my_snps),":",pos(my_snps)),
   rsID=my_snps$RefSNP_id,stringsAsFactors = FALSE)
 head(snp_ID)
 
 
-## ----dbSNPV_varMan_tbl_1------------------------------------------------------
+## ----dbSNPV_varMan_tbl_1, cache=F---------------------------------------------
 matV1 <- data.frame(Variant=names(rd_chr1),stringsAsFactors = FALSE)
 matV1[1:2,]
 
 
-## ----dbSNPV_varMan_tbl_2------------------------------------------------------
+## ----dbSNPV_varMan_tbl_2, cache=F---------------------------------------------
 matV1$chromosome <- gsub("(.*):(.*)_(.*)/(.*)","\\1",matV1$Variant)
 matV1$start <- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)
 matV1$end <- gsub("(.*):(.*)_(.*)/(.*)","\\2",matV1$Variant)

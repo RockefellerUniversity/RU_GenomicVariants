@@ -201,19 +201,19 @@ meta(header(vcf))$contig
 
 ```
 ## DataFrame with 25 rows and 2 columns
-##            length                       assembly
-##       &lt;character&gt;                    &lt;character&gt;
-## chr1    249250621 BSgenome.Hsapiens.UCSC.hg19.fa
-## chr2    243199373 BSgenome.Hsapiens.UCSC.hg19.fa
-## chr3    198022430 BSgenome.Hsapiens.UCSC.hg19.fa
-## chr4    191154276 BSgenome.Hsapiens.UCSC.hg19.fa
-## chr5    180915260 BSgenome.Hsapiens.UCSC.hg19.fa
-## ...           ...                            ...
-## chr21    48129895 BSgenome.Hsapiens.UCSC.hg19.fa
-## chr22    51304566 BSgenome.Hsapiens.UCSC.hg19.fa
-## chrX    155270560 BSgenome.Hsapiens.UCSC.hg19.fa
-## chrY     59373566 BSgenome.Hsapiens.UCSC.hg19.fa
-## chrM        16571 BSgenome.Hsapiens.UCSC.hg19.fa
+##            length               assembly
+##       &lt;character&gt;            &lt;character&gt;
+## chr1    249250621 BSgenome.Hsapiens.UC..
+## chr2    243199373 BSgenome.Hsapiens.UC..
+## chr3    198022430 BSgenome.Hsapiens.UC..
+## chr4    191154276 BSgenome.Hsapiens.UC..
+## chr5    180915260 BSgenome.Hsapiens.UC..
+## ...           ...                    ...
+## chr21    48129895 BSgenome.Hsapiens.UC..
+## chr22    51304566 BSgenome.Hsapiens.UC..
+## chrX    155270560 BSgenome.Hsapiens.UC..
+## chrY     59373566 BSgenome.Hsapiens.UC..
+## chrM        16571 BSgenome.Hsapiens.UC..
 ```
 
 ---
@@ -357,14 +357,10 @@ info(header(vcf))[1:2, ]
 
 ```
 ## DataFrame with 2 rows and 3 columns
-##         Number        Type
-##    &lt;character&gt; &lt;character&gt;
-## AC           A     Integer
-## AF           A       Float
-##                                                                    Description
-##                                                                    &lt;character&gt;
-## AC Allele count in genotypes, for each ALT allele, in the same order as listed
-## AF          Allele Frequency, for each ALT allele, in the same order as listed
+##         Number        Type            Description
+##    &lt;character&gt; &lt;character&gt;            &lt;character&gt;
+## AC           A     Integer Allele count in geno..
+## AF           A       Float Allele Frequency, fo..
 ```
 
 ---
@@ -405,14 +401,10 @@ geno(header(vcf))[1:2, ]
 
 ```
 ## DataFrame with 2 rows and 3 columns
-##         Number        Type
-##    &lt;character&gt; &lt;character&gt;
-## GT           1      String
-## AD           R     Integer
-##                                                       Description
-##                                                       &lt;character&gt;
-## GT                                                       Genotype
-## AD Allelic depths for the ref and alt alleles in the order listed
+##         Number        Type            Description
+##    &lt;character&gt; &lt;character&gt;            &lt;character&gt;
+## GT           1      String               Genotype
+## AD           R     Integer Allelic depths for t..
 ```
 
 ---
