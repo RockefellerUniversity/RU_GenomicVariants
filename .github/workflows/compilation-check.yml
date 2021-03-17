@@ -113,7 +113,13 @@ jobs:
           cd -
           git --version
         shell: bash {0}
-      ## Related to https://github.com/actions/checkout/issues/238
+      
+      - name: Install GLPK
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y glpk-utils
+        shell: bash {0}
+        ## Related to https://github.com/actions/checkout/issues/238
       ## https://www.digitalocean.com/community/tutorials/how-to-install-git-on-ubuntu-18-04
 
       ## Most of these steps are the same as the ones in
@@ -201,6 +207,7 @@ jobs:
       - name: Move to docs
         run: |
           mkdir -p docs
+          rm -r r_course/*/*/*_cache
           cp -r  r_course/* docs/
           echo "Copied to docs"
         shell:

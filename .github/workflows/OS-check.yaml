@@ -65,6 +65,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          install.packages("XML", type = "binary")
           remotes::install_deps("genomicvariants/",dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
           remotes::install_cran("BiocManager")
