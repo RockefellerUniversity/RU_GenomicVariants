@@ -55,6 +55,10 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
+      - name: Install XQuartz on macOS
+        if: runner.os == 'macOS'
+        run: brew cask install xquartz
+
       - name: Install System Dependencies
         if: runner.os == 'Linux'
         run: |
