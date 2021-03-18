@@ -376,7 +376,7 @@ ggplot(taC_dat,aes(x=Var1,y=Freq,fill=Var1))+
 ## Integrate SNP and amino acid change into single table
 ```{r comb_varMan}
 matS$GeneID <- matA$GeneID[match(matS$Variant,matA$Variant)]
-matS$AAChange <- matA$GeneID[match(matS$Variant,matA$Variant)]
+matS$AAChange <- matA$AAChange[match(matS$Variant,matA$Variant)]
 matS[1:2,]
 ```
 
